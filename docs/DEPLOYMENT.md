@@ -31,4 +31,6 @@ Vercel project `hsc-study-planner` is connected to this GitHub repository and de
 
 `https://hsc-study-planner-nine.vercel.app`
 
-If the Vercel URL shows a blank page or a sign-in wall, use GitHub Pages instead. Automatic git-push deployments are currently disabled on that Vercel project, so publish a new deployment there after code changes if needed.
+Always use the stable project alias above (`hsc-study-planner-nine.vercel.app`). Vercel's per-deployment URLs such as `hsc-study-planner-xxxx.vercel-be18.vercel.app` are protected by this team's SSO policy and redirect to a Vercel login page; that is why a deployment link can look blank while the alias works.
+
+If the alias ever shows a sign-in wall, use GitHub Pages instead. Automatic git-push deployments are currently disabled on that Vercel project, so publish a new deployment there after code changes if needed.
