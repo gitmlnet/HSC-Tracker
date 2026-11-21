@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { ArrowLeft, ArrowRight, Check } from "lucide-react";
 import type { AppData, Group } from "../types";
 import type { AppActions } from "../lib/appTypes";
+import { useDialogFocus } from "../lib/dialogFocus";
 import { GROUP_SUBJECTS } from "../lib/storage";
 import { GROUP_LABELS, subjectName } from "../data/subjects";
 
@@ -11,15 +12,16 @@ export default function Setup({ data, actions }: { data: AppData; actions: AppAc
   const [subjects, setSubjects] = useState<string[]>(data.settings.subjects);
   const [examDate, setExamDate] = useState(data.settings.examDate);
   const [goal, setGoal] = useState(data.settings.dailyGoalMinutes);
-
+  const dialogRef = useRef<HTMLDivElement>(null);
   const finish = () => actions.setData(prev => ({
     ...prev,
     settings: { ...prev.settings, group, subjects: subjects.length ? subjects : GROUP_SUBJECTS[group], examDate, dailyGoalMinutes: goal, onboarded: true }
   }));
+  useDialogFocus(dialogRef, finish);
 
   return (
     <div className="setup-screen" role="dialog" aria-modal="true" aria-label="Initial setup">
-      <div className="setup-card">
+      <div ref={dialogRef} className="setup-card" tabIndex={-1}>
         <span className="eyebrow">WELCOME · STEP {step + 1} OF 3</span>
         {step === 0 && <>
           <h1>Which group are you in?</h1>

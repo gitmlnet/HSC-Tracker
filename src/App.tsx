@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { BarChart3, Bell, CalendarRange, Command, Download, History as HistoryIcon, LayoutDashboard, Menu, Plus, Settings as SettingsIcon, X } from "lucide-react";
 import type { AppData } from "./types";
 import type { Page, TimerState } from "./lib/appTypes";
-import { emptyData, loadData, saveData, localDate, timeBefore, clockNow, weekStart, weekDates } from "./lib/storage";
+import { emptyData, loadData, saveData, localDate, timeBefore, clockNow, weekStart, weekDates, reducedMotion } from "./lib/storage";
 import { makeSession } from "./lib/targetActions";
 import { weekSummary } from "./lib/selectors";
 import TimerDock from "./components/TimerDock";
@@ -73,7 +73,7 @@ export default function App() {
     setFocusTargetId(targetId || null);
     setPage(next);
     setMenuOpen(false);
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    window.scrollTo({ top: 0, behavior: reducedMotion() ? "auto" : "smooth" });
   }, []);
 
   const elapsedMs = timer ? timer.accumulatedMs + (timer.running ? Math.max(0, now - timer.startedAt) : 0) : 0;
@@ -96,22 +96,25 @@ export default function App() {
     if (!timer) return;
     const target = data.targets.find(t => t.id === timer.targetId);
     const duration = Math.max(1, Math.round((timer.accumulatedMs + (timer.running ? Math.max(0, Date.now() - timer.startedAt) : 0)) / 60000));
-    if (target) {
-      const session = makeSession({
-        targetId: target.id,
-        date: localDate(),
-        subjectId: target.subjectId,
-        paperId: target.paperId,
-        chapterId: target.chapterId,
-        topic: target.topic,
-        start: timeBefore(duration),
-        end: clockNow(),
-        duration,
-        ...(mode === "full" ? { progress: 100 } : {})
-      });
-      setData(prev => ({ ...prev, sessions: [...prev.sessions, session] }));
-      notify(mode === "full" ? `${duration} min logged · target complete` : `${duration} min logged`);
+    if (!target) {
+      notify("That target is no longer in the plan — no session was logged");
+      setTimer(null);
+      return;
     }
+    const session = makeSession({
+      targetId: target.id,
+      date: localDate(),
+      subjectId: target.subjectId,
+      paperId: target.paperId,
+      chapterId: target.chapterId,
+      topic: target.topic,
+      start: timeBefore(duration),
+      end: clockNow(),
+      duration,
+      ...(mode === "full" ? { progress: 100 } : {})
+    });
+    setData(prev => ({ ...prev, sessions: [...prev.sessions, session] }));
+    notify(mode === "full" ? `${duration} min logged · target complete` : `${duration} min logged`);
     setTimer(null);
   }, [timer, data.targets, notify]);
 
@@ -122,11 +125,12 @@ export default function App() {
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
       const typing = event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement || event.target instanceof HTMLSelectElement;
-      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k") {
+      const otherDialog = installInfoOpen || !data.settings.onboarded;
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k" && !otherDialog) {
         event.preventDefault();
         setPaletteOpen(v => !v);
       }
-      if (!typing && event.key.toLowerCase() === "n" && !event.ctrlKey && !event.metaKey) {
+      if (!typing && !paletteOpen && !otherDialog && event.key.toLowerCase() === "n" && !event.ctrlKey && !event.metaKey) {
         event.preventDefault();
         setPaletteOpen(true);
       }
@@ -134,7 +138,7 @@ export default function App() {
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, []);
+  }, [paletteOpen, installInfoOpen, data.settings.onboarded]);
 
   useEffect(() => {
     if (!ready || !data.settings.reminders.enabled) return;

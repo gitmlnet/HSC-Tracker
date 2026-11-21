@@ -22,36 +22,39 @@ export default function Today({ data, actions }: { data: AppData; actions: AppAc
   const hour = new Date().getHours();
   const greeting = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
 
+  const dayLabel = (date: string) => date === today ? "today" : prettyDate(date, { weekday: "short", day: "numeric", month: "short" });
+
   const addPlan = (draft: Draft) => {
     const now = new Date().toISOString();
     if (draft.intent === "log") { addLog(draft); return; }
-    actions.setData(prev => ({
-      ...prev,
-      targets: [...prev.targets, {
-        id: uid(),
-        date: today,
-        subjectId: draft.subjectId,
-        paperId: draft.paperId,
-        chapterId: draft.chapterId,
-        topic: draft.topic,
-        plannedMinutes: draft.minutes,
-        priority: "normal",
-        source: "quick",
-        createdAt: now,
-        updatedAt: now
-      }]
-    }));
-    actions.notify("Added to today's plan");
+    const target = {
+      id: uid(),
+      date: draft.date,
+      subjectId: draft.subjectId,
+      paperId: draft.paperId,
+      chapterId: draft.chapterId,
+      topic: draft.topic,
+      plannedMinutes: draft.minutes,
+      priority: "normal" as const,
+      source: "quick" as const,
+      createdAt: now,
+      updatedAt: now
+    };
+    actions.setData(prev => ({ ...prev, targets: [...prev.targets, target] }));
+    actions.notify(`Added to ${dayLabel(target.date)}'s plan`, () => actions.setData(prev => ({
+      ...prev, targets: prev.targets.filter(t => t.id !== target.id)
+    })));
   };
 
   const addLog = (draft: Draft) => {
-    const session = quickLogSession({ ...draft, date: today });
-    const match = targets.find(t => !isDone(t, data.sessions) && t.subjectId === session.subjectId && t.paperId === session.paperId && t.chapterId === session.chapterId);
+    const session = quickLogSession(draft);
+    const match = data.targets.find(t => t.date === draft.date && !isDone(t, data.sessions)
+      && t.subjectId === session.subjectId && t.paperId === session.paperId && t.chapterId === session.chapterId);
     actions.setData(prev => ({
       ...prev,
       sessions: [...prev.sessions, match ? { ...session, targetId: match.id } : session]
     }));
-    actions.notify(`${formatDuration(draft.minutes)} logged · ${match ? "target completed" : "extra study"}`);
+    actions.notify(`${formatDuration(draft.minutes)} logged for ${dayLabel(draft.date)} · ${match ? "target completed" : "extra study"}`);
   };
 
   return (
@@ -110,13 +113,13 @@ export default function Today({ data, actions }: { data: AppData; actions: AppAc
               <EmptyState icon={Target} title="Nothing planned for today" text="Add a target below, or set the whole week in the planner." />
             )}
             <div className="inline-add">
-              <label>Add a target for today</label>
-              <SmartInput settings={data.settings} value={planText} onChange={setPlanText} onSubmit={addPlan} placeholder="e.g. Physics ch 3, 45 min" />
+              <label>Add a target</label>
+              <SmartInput settings={data.settings} value={planText} onChange={setPlanText} onSubmit={addPlan} placeholder="e.g. Physics ch 3, 45 min tomorrow" />
             </div>
           </Card>
 
           <Card>
-            <SectionTitle eyebrow="CAPTURE" title="Quick log" detail="Studied something outside the plan? One line is enough." />
+            <SectionTitle eyebrow="CAPTURE" title="Quick log" detail="Studied something outside the plan? One line is enough. Add a day to log another date." />
             <SmartInput settings={data.settings} value={logText} onChange={setLogText} onSubmit={addLog} defaultIntent="log" placeholder="e.g. did Chemistry organic 30 min" />
           </Card>
         </div>

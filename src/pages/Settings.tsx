@@ -36,6 +36,11 @@ export default function SettingsPage({ data, actions }: { data: AppData; actions
 
   const clearAll = () => {
     if (!confirmClear) { setConfirmClear(true); return; }
+    if (actions.timer?.targetId && data.targets.some(t => t.id === actions.timer?.targetId)) {
+      setConfirmClear(false);
+      actions.notify("Finish the active timer before clearing the workspace");
+      return;
+    }
     const before = data;
     actions.setData({ ...emptyData, settings: { ...defaultSettings(), theme: s.theme, onboarded: true, group: s.group, subjects: s.subjects } });
     setConfirmClear(false);

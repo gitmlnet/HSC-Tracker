@@ -5,8 +5,9 @@ import type { AppData, Target } from "../types";
 import type { AppActions } from "../lib/appTypes";
 import type { Draft } from "../lib/parser";
 import type { PlanStyle } from "../lib/autoPlan";
-import { DAY_NAMES, addDays, formatDuration, localDate, prettyDate, uid, weekDates, weekStart } from "../lib/storage";
+import { DAY_NAMES, addDays, formatDuration, localDate, prettyDate, reducedMotion, uid, weekDates, weekStart } from "../lib/storage";
 import { buildWeek, copyWeek, STYLE_INFO } from "../lib/autoPlan";
+import { quickLogSession } from "../lib/targetActions";
 import { daySummary, isDone, weekSummary } from "../lib/selectors";
 import { Card, Meter, SectionTitle, SmartInput, TargetRow } from "../components/UI";
 
@@ -32,14 +33,25 @@ export default function Planner({ data, actions, anchor, setAnchor, focusTargetI
   useEffect(() => {
     if (!focusTargetId) return;
     setEditingId(focusTargetId);
-    const id = window.requestAnimationFrame(() => document.querySelector(".target-editor")?.scrollIntoView?.({ block: "nearest", behavior: "smooth" }));
+    const id = window.requestAnimationFrame(() => document.querySelector(".target-editor")?.scrollIntoView?.({ block: "nearest", behavior: reducedMotion() ? "auto" : "smooth" }));
     return () => window.cancelAnimationFrame(id);
   }, [focusTargetId]);
 
   const showSetup = week.count === 0 && !dismissedSetup;
 
+  // A target with a live timer holds unsaved minutes; never remove it silently.
+  const protectsTimer = (targets: Target[]) => {
+    const activeId = actions.timer?.targetId;
+    if (activeId && targets.some(t => t.id === activeId)) {
+      actions.notify("Finish the active timer before changing that target");
+      return true;
+    }
+    return false;
+  };
+
   const replaceWeek = (targets: Target[], message: string, undoTargets?: Target[]) => {
     const previous = undoTargets || data.targets.filter(t => dates.includes(t.date));
+    if (protectsTimer(previous)) return;
     actions.setData(prev => ({
       ...prev,
       targets: [...prev.targets.filter(t => !dates.includes(t.date)), ...targets]
@@ -73,6 +85,7 @@ export default function Planner({ data, actions, anchor, setAnchor, focusTargetI
   const clearWeek = () => {
     if (!confirmClear) { setConfirmClear(true); return; }
     const previous = data.targets.filter(t => dates.includes(t.date));
+    if (protectsTimer(previous)) { setConfirmClear(false); return; }
     actions.setData(prev => ({ ...prev, targets: prev.targets.filter(t => !dates.includes(t.date)) }));
     setConfirmClear(false);
     actions.notify("Week cleared", () => actions.setData(prev => ({ ...prev, targets: [...prev.targets, ...previous] })));
@@ -95,7 +108,16 @@ export default function Planner({ data, actions, anchor, setAnchor, focusTargetI
     actions.notify(`${copies.length} unfinished target${copies.length > 1 ? "s" : ""} moved to next week`);
   };
 
-  const addTarget = (date: string, draft: Draft) => {
+  const addEntry = (columnDate: string, draft: Draft) => {
+    const date = dates.includes(draft.date) ? draft.date : columnDate;
+    if (draft.intent === "log") {
+      const session = quickLogSession({ ...draft, date });
+      const match = data.targets.find(t => t.date === date && !isDone(t, data.sessions)
+        && t.subjectId === session.subjectId && t.paperId === session.paperId && t.chapterId === session.chapterId);
+      actions.setData(prev => ({ ...prev, sessions: [...prev.sessions, match ? { ...session, targetId: match.id } : session] }));
+      actions.notify(`${formatDuration(draft.minutes)} logged for ${prettyDate(date)}`);
+      return;
+    }
     const now = new Date().toISOString();
     const target: Target = {
       id: uid(),
@@ -112,7 +134,7 @@ export default function Planner({ data, actions, anchor, setAnchor, focusTargetI
     };
     actions.setData(prev => ({ ...prev, targets: [...prev.targets, target] }));
     setDismissedSetup(true);
-    actions.notify("Target added to the week", () => actions.setData(prev => ({ ...prev, targets: prev.targets.filter(t => t.id !== target.id) })));
+    actions.notify(`Target added for ${prettyDate(target.date)}`, () => actions.setData(prev => ({ ...prev, targets: prev.targets.filter(t => t.id !== target.id) })));
   };
 
   const patchTarget = (id: string, patch: Partial<Target>) => {
@@ -124,7 +146,7 @@ export default function Planner({ data, actions, anchor, setAnchor, focusTargetI
 
   const removeTarget = (id: string) => {
     const target = data.targets.find(t => t.id === id);
-    if (!target) return;
+    if (!target || protectsTimer([target])) return;
     actions.setData(prev => ({ ...prev, targets: prev.targets.filter(t => t.id !== id) }));
     setEditingId(null);
     actions.notify("Target removed", () => actions.setData(prev => ({ ...prev, targets: [...prev.targets, target] })));
@@ -234,7 +256,7 @@ export default function Planner({ data, actions, anchor, setAnchor, focusTargetI
                   settings={data.settings}
                   value={texts[date] || ""}
                   onChange={value => setTexts(prev => ({ ...prev, [date]: value }))}
-                  onSubmit={draft => addTarget(date, draft)}
+                  onSubmit={draft => addEntry(date, draft)}
                   placeholder="+ type a target…"
                 />
               </div>

@@ -1,5 +1,6 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { Check, Copy, Download, Monitor, Smartphone, Tablet, X } from "lucide-react";
+import { useDialogFocus } from "../lib/dialogFocus";
 
 export default function InstallDialog({ prompt, onClose, onInstall }: {
   prompt: Event | null;
@@ -7,13 +8,8 @@ export default function InstallDialog({ prompt, onClose, onInstall }: {
   onInstall: () => void;
 }) {
   const [copied, setCopied] = useState(false);
-  const closeRef = useRef<HTMLButtonElement>(null);
-  useEffect(() => {
-    closeRef.current?.focus();
-    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [onClose]);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  useDialogFocus(dialogRef, onClose);
   const copy = async () => {
     try {
       await navigator.clipboard.writeText(window.location.href.split("#")[0]);
@@ -23,8 +19,8 @@ export default function InstallDialog({ prompt, onClose, onInstall }: {
 
   return (
     <div className="modal-backdrop" onMouseDown={onClose}>
-      <div className="install-dialog" onMouseDown={e => e.stopPropagation()} role="dialog" aria-modal="true" aria-label="Install the app">
-        <button ref={closeRef} className="icon-btn dialog-close" onClick={onClose} aria-label="Close"><X size={18} /></button>
+      <div ref={dialogRef} className="install-dialog" onMouseDown={e => e.stopPropagation()} role="dialog" aria-modal="true" aria-label="Install the app" tabIndex={-1}>
+        <button className="icon-btn dialog-close" onClick={onClose} aria-label="Close"><X size={18} /></button>
         <div className="install-badge"><Download size={24} /></div>
         <span className="eyebrow">INSTALL THE PWA</span>
         <h2>HSC Study Planner on your home screen</h2>

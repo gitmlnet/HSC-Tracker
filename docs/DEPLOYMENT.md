@@ -1,6 +1,6 @@
 # Deployment notes
 
-## GitHub Pages (target)
+## GitHub Pages (pending — not live yet)
 
 The repository already has `.github/workflows/deploy.yml`, which builds `dist/` and publishes it with `actions/deploy-pages@v4`.
 
@@ -25,7 +25,7 @@ The build is subpath-safe: `vite.config.ts` uses `base: "./"`, `index.html` uses
 
 Note: there is a separate older Pages site at `https://gitmlnet.github.io/daily/`. This project should use its own `HSC-Tracker` Pages site so both can coexist.
 
-## Vercel mirror
+## Live deployment (Vercel)
 
 Vercel project `hsc-study-planner` is connected to this GitHub repository and deployed the branch manually:
 

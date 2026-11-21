@@ -3,8 +3,9 @@ import { ArrowUpRight, Check, Circle, CornerDownLeft, Pause, Play, Square, Trash
 import type { AppData, Target } from "../types";
 import type { AppActions } from "../lib/appTypes";
 import { targetLabel } from "../data/subjects";
-import { formatDuration, localDate, uid } from "../lib/storage";
-import { isDone, loggedMinutes, progressOf } from "../lib/selectors";
+import { formatDuration, localDate } from "../lib/storage";
+import { isDone, loggedMinutes, progressOf, sessionsFor } from "../lib/selectors";
+import { completionSession, uncompleteTarget } from "../lib/targetActions";
 import { parseSmartInput, type Draft } from "../lib/parser";
 
 export function Card({ children, className = "" }: { children: ReactNode; className?: string }) {
@@ -124,38 +125,21 @@ export function TargetRow({ target, data, actions, onEdit, onDelete, onDragStart
 
   const toggle = () => {
     if (done) {
-      const before = data;
-      actions.setData(prev => {
-        const ids = new Set(prev.sessions.filter(s => s.targetId === target.id).map(s => s.id));
-        return { ...prev, sessions: prev.sessions.map(s => ids.has(s.id) ? { ...s, progress: 0 } : s) };
-      });
-      actions.notify("Target reopened", () => actions.setData(before));
+      const progressBefore = sessionsFor(target, data.sessions).map(s => ({ id: s.id, progress: s.progress }));
+      actions.setData(prev => uncompleteTarget(prev, target));
+      actions.notify("Target reopened", () => actions.setData(prev => ({
+        ...prev,
+        sessions: prev.sessions.map(s => {
+          const old = progressBefore.find(item => item.id === s.id);
+          return old && old.progress !== s.progress ? { ...s, progress: old.progress } : s;
+        })
+      })));
     } else {
-      const before = data;
-      actions.setData(prev => {
-        const linked = prev.sessions.filter(s => s.targetId === target.id);
-        if (linked.some(s => (s.progress ?? 0) >= 100)) return prev;
-        const now = new Date();
-        return {
-          ...prev,
-          sessions: [...prev.sessions, {
-            id: uid(),
-            targetId: target.id,
-            date: target.date,
-            subjectId: target.subjectId,
-            paperId: target.paperId,
-            chapterId: target.chapterId,
-            topic: target.topic,
-            start: `${String(Math.max(0, now.getHours() - 1)).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`,
-            end: `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`,
-            duration: target.plannedMinutes,
-            progress: 100,
-            createdAt: now.toISOString(),
-            updatedAt: now.toISOString()
-          }]
-        };
-      });
-      actions.notify("Target completed — time logged", () => actions.setData(before));
+      const session = completionSession(target);
+      actions.setData(prev => ({ ...prev, sessions: [...prev.sessions, session] }));
+      actions.notify("Target completed — time logged", () => actions.setData(prev => ({
+        ...prev, sessions: prev.sessions.filter(s => s.id !== session.id)
+      })));
     }
   };
 

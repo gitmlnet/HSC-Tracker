@@ -1,7 +1,8 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { ArrowRight, CalendarPlus, Clock3, CornerDownLeft, Search, Sparkles } from "lucide-react";
 import type { AppData } from "../types";
 import type { AppActions, Page } from "../lib/appTypes";
+import { useDialogFocus } from "../lib/dialogFocus";
 import { parseSmartInput } from "../lib/parser";
 import { quickLogSession } from "../lib/targetActions";
 import { formatDuration, uid } from "../lib/storage";
@@ -11,13 +12,14 @@ import { targetLabel } from "../data/subjects";
 export default function CommandPalette({ data, actions, onClose }: { data: AppData; actions: AppActions; onClose: () => void }) {
   const [text, setText] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
-  useEffect(() => { inputRef.current?.focus(); }, []);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  useDialogFocus(dialogRef, onClose);
   const draft = parseSmartInput(text, data.settings);
   const navMatch = /^(go\s+)?(today|planner|insights|history|settings)$/i.exec(text.trim());
 
   const run = () => {
     if (navMatch) {
-      actions.go((navMatch[2].toLowerCase() === "insight" ? "insights" : navMatch[2].toLowerCase()) as Page);
+      actions.go(navMatch[2].toLowerCase() as Page);
       onClose();
       return;
     }
@@ -50,10 +52,9 @@ export default function CommandPalette({ data, actions, onClose }: { data: AppDa
 
   return (
     <div className="palette-backdrop" onMouseDown={onClose}>
-      <div className="command-palette" onMouseDown={e => e.stopPropagation()} role="dialog" aria-label="Command palette">
+      <div ref={dialogRef} className="command-palette" onMouseDown={e => e.stopPropagation()} role="dialog" aria-modal="true" aria-label="Command palette" tabIndex={-1}>
         <div className="palette-input"><Search size={19} /><input ref={inputRef} value={text} onChange={e => setText(e.target.value)} onKeyDown={e => {
           if (e.key === "Enter") { e.preventDefault(); run(); }
-          if (e.key === "Escape") onClose();
         }} placeholder="Type a command, target or session…" /></div>
         <div className="palette-body">
           {draft ? (

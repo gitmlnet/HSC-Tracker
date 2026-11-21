@@ -27,11 +27,13 @@ React 19, TypeScript, Vite 8, Lucide React. No backend; study records never leav
 
 ## Live PWA
 
-**GitHub Pages (preferred):** `https://gitmlnet.github.io/HSC-Tracker/`
+**Live now (Vercel):** https://hsc-study-planner-nine.vercel.app
 
-**Vercel mirror:** https://hsc-study-planner-nine.vercel.app
+The PWA is published from this branch to the stable Vercel project alias. Always use that alias — Vercel's per-deployment URLs are protected by the team's SSO policy. Automatic git-push deployments are disabled, so a new deployment is published after code changes via the connected Vercel app.
 
-Both serve the same build. GitHub Pages must be enabled for this repository with **Source: GitHub Actions**; see [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md). The workflow can then be dispatched from any branch, including this one.
+**GitHub Pages (pending repository setup):** `https://gitmlnet.github.io/HSC-Tracker/`
+
+Pages is not live yet: it must first be enabled for this repository with **Source: GitHub Actions**. See [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md). The same production build is subpath-safe, so no code changes are needed once Pages is enabled.
 
 - Use the always-visible **Install app** button in the app header. It triggers the browser's native install prompt when available and otherwise shows exact platform instructions.
 - **Android / desktop Chrome:** open the URL, then use the browser's **Install app** option.
@@ -77,4 +79,6 @@ src/
   App.tsx      shell, navigation, timer, notifications, toasts
 docs/
   SYSTEM_BLUEPRINT.md  full product and architecture plan
+  DEPLOYMENT.md        Vercel and GitHub Pages setup
+  QA_CHECKLIST.md      verified production checks
 ```
