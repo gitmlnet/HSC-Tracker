@@ -25,6 +25,16 @@ The spaced revision queue and mock-test tracking from the [system blueprint](doc
 
 React 19, TypeScript, Vite 8, Lucide React. No backend; study records never leave the device unless exported.
 
+## Live PWA
+
+**https://hsc-study-planner-nine.vercel.app**
+
+Deployed from this branch by the Vercel project `hsc-study-planner` (deployment `dpl_JpACJa2uKNRCtygEL73hGj6EESsY`, commit `1e9fb98`). The site is served over HTTPS, includes the web manifest and icons, and registers the offline service worker on first load.
+
+- **Android / desktop Chrome:** open the URL, then use the browser's **Install app** option (the app also shows an install button when the browser supports it).
+- **iOS Safari:** **Share → Add to Home Screen**.
+- Once installed, it opens full-screen and keeps working offline using the cached app shell; study records stay in the device's local database.
+
 ## Local development
 
 ```bash
