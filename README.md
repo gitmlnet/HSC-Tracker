@@ -18,6 +18,7 @@ An offline-first weekly study planner for Bangladesh HSC students. The whole wee
 - **History:** searchable/filterable sessions with inline editing and CSV export.
 - **Data:** IndexedDB with localStorage fallback, automatic migration from the older v1 format (no data loss), JSON backup/restore with undo, CSV export.
 - **PWA:** installable, offline app shell, versioned service worker, theme-aware UI, keyboard and touch support.
+- **User guide:** a searchable manual on every screen (top-bar **Guide**, sidebar, `help` in the command palette), plus the full written [user guide](docs/USER_GUIDE.md).
 
 The spaced revision queue and mock-test tracking from the [system blueprint](docs/SYSTEM_BLUEPRINT.md) are designed but not implemented yet.
 
@@ -82,4 +83,5 @@ docs/
   DEPLOYMENT.md        Vercel and GitHub Pages setup
   QA_CHECKLIST.md      verified production checks
   QUALITY_STANDARD.md  permanent project-wide quality bar and completion gate
+  USER_GUIDE.md        complete written manual for every feature
 ```

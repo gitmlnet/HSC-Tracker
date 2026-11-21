@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowRight, CalendarPlus, CheckCircle2, Clock3, Flame, Target, Timer, TrendingUp } from "lucide-react";
+import { ArrowRight, BookOpen, CalendarPlus, Clock3, Flame, Target, Timer, TrendingUp } from "lucide-react";
 import type { AppData } from "../types";
 import type { AppActions } from "../lib/appTypes";
 import type { Draft } from "../lib/parser";
@@ -145,6 +145,12 @@ export default function Today({ data, actions }: { data: AppData; actions: AppAc
           <Card className="side-note">
             <div><Timer size={19} /></div>
             <div><b>Timer tip</b><p>Press <kbd>Ctrl</kbd> + <kbd>K</kbd> anywhere to plan, log or jump to a page without leaving your keyboard.</p></div>
+          </Card>
+          <Card className="side-note guide-promo">
+            <div><BookOpen size={19} /></div>
+            <div><b>New here? Read the guide</b><p>From planning the whole week to reading your insights — every feature is explained step by step.</p>
+              <button className="btn ghost guide-promo-btn" onClick={() => actions.openGuide("start")}>Open user guide <ArrowRight size={14} /></button>
+            </div>
           </Card>
         </aside>
       </div>

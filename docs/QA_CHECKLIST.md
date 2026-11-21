@@ -14,6 +14,8 @@ Verification performed on this branch. Every item below was checked against the 
 - [x] Undo is surgical: reversing a completion no longer overwrites unrelated edits made while the toast is visible.
 - [x] A target with an active timer cannot be deleted or removed by clearing/replacing its week; no logged minutes are silently lost.
 - [x] Past-dated logs use a timestamp from that day instead of the current time.
+- [x] The in-app user guide has 13 searchable chapters, opens contextually from every page, supports next/previous navigation, deep links to the described screen, and is reachable from the sidebar, Today promo and `help <topic>` palette command.
+- [x] The written manual in `docs/USER_GUIDE.md` matches the implemented behaviour, including honest notes on chapter coverage, reminders and local-only data.
 - [x] JSON backup/restore, CSV export and clear-workspace undo remain functional.
 
 ## PWA

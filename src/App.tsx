@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { BarChart3, Bell, CalendarRange, Command, Download, History as HistoryIcon, LayoutDashboard, Menu, Plus, Settings as SettingsIcon, X } from "lucide-react";
+import { ArrowRight, BarChart3, Bell, BookOpen, CalendarRange, Command, Download, History as HistoryIcon, LayoutDashboard, Menu, Settings as SettingsIcon, X } from "lucide-react";
 import type { AppData } from "./types";
 import type { Page, TimerState } from "./lib/appTypes";
 import { emptyData, loadData, saveData, localDate, timeBefore, clockNow, weekStart, weekDates, reducedMotion } from "./lib/storage";
@@ -8,6 +8,8 @@ import { weekSummary } from "./lib/selectors";
 import TimerDock from "./components/TimerDock";
 import CommandPalette from "./components/CommandPalette";
 import InstallDialog from "./components/InstallDialog";
+import GuideDialog from "./components/GuideDialog";
+import { PAGE_GUIDE } from "./data/guide";
 import Today from "./pages/Today";
 import Planner from "./pages/Planner";
 import Insights from "./pages/Insights";
@@ -38,6 +40,8 @@ export default function App() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [installInfoOpen, setInstallInfoOpen] = useState(false);
+  const [guideOpen, setGuideOpen] = useState(false);
+  const [guideSection, setGuideSection] = useState("start");
   const [toast, setToast] = useState<Toast | null>(null);
   const [installPrompt, setInstallPrompt] = useState<Event | null>(null);
   const [now, setNow] = useState(Date.now());
@@ -67,6 +71,13 @@ export default function App() {
     const id = window.setTimeout(() => setToast(null), 5000);
     return () => window.clearTimeout(id);
   }, [toast]);
+
+  const openGuide = useCallback((section?: string) => {
+    setGuideSection(section || "start");
+    setGuideOpen(true);
+    setMenuOpen(false);
+    setPaletteOpen(false);
+  }, []);
 
   const go = useCallback((next: Page, date?: string, targetId?: string) => {
     if (date) setAnchor(date);
@@ -119,13 +130,13 @@ export default function App() {
   }, [timer, data.targets, notify]);
 
   const actions = useMemo(() => ({
-    setData, notify, timer, elapsedMs, startTimer, pauseTimer, stopTimer, go
-  }), [notify, timer, elapsedMs, startTimer, pauseTimer, stopTimer, go]);
+    setData, notify, timer, elapsedMs, startTimer, pauseTimer, stopTimer, go, openGuide
+  }), [notify, timer, elapsedMs, startTimer, pauseTimer, stopTimer, go, openGuide]);
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
       const typing = event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement || event.target instanceof HTMLSelectElement;
-      const otherDialog = installInfoOpen || !data.settings.onboarded;
+      const otherDialog = installInfoOpen || guideOpen || !data.settings.onboarded;
       if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k" && !otherDialog) {
         event.preventDefault();
         setPaletteOpen(v => !v);
@@ -134,11 +145,11 @@ export default function App() {
         event.preventDefault();
         setPaletteOpen(true);
       }
-      if (event.key === "Escape") setPaletteOpen(false);
+      if (event.key === "Escape") { setPaletteOpen(false); setGuideOpen(false); }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [paletteOpen, installInfoOpen, data.settings.onboarded]);
+  }, [paletteOpen, installInfoOpen, guideOpen, data.settings.onboarded]);
 
   useEffect(() => {
     if (!ready || !data.settings.reminders.enabled) return;
@@ -183,6 +194,7 @@ export default function App() {
         </nav>
         <div className="sidebar-foot">
           <button className="command-link" onClick={() => setPaletteOpen(true)}><Command size={15} /> Quick commands <kbd>Ctrl K</kbd></button>
+          <button className="command-link guide-link" onClick={() => openGuide("start")}><BookOpen size={15} /> User guide <ArrowRight size={14} /></button>
           <p>Built for one honest plan at a time.</p>
         </div>
       </aside>
@@ -192,6 +204,7 @@ export default function App() {
           <button className="icon-btn menu-btn" onClick={() => setMenuOpen(v => !v)} aria-label="Open navigation"><Menu size={20} /></button>
           <div className="topbar-title"><span className="eyebrow">HSC STUDY PLANNER</span><h1>{currentLabel}</h1></div>
           <div className="topbar-actions">
+            <button className="btn ghost guide-btn" onClick={() => openGuide(PAGE_GUIDE[page])} title={`${currentLabel} guide`} aria-label="Open user guide"><BookOpen size={16} /> <span>Guide</span></button>
             <button className="icon-btn" onClick={() => setPaletteOpen(true)} title="Quick commands" aria-label="Quick commands"><Command size={18} /></button>
             <button className="btn ghost install" onClick={() => {
               if (installPrompt) {
@@ -215,6 +228,7 @@ export default function App() {
 
       {!data.settings.onboarded && <Setup data={data} actions={actions} />}
       {paletteOpen && <CommandPalette data={data} actions={actions} onClose={() => setPaletteOpen(false)} />}
+      {guideOpen && <GuideDialog initialSection={guideSection} actions={actions} onClose={() => setGuideOpen(false)} />}
       {installInfoOpen && <InstallDialog prompt={installPrompt} onClose={() => setInstallInfoOpen(false)} onInstall={() => {
         const event = installPrompt as Event & { prompt?: () => Promise<void> } | null;
         event?.prompt?.().catch(() => undefined);

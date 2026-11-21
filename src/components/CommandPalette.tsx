@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { ArrowRight, CalendarPlus, Clock3, CornerDownLeft, Search, Sparkles } from "lucide-react";
+import { ArrowRight, BookOpen, CalendarPlus, Clock3, CornerDownLeft, Search, Sparkles } from "lucide-react";
 import type { AppData } from "../types";
 import type { AppActions, Page } from "../lib/appTypes";
 import { useDialogFocus } from "../lib/dialogFocus";
@@ -16,8 +16,27 @@ export default function CommandPalette({ data, actions, onClose }: { data: AppDa
   useDialogFocus(dialogRef, onClose);
   const draft = parseSmartInput(text, data.settings);
   const navMatch = /^(go\s+)?(today|planner|insights|history|settings)$/i.exec(text.trim());
+  const guideMatch = /^(guide|help)(?:\s+(start|setup|week|planner|today|quick|entry|timer|insights|history|settings|install|pwa|offline|keyboard|faq|help))?$/i.exec(text.trim());
+  const guideSection = guideMatch?.[2]?.toLowerCase();
+  const guideTarget = !guideSection || guideSection === "help" ? "start"
+    : ["week", "planner"].includes(guideSection) ? "weekly"
+    : ["quick", "entry"].includes(guideSection) ? "quick-entry"
+    : ["install", "pwa", "offline"].includes(guideSection) ? "pwa"
+    : guideSection === "keyboard" ? "keyboard"
+    : guideSection === "faq" ? "faq"
+    : guideSection === "setup" ? "setup"
+    : guideSection === "timer" ? "timer"
+    : guideSection === "insights" ? "insights"
+    : guideSection === "history" ? "history"
+    : guideSection === "settings" ? "settings"
+    : guideSection === "today" ? "today" : "start";
 
   const run = () => {
+    if (guideMatch) {
+      actions.openGuide(guideTarget);
+      onClose();
+      return;
+    }
     if (navMatch) {
       actions.go(navMatch[2].toLowerCase() as Page);
       onClose();
@@ -57,7 +76,13 @@ export default function CommandPalette({ data, actions, onClose }: { data: AppDa
           if (e.key === "Enter") { e.preventDefault(); run(); }
         }} placeholder="Type a command, target or session…" /></div>
         <div className="palette-body">
-          {draft ? (
+          {guideMatch ? (
+            <button className="palette-result" onClick={run}>
+              <BookOpen size={17} />
+              <span><b>Open the user guide</b><small>Complete, searchable instructions for every part of the app</small></span>
+              <CornerDownLeft size={15} />
+            </button>
+          ) : draft ? (
             <button className="palette-result" onClick={run}>
               {draft.intent === "log" ? <Clock3 size={17} /> : <CalendarPlus size={17} />}
               <span><b>{draft.intent === "log" ? "Log study" : "Add target"}</b><small>{targetLabel(draft, data.settings)} · {formatDuration(draft.minutes)} · {draft.date}</small></span>
@@ -68,7 +93,7 @@ export default function CommandPalette({ data, actions, onClose }: { data: AppDa
           ) : (
             <div className="palette-empty">
               <Sparkles size={18} />
-              <p>Try <code>plan Physics ch 3 45m</code>, <code>log Biology 30 min</code>, or <code>go planner</code>.</p>
+              <p>Try <code>plan Physics ch 3 45m</code>, <code>log Biology 30 min</code>, <code>go planner</code> or <code>help timer</code>.</p>
               <p>Chapter names, numbers and subject shortcuts all work.</p>
             </div>
           )}
