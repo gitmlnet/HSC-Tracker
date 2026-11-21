@@ -81,4 +81,5 @@ docs/
   SYSTEM_BLUEPRINT.md  full product and architecture plan
   DEPLOYMENT.md        Vercel and GitHub Pages setup
   QA_CHECKLIST.md      verified production checks
+  QUALITY_STANDARD.md  permanent project-wide quality bar and completion gate
 ```
