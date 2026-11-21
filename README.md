@@ -33,7 +33,8 @@ React 19, TypeScript, Vite 8, Lucide React. No backend; study records never leav
 
 Both serve the same build. GitHub Pages must be enabled for this repository with **Source: GitHub Actions**; see [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md). The workflow can then be dispatched from any branch, including this one.
 
-- **Android / desktop Chrome:** open the URL, then use the browser's **Install app** option (the app also shows an install button when the browser supports it).
+- Use the always-visible **Install app** button in the app header. It triggers the browser's native install prompt when available and otherwise shows exact platform instructions.
+- **Android / desktop Chrome:** open the URL, then use the browser's **Install app** option.
 - **iOS Safari:** **Share → Add to Home Screen**.
 - Once installed, it opens full-screen and keeps working offline using the cached app shell; study records stay in the device's local database.
 

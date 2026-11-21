@@ -1,19 +1,22 @@
 export function registerSW() {
-  if (!import.meta.env.PROD || !("serviceWorker" in navigator) || !window.isSecureContext) return;
+  if (!("serviceWorker" in navigator) || !window.isSecureContext) return;
 
-  window.addEventListener("load", () => {
-    const scriptUrl = new URL("sw.js", document.baseURI);
-    const scopeUrl = new URL("./", document.baseURI);
-
-    navigator.serviceWorker.register(scriptUrl.href, {
-      scope: scopeUrl.pathname,
+  // Register on first load instead of waiting for `load`, so the browser can
+  // assess installability as soon as the app shell is ready.
+  const register = () => {
+    const url = new URL("sw.js", document.baseURI);
+    if (!import.meta.env.PROD) url.searchParams.set("dev", "1");
+    navigator.serviceWorker.register(url.href, {
+      scope: new URL("./", document.baseURI).pathname,
       updateViaCache: "none"
     }).then(registration => {
-      // Check for a fresh app shell when the app is opened.
       registration.update().catch(() => undefined);
     }).catch(error => {
-      // The app remains fully usable online if service-worker setup is unavailable.
-      console.warn("Study Tracker offline support could not be enabled.", error);
+      // The app remains usable if service-worker setup is unavailable.
+      console.warn("PWA offline support could not be enabled.", error);
     });
-  }, { once: true });
+  };
+
+  if (document.readyState === "complete") register();
+  else window.addEventListener("load", register, { once: true });
 }

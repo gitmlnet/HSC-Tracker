@@ -1,11 +1,17 @@
-/* HSC Study Tracker offline app shell. Bump VERSION for every release. */
-const VERSION = "v6";
-const CACHE_PREFIX = "hsc-study-tracker-";
+/* HSC Study Planner offline app shell. Bump VERSION for every release. */
+const VERSION = "v7";
+const CACHE_PREFIX = "hsc-study-planner-";
 const CACHE_NAME = CACHE_PREFIX + VERSION;
 const APP_SCOPE = new URL("./", self.location.href);
+const DEV = new URL(self.location.href).searchParams.has("dev");
 
 self.addEventListener("install", (event) => {
   event.waitUntil((async () => {
+    // In the dev preview, register a harmless worker without caching the HMR shell.
+    if (DEV) {
+      await self.skipWaiting();
+      return;
+    }
     const cache = await caches.open(CACHE_NAME);
     const shellResponse = await fetch(APP_SCOPE.href, { cache: "reload" });
     if (!shellResponse.ok) throw new Error("Unable to fetch the Study Tracker app shell");
@@ -45,6 +51,8 @@ self.addEventListener("activate", (event) => {
 });
 
 self.addEventListener("fetch", (event) => {
+  // The listener itself is required for installability; dev mode passes through.
+  if (DEV) return;
   const request = event.request;
   if (request.method !== "GET") return;
   const url = new URL(request.url);

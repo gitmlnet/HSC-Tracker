@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { BarChart3, Bell, CalendarRange, Command, History as HistoryIcon, LayoutDashboard, Menu, Plus, Settings as SettingsIcon, X } from "lucide-react";
+import { BarChart3, Bell, CalendarRange, Command, Download, History as HistoryIcon, LayoutDashboard, Menu, Plus, Settings as SettingsIcon, X } from "lucide-react";
 import type { AppData } from "./types";
 import type { Page, TimerState } from "./lib/appTypes";
 import { emptyData, loadData, saveData, localDate, timeBefore, clockNow, weekStart, weekDates } from "./lib/storage";
@@ -7,6 +7,7 @@ import { makeSession } from "./lib/targetActions";
 import { weekSummary } from "./lib/selectors";
 import TimerDock from "./components/TimerDock";
 import CommandPalette from "./components/CommandPalette";
+import InstallDialog from "./components/InstallDialog";
 import Today from "./pages/Today";
 import Planner from "./pages/Planner";
 import Insights from "./pages/Insights";
@@ -35,6 +36,7 @@ export default function App() {
   const [ready, setReady] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [paletteOpen, setPaletteOpen] = useState(false);
+  const [installInfoOpen, setInstallInfoOpen] = useState(false);
   const [toast, setToast] = useState<Toast | null>(null);
   const [installPrompt, setInstallPrompt] = useState<Event | null>(null);
   const [now, setNow] = useState(Date.now());
@@ -185,11 +187,13 @@ export default function App() {
           <div className="topbar-title"><span className="eyebrow">HSC STUDY PLANNER</span><h1>{currentLabel}</h1></div>
           <div className="topbar-actions">
             <button className="icon-btn" onClick={() => setPaletteOpen(true)} title="Quick commands" aria-label="Quick commands"><Command size={18} /></button>
-            {installPrompt && <button className="btn ghost install" onClick={async () => {
-              const event = installPrompt as Event & { prompt?: () => Promise<void> };
-              await event.prompt?.();
-              setInstallPrompt(null);
-            }}><Plus size={16} /> Install</button>}
+            <button className="btn ghost install" onClick={() => {
+              if (installPrompt) {
+                const event = installPrompt as Event & { prompt?: () => Promise<void> };
+                event.prompt?.().catch(() => undefined);
+                setInstallPrompt(null);
+              } else setInstallInfoOpen(true);
+            }}><Download size={16} /> <span>Install app</span></button>
             <button className="btn primary" onClick={() => go("planner")}><CalendarRange size={17} /> <span>Plan week</span></button>
           </div>
         </header>
@@ -205,6 +209,12 @@ export default function App() {
 
       {!data.settings.onboarded && <Setup data={data} actions={actions} />}
       {paletteOpen && <CommandPalette data={data} actions={actions} onClose={() => setPaletteOpen(false)} />}
+      {installInfoOpen && <InstallDialog prompt={installPrompt} onClose={() => setInstallInfoOpen(false)} onInstall={() => {
+        const event = installPrompt as Event & { prompt?: () => Promise<void> } | null;
+        event?.prompt?.().catch(() => undefined);
+        setInstallPrompt(null);
+        setInstallInfoOpen(false);
+      }} />}
       <TimerDock data={data} actions={actions} />
       {toast && (
         <div className="toast" role="status">
