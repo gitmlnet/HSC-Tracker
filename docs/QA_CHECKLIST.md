@@ -4,7 +4,7 @@ Verification performed on this branch. Every item below was checked against the 
 
 ## Correctness
 
-- [x] TypeScript strict check and Vite production build pass.
+- [x] TypeScript strict check and Vite production build pass; `npm audit` reports 0 vulnerabilities (Vite pinned to 8.3.8).
 - [x] Setup → week template → inline quick add → timer start/finish → history → insights flow passes with no console or runtime errors.
 - [x] Completing a target logs a session and shows an Undo toast; Undo restores the previous state.
 - [x] Clicking a target on Today opens that exact target's editor in the weekly planner.
