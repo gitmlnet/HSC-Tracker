@@ -27,7 +27,7 @@ A planning week always runs **Saturday → Friday**. That matches a typical HSC 
 
 1. **Saturday — decide the week.** Apply a template or auto-plan, then remove unrealistic items and add what must happen.
 2. **Sunday to Thursday — execute and adjust.** Work from **Today**. If a subject takes longer than expected, change its minutes, move it to another day or add an extra target. Nothing is locked.
-3. **Friday — lighter review.** The planner automatically gives Friday fewer targets. Use the weekly review to see what is unfinished.
+3. **Friday — lighter review.** Templates that schedule two or more targets a day give Friday one fewer target. Use the weekly review to see what is unfinished.
 4. **Next week — carry forward.** Copy unfinished targets into next week. The originals remain in the current week so history stays truthful.
 
 The point is concentration: you should never have to hunt across screens to know **what is next**.

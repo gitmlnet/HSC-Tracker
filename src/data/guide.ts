@@ -82,7 +82,7 @@ export const GUIDE_SECTIONS: GuideSection[] = [
         items: [
           { title: "Saturday: decide the week", text: "Pick a template or auto-plan, then scan the seven columns. Remove what is unrealistic and add what absolutely must happen." },
           { title: "Sunday to Thursday: execute and adjust", text: "Work from Today. If something is harder than expected, change the minutes, move the target to another day, or add an extra target whenever you need to." },
-          { title: "Friday: lighten and review", text: "The planner automatically makes Friday lighter. Use the weekly review to see what is unfinished." },
+          { title: "Friday: lighten and review", text: "Templates that schedule two or more targets a day make Friday lighter. Use the weekly review to see what is unfinished." },
           { title: "At the next week: carry forward", text: "Carry unfinished targets into next week so nothing quietly disappears. Their history stays in the original week." }
         ]
       },
@@ -117,7 +117,7 @@ export const GUIDE_SECTIONS: GuideSection[] = [
           "Drag a target onto another day column to move it. The day dropdown in the editor does the same thing with a keyboard or on touch.",
           "Use the trash button to remove a target; Undo brings it back.",
           "The small bar shows planned minutes against your daily goal. Amber means the day is over capacity.",
-          "The Friday column is deliberately lighter than the other days."
+          "Templates with two or more targets a day give Friday one fewer target; a one-a-day light week stays at one."
         ]
       },
       {
