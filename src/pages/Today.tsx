@@ -104,7 +104,7 @@ export default function Today({ data, actions }: { data: AppData; actions: AppAc
             />
             {targets.length ? (
               <div className="target-list">
-                {targets.map(t => <TargetRow key={t.id} target={t} data={data} actions={actions} onEdit={() => actions.go("planner", t.date)} />)}
+                {targets.map(t => <TargetRow key={t.id} target={t} data={data} actions={actions} onEdit={() => actions.go("planner", t.date, t.id)} />)}
               </div>
             ) : (
               <EmptyState icon={Target} title="Nothing planned for today" text="Add a target below, or set the whole week in the planner." />

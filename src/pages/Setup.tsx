@@ -18,7 +18,7 @@ export default function Setup({ data, actions }: { data: AppData; actions: AppAc
   }));
 
   return (
-    <div className="setup-screen">
+    <div className="setup-screen" role="dialog" aria-modal="true" aria-label="Initial setup">
       <div className="setup-card">
         <span className="eyebrow">WELCOME · STEP {step + 1} OF 3</span>
         {step === 0 && <>

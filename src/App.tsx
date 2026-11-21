@@ -33,6 +33,7 @@ export default function App() {
     return NAV.some(([id]) => id === hash) ? hash as Page : "today";
   });
   const [anchor, setAnchor] = useState(localDate());
+  const [focusTargetId, setFocusTargetId] = useState<string | null>(null);
   const [ready, setReady] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [paletteOpen, setPaletteOpen] = useState(false);
@@ -67,8 +68,9 @@ export default function App() {
     return () => window.clearTimeout(id);
   }, [toast]);
 
-  const go = useCallback((next: Page, date?: string) => {
+  const go = useCallback((next: Page, date?: string, targetId?: string) => {
     if (date) setAnchor(date);
+    setFocusTargetId(targetId || null);
     setPage(next);
     setMenuOpen(false);
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -200,7 +202,7 @@ export default function App() {
 
         <main>
           {page === "today" && <Today data={data} actions={actions} />}
-          {page === "planner" && <Planner data={data} actions={actions} anchor={anchor} setAnchor={setAnchor} />}
+          {page === "planner" && <Planner data={data} actions={actions} anchor={anchor} setAnchor={setAnchor} focusTargetId={focusTargetId} />}
           {page === "insights" && <Insights data={data} />}
           {page === "history" && <HistoryPage data={data} actions={actions} />}
           {page === "settings" && <SettingsPage data={data} actions={actions} />}

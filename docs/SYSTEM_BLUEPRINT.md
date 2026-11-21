@@ -228,6 +228,6 @@ Migration runs once on load: v1 `plans` → `targets`, sessions matched to a tar
 - **G2 — Speed:** done. Today command center, one-tap wall-clock timer with pause/partial/finish, natural-language quick capture, `Ctrl/Cmd + K` palette, `N` shortcut, undo toasts.
 - **G3 — Planner:** done. Saturday–Friday board, setup templates, auto-plan, copy last week, inline editing, drag between days, carry-forward, weekly review.
 - **G4 — Intelligence:** partially done. Coverage, subject distribution, 8-week trend and consistency heatmap are in Insights; the spaced revision queue, mastery map and weak-topic engine are still to build.
-- **G5 — Polish & ship:** largely done. Responsive premium UI, PWA with portable root/subpath support, notification digest, v2 backup with undo. Vercel deployment is possible with the relative Vite base; GitHub Pages workflow is retained.
+- **G5 — Polish & ship:** done to a high standard. Responsive premium UI with platform-native typography, subject colour coding, touch-sized controls, accessible dialogs, motion with reduced-motion support, contrast-checked tokens, PWA install prompt + fallback guide, notification digest, v2 backup with undo. Vercel alias is live; GitHub Pages workflow is ready but Pages must be enabled in repository settings. See `docs/QA_CHECKLIST.md`.
 
 Verified with a production build plus scripted browser-DOM flows: setup → template → quick add → timer finish → history → insights, and a v1 data migration check.

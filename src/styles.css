@@ -14,11 +14,11 @@
   --accent-2: #7c6cf0;
   --accent-soft: #efedff;
   --accent-ink: #ffffff;
-  --green: #1e9e6a;
+  --green: #147a50;
   --green-soft: #e5f7ef;
-  --amber: #c98216;
+  --amber: #9a5a0b;
   --amber-soft: #fff4dc;
-  --red: #d24b58;
+  --red: #b83242;
   --red-soft: #ffebed;
   --shadow: 0 10px 34px rgba(22, 31, 63, .055);
   --shadow-lg: 0 22px 60px rgba(22, 31, 63, .14);
@@ -426,3 +426,53 @@ input::placeholder { color: color-mix(in srgb, var(--muted) 80%, transparent); }
 .install-steps small { display: block; color: var(--muted); font-size: 11.5px; line-height: 1.5; margin-top: 3px; }
 .install-foot { display: grid; gap: 10px; justify-items: center; }
 .install-foot small { color: var(--muted); font-size: 10.5px; line-height: 1.5; }
+
+/* Micro-polish pass — typography, motion, touch and clarity */
+:root {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Inter, ui-sans-serif, system-ui, sans-serif;
+  --muted: #66748c;
+  --ease: cubic-bezier(.22, 1, .36, 1);
+}
+h1, h2, h3, h4 { font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Inter, ui-sans-serif, system-ui, sans-serif; letter-spacing: -.028em; }
+.btn, .icon-btn, .template, .sidebar nav button, .chip, .segmented button { transition-timing-function: var(--ease); }
+.meter i { transition: width .42s var(--ease); }
+.ring-value { transition: stroke-dashoffset .55s var(--ease); filter: drop-shadow(0 0 5px color-mix(in srgb, var(--accent) 24%, transparent)); }
+.page { animation: page-in .3s var(--ease) both; }
+@keyframes page-in { from { opacity: 0; transform: translateY(7px); } to { opacity: 1; transform: none; } }
+@keyframes check-pop { 0% { transform: scale(.72); } 60% { transform: scale(1.14); } 100% { transform: scale(1); } }
+@keyframes toast-in { from { opacity: 0; transform: translate(-50%, 12px); } to { opacity: 1; transform: translate(-50%, 0); } }
+@keyframes dialog-in { from { opacity: 0; transform: translateY(10px) scale(.985); } to { opacity: 1; transform: none; } }
+.check.checked { animation: check-pop .24s var(--ease) both; }
+.toast { animation: toast-in .26s var(--ease) both; }
+.install-dialog, .command-palette, .setup-card { animation: dialog-in .28s var(--ease) both; }
+
+/* Subject identity on every target */
+.target-row { position: relative; }
+.target-row::before { content: ""; position: absolute; left: 0; top: 12px; bottom: 12px; width: 3px; border-radius: 0 4px 4px 0; background: var(--subject, var(--accent)); opacity: .85; transition: opacity .16s var(--ease); }
+.target-row.done::before { opacity: .3; }
+.target-row[data-subject="physics"] { --subject: #5b5bd6; }
+.target-row[data-subject="chemistry"] { --subject: #12a37f; }
+.target-row[data-subject="biology"] { --subject: #e1793c; }
+.target-row[data-subject="higher-math"] { --subject: #c2568c; }
+.target-row[data-subject^="c-"] { --subject: #3b82f6; }
+.target-row[data-subject^="a-"] { --subject: #8b5cf6; }
+.target-actions { opacity: .78; transition: opacity .14s ease; }
+.target-row:hover .target-actions, .target-row:focus-within .target-actions, .target-row.running .target-actions { opacity: 1; }
+.smart-hint { font-size: 11px; }
+.smart-input input { font-size: 13px; }
+
+@media (hover: none) {
+  .target-actions { opacity: 1; }
+}
+@media (max-width: 720px) {
+  .btn { min-height: 42px; }
+  .icon-btn { width: 38px; height: 38px; min-height: 38px; }
+  .target-row.compact { padding: 10px 10px 10px 13px; gap: 9px; }
+  .target-row.compact .check { width: 26px; height: 26px; }
+  .target-row.compact .icon-btn { width: 34px; height: 34px; min-height: 34px; }
+  .target-row.compact .target-actions { gap: 3px; }
+  .smart-hint { font-size: 11.5px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .page, .toast, .install-dialog, .command-palette, .setup-card, .check.checked { animation: none !important; }
+}

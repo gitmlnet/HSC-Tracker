@@ -19,5 +19,5 @@ export type AppActions = {
   startTimer: (targetId: string) => void;
   pauseTimer: () => void;
   stopTimer: (mode: "full" | "partial") => void;
-  go: (page: Page, date?: string) => void;
+  go: (page: Page, date?: string, targetId?: string) => void;
 };

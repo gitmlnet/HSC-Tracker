@@ -1,9 +1,8 @@
-import { useState } from "react";
 import type { DragEvent, ElementType, KeyboardEvent, ReactNode } from "react";
 import { ArrowUpRight, Check, Circle, CornerDownLeft, Pause, Play, Square, Trash2, WandSparkles } from "lucide-react";
 import type { AppData, Target } from "../types";
 import type { AppActions } from "../lib/appTypes";
-import { chapterName, targetLabel } from "../data/subjects";
+import { targetLabel } from "../data/subjects";
 import { formatDuration, localDate, uid } from "../lib/storage";
 import { isDone, loggedMinutes, progressOf } from "../lib/selectors";
 import { parseSmartInput, type Draft } from "../lib/parser";
@@ -96,7 +95,7 @@ export function SmartInput({ settings, value, onChange, onSubmit, placeholder, d
           <CornerDownLeft size={16} />
         </button>
       </div>
-      <div className={`smart-hint ${draft ? "valid" : ""}`}>
+      <div className={`smart-hint ${draft ? "valid" : ""}`} aria-live="polite">
         {draft ? (
           <>
             <Check size={13} /> {draft.intent === "log" ? "Log" : "Plan"}: {targetLabel({ ...draft, topic: draft.topic }, settings)}
@@ -121,17 +120,18 @@ export function TargetRow({ target, data, actions, onEdit, onDelete, onDragStart
   const done = isDone(target, data.sessions);
   const minutes = loggedMinutes(target, data.sessions);
   const timerHere = actions.timer?.targetId === target.id;
-  const chapter = chapterName(target, data.settings);
-  const [hover, setHover] = useState(false);
+  const label = targetLabel(target, data.settings);
 
   const toggle = () => {
     if (done) {
+      const before = data;
       actions.setData(prev => {
         const ids = new Set(prev.sessions.filter(s => s.targetId === target.id).map(s => s.id));
         return { ...prev, sessions: prev.sessions.map(s => ids.has(s.id) ? { ...s, progress: 0 } : s) };
       });
-      actions.notify("Target reopened");
+      actions.notify("Target reopened", () => actions.setData(before));
     } else {
+      const before = data;
       actions.setData(prev => {
         const linked = prev.sessions.filter(s => s.targetId === target.id);
         if (linked.some(s => (s.progress ?? 0) >= 100)) return prev;
@@ -155,19 +155,19 @@ export function TargetRow({ target, data, actions, onEdit, onDelete, onDragStart
           }]
         };
       });
-      actions.notify("Target completed — time logged");
+      actions.notify("Target completed — time logged", () => actions.setData(before));
     }
   };
 
   return (
     <div
       className={`target-row ${done ? "done" : ""} ${timerHere ? "running" : ""} ${compact ? "compact" : ""}`}
+      data-subject={target.subjectId}
       draggable={Boolean(onDragStart)}
       onDragStart={onDragStart}
-      onMouseEnter={() => setHover(true)}
-      onMouseLeave={() => setHover(false)}
+      aria-label={label}
     >
-      <button className={`check ${done ? "checked" : ""}`} onClick={toggle} aria-label={done ? "Mark not done" : "Mark done"}>
+      <button className={`check ${done ? "checked" : ""}`} onClick={toggle} aria-label={`${done ? "Reopen" : "Complete"} ${label}`}>
         {done ? <Check size={14} /> : <Circle size={15} />}
       </button>
       <div className="target-main" onClick={onEdit} role={onEdit ? "button" : undefined} tabIndex={onEdit ? 0 : undefined} onKeyDown={e => { if (onEdit && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); onEdit(); } }}>
@@ -182,7 +182,7 @@ export function TargetRow({ target, data, actions, onEdit, onDelete, onDragStart
           {target.topic && <span className="topic">· {target.topic}</span>}
         </div>
       </div>
-      <div className="target-actions" style={{ opacity: hover || timerHere || !compact ? 1 : 0.35 }}>
+      <div className="target-actions">
         {timerHere ? (
           <>
             <button className="icon-btn" onClick={actions.pauseTimer} title="Pause timer" aria-label="Pause timer"><Pause size={15} /></button>

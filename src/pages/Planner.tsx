@@ -12,11 +12,12 @@ import { Card, Meter, SectionTitle, SmartInput, TargetRow } from "../components/
 
 const STYLES: PlanStyle[] = ["balanced", "exam", "revision", "light"];
 
-export default function Planner({ data, actions, anchor, setAnchor }: {
+export default function Planner({ data, actions, anchor, setAnchor, focusTargetId }: {
   data: AppData;
   actions: AppActions;
   anchor: string;
   setAnchor: (date: string) => void;
+  focusTargetId?: string | null;
 }) {
   const start = weekStart(anchor);
   const dates = useMemo(() => weekDates(start), [start]);
@@ -27,7 +28,13 @@ export default function Planner({ data, actions, anchor, setAnchor }: {
   const [dismissedSetup, setDismissedSetup] = useState(false);
   const [confirmClear, setConfirmClear] = useState(false);
 
-  useEffect(() => { setDismissedSetup(false); setEditingId(null); }, [start]);
+  useEffect(() => { setDismissedSetup(false); setEditingId(focusTargetId || null); }, [start]);
+  useEffect(() => {
+    if (!focusTargetId) return;
+    setEditingId(focusTargetId);
+    const id = window.requestAnimationFrame(() => document.querySelector(".target-editor")?.scrollIntoView?.({ block: "nearest", behavior: "smooth" }));
+    return () => window.cancelAnimationFrame(id);
+  }, [focusTargetId]);
 
   const showSetup = week.count === 0 && !dismissedSetup;
 
