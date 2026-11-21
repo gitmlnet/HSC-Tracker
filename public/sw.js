@@ -1,8 +1,8 @@
 /* HSC Study Tracker offline app shell. Bump VERSION for every release. */
-const VERSION = "v5";
+const VERSION = "v6";
 const CACHE_PREFIX = "hsc-study-tracker-";
 const CACHE_NAME = CACHE_PREFIX + VERSION;
-const APP_SCOPE = new URL("/daily/", self.location.origin);
+const APP_SCOPE = new URL("./", self.location.href);
 
 self.addEventListener("install", (event) => {
   event.waitUntil((async () => {
@@ -13,9 +13,9 @@ self.addEventListener("install", (event) => {
 
     const html = await shellResponse.clone().text();
     const assetPaths = [
-      "/daily/manifest.webmanifest",
-      "/daily/icon-192.png",
-      "/daily/icon-512.png",
+      "./manifest.webmanifest",
+      "./icon-192.png",
+      "./icon-512.png",
       ...Array.from(
         html.matchAll(/(?:src|href)=["']([^"']+\.(?:js|css)(?:\?[^"']*)?)["']/g),
         (match) => match[1]

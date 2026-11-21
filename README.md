@@ -1,96 +1,65 @@
-# HSC Study Tracker
+# HSC Study Planner
 
-An offline-first, mobile-friendly Bangladesh HSC study tracker and planner. It replaces a paper study-time log with fast digital entry, structured syllabus selection, planning, progress tracking, history, backup/restore, analytics, and browser reminders.
+An offline-first weekly study planner for Bangladesh HSC students. The whole week (Saturday → Friday) is planned from one board, and daily study is captured from a single line or a one-tap timer.
 
-## Features
+## The idea
 
-- Daily study log: date, subject, paper, chapter, start/end time, automatic duration, optional topic.
-- Searchable dependent syllabus pickers for Physics, Chemistry, Biology, and Higher Mathematics, with separate 1st/2nd Papers.
-- Planning: date + structured syllabus target + free-text topic + progress + reminder.
-- Planning ↔ Daily Log linking by **date + subject + paper + chapter**; topic text never needs to match.
-- Progress controls at 0/25/50/75/100%; 100% is shown as completed.
-- Dashboard, study history with filters/sorting, subject-time analytics, edit/delete flows.
-- IndexedDB persistence with a small localStorage fallback.
-- JSON backup/restore and CSV study-history export.
-- Light/dark theme.
-- Installable PWA with standalone display, app icons, browser install prompt, versioned offline app-shell caching and update checks.\n- The app shell and its built JavaScript/CSS are cached after the first successful online load; study records continue to use the existing browser database.
-- Responsive mobile/tablet/desktop layouts and accessible native form controls plus keyboard-focusable searchable pickers.
+1. **Plan the week before it starts.** Pick a template or auto-plan, then adjust any target inline.
+2. **Work from Today.** Your targets, timer, quick capture and week strip are on one screen.
+3. **Log in seconds.** Start a timer on a planned target and press Finish — the session is saved and the target is completed automatically.
+
+## What is built
+
+- **Setup:** student group (Science / Commerce / Arts), subjects, exam date, daily study goal.
+- **Today:** exam countdown, streak, daily progress ring, target checklist with Start/Pause/Finish, inline quick capture, 7-day strip, and a week-open nudge.
+- **Weekly Planner:** 7-day board with daily capacity bars, inline "type + Enter" target adding, templates (Balanced / Exam sprint / Revision / Light), auto-plan from your goals, copy last week, drag targets between days, inline editing, carry-forward of unfinished targets, and a weekly review.
+- **Quick entry:** natural language such as `Physics ch 3 45m`, `log Chemistry 30 min`, `plan Math ch 4 1h`; global `Ctrl/Cmd + K` command palette and `N` shortcut.
+- **Insights:** total time, completion rate, subject distribution, chapter coverage, 8-week planned-vs-studied trend, and a 12-week consistency heatmap.
+- **History:** searchable/filterable sessions with inline editing and CSV export.
+- **Data:** IndexedDB with localStorage fallback, automatic migration from the older v1 format (no data loss), JSON backup/restore with undo, CSV export.
+- **PWA:** installable, offline app shell, versioned service worker, theme-aware UI, keyboard and touch support.
+
+The spaced revision queue and mock-test tracking from the [system blueprint](docs/SYSTEM_BLUEPRINT.md) are designed but not implemented yet.
 
 ## Technology
 
-React 19, TypeScript 7, Vite 8, Lucide React. No application backend is required.
-
-The current package versions were pinned after checking their published npm versions in September 2026.
+React 19, TypeScript, Vite 8, Lucide React. No backend; study records never leave the device unless exported.
 
 ## Local development
-
-Requires a current Node.js release compatible with Vite 8.
 
 ```bash
 npm install
 npm run dev
 ```
 
-For a production build:
+Production build:
 
 ```bash
 npm run build
 npm run preview
 ```
 
-The Vite base is relative, so the same build works at the local root or at a GitHub Pages repository path such as `/daily/`.
+The Vite base is relative, so the same build works at a domain root (Vercel) or a repository path such as `/daily/` (GitHub Pages). The existing `.github/workflows/deploy.yml` publishes `dist/` to GitHub Pages on pushes to `main`.
 
-## GitHub Pages
+## Data model
 
-A workflow is included at `.github/workflows/deploy.yml`.
+`src/types.ts` defines version 2: `Settings`, `Target` (a planned commitment with its own id and planned minutes), `StudySession` (linked to a target by `targetId`), and `Revision` (reserved for the next phase). `src/lib/storage.ts` migrates any v1 `plans`/`sessions` into this model and keeps a copy of the original record in localStorage before migrating.
 
-1. In the repository, open **Settings → Pages**.
-2. Select **GitHub Actions** as the source if GitHub has not already configured it.
-3. Push to `main`; the workflow installs dependencies, runs the production build and publishes `dist/`.
+Status is derived in `src/lib/selectors.ts`, and natural-language entry lives in `src/lib/parser.ts`. Weekly templates and auto-planning live in `src/lib/autoPlan.ts`.
 
-Expected project URL:
+## Backup and privacy
 
-`https://<username>.github.io/daily/`
+Use **Settings → Backup & safety** to export JSON, export study history as CSV, or import a backup. Destructive actions show an Undo toast. Clearing browser/site data removes the local database, so export a backup first. Browser notifications, where permitted, are checked only while the app is open.
 
-## Data storage and privacy
-
-Core records are stored locally in the browser using IndexedDB. The application does not send study records to a backend or third-party analytics service. Clearing browser/site data can remove the local database, so regular JSON backups are recommended.
-
-## Backup / restore
-
-Use **Settings → Backup & restore** to export JSON. Import validates the backup shape and record fields before replacing or merging local data. Study history can also be exported as CSV.
-
-## Notifications
-
-Reminder settings are stored with each plan. The app requests browser Notification permission and checks due reminders while the app is running in the active browser/PWA context.
-
-An ordinary static web application cannot guarantee arbitrary notification delivery after every browser/device has been fully terminated, and mobile browser behavior varies. The UI therefore does not claim guaranteed background delivery. The hourly option means hourly reminders **while the app can run the reminder check**.
-
-## Architecture
+## Structure
 
 ```
 src/
-  components/      reusable fields and UI
-  data/            centralized HSC syllabus
-  lib/             persistence and backup logic
-  pages/           dashboard, log, planning, history, progress, settings
-  App.tsx          app shell/navigation/reminder coordinator
+  components/  UI kit, smart input, timer dock, command palette
+  data/        NCTB-based syllabus, subject presets
+  lib/         storage + migration, selectors, parser, auto-plan, backup
+  pages/       Today, Planner, Insights, History, Settings, Setup
+  App.tsx      shell, navigation, timer, notifications, toasts
+docs/
+  SYSTEM_BLUEPRINT.md  full product and architecture plan
 ```
-
-The syllabus is ID-based so session/plan records do not duplicate chapter strings unnecessarily.
-
-## Syllabus sources
-
-The centralized syllabus was built against the Bangladesh National Curriculum and Textbook Board (NCTB) higher-secondary curriculum/syllabus resources and cross-checked against Bangladesh HSC textbook-aligned chapter lists. The primary official references are:
-
-- NCTB: [Higher Secondary Curriculum](https://nctb.gov.bd/site/files/e977a7e5-be01-4c42-99ac-bc966d334ae7/%E0%A6%89%E0%A6%9A%E0%A7%8D%E0%A6%9A-%E0%A6%AE%E0%A6%BE%E0%A6%A7%E0%A7%8D%E0%A6%AF%E0%A6%AE%E0%A6%BF%E0%A6%95)
-- NCTB: [SSC & HSC syllabus page](https://nctb.gov.bd/site/page/9a90c854-ce5f-4d77-9915-1ecd0953079d/SSC-%26-HSC-Syllabus)
-- NCTB: [2024–25 higher-secondary textbook list](https://nctb.gov.bd/pages/static-pages/6922dbf9933eb65569e0dc01)
-
-When NCTB publishes a revised curriculum, update only `src/data/syllabus.ts`; the UI and data model consume the centralized IDs.
-
-## Notes
-
-No fake study records are seeded on startup. A student starts with an empty local workspace.
-
-Because this repository is private, GitHub Pages availability also depends on the repository/account Pages permissions and settings.
