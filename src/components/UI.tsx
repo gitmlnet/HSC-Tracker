@@ -4,8 +4,8 @@ import type { AppData, Target } from "../types";
 import type { AppActions } from "../lib/appTypes";
 import { targetLabel } from "../data/subjects";
 import { formatDuration, localDate } from "../lib/storage";
-import { isDone, loggedMinutes, progressOf, sessionsFor } from "../lib/selectors";
-import { completionSession, uncompleteTarget } from "../lib/targetActions";
+import { chapterProgressOf, isDone, loggedMinutes, progressOf, sessionsFor } from "../lib/selectors";
+import { uncompleteTarget } from "../lib/targetActions";
 import { parseSmartInput, type Draft } from "../lib/parser";
 
 export function Card({ children, className = "" }: { children: ReactNode; className?: string }) {
@@ -123,8 +123,9 @@ export function TargetRow({ target, data, actions, onEdit, onDelete, onDragStart
   const timerHere = actions.timer?.targetId === target.id;
   const label = targetLabel(target, data.settings);
 
+  const chapterProgress = chapterProgressOf(target, data.sessions);
   const toggle = () => {
-    if (done) {
+    if (done && target.trackingMode !== "progress") {
       const progressBefore = sessionsFor(target, data.sessions).map(s => ({ id: s.id, progress: s.progress }));
       actions.setData(prev => uncompleteTarget(prev, target));
       actions.notify("Target reopened", () => actions.setData(prev => ({
@@ -134,13 +135,9 @@ export function TargetRow({ target, data, actions, onEdit, onDelete, onDragStart
           return old && old.progress !== s.progress ? { ...s, progress: old.progress } : s;
         })
       })));
-    } else {
-      const session = completionSession(target);
-      actions.setData(prev => ({ ...prev, sessions: [...prev.sessions, session] }));
-      actions.notify("Target completed — time logged", () => actions.setData(prev => ({
-        ...prev, sessions: prev.sessions.filter(s => s.id !== session.id)
-      })));
+      return;
     }
+    actions.openStudyWizard("log", target.date, target.id);
   };
 
   return (
@@ -151,7 +148,7 @@ export function TargetRow({ target, data, actions, onEdit, onDelete, onDragStart
       onDragStart={onDragStart}
       aria-label={label}
     >
-      <button className={`check ${done ? "checked" : ""}`} onClick={toggle} aria-label={`${done ? "Reopen" : "Complete"} ${label}`}>
+      <button className={`check ${done ? "checked" : ""}`} onClick={toggle} aria-label={done && target.trackingMode !== "progress" ? `Reopen ${label}` : `Log study for ${label}`} title={done && target.trackingMode !== "progress" ? "Reopen target" : "Log study"}>
         {done ? <Check size={14} /> : <Circle size={15} />}
       </button>
       <div className="target-main" onClick={onEdit} role={onEdit ? "button" : undefined} tabIndex={onEdit ? 0 : undefined} onKeyDown={e => { if (onEdit && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); onEdit(); } }}>
@@ -160,10 +157,11 @@ export function TargetRow({ target, data, actions, onEdit, onDelete, onDragStart
           {target.priority === "high" && <span className="priority-dot" title="Priority" />}
         </div>
         <div className="target-meta">
-          <span>{formatDuration(target.plannedMinutes)} planned</span>
+          {target.trackingMode === "progress" ? <span className="progress-text">{chapterProgress}% chapter · goal {target.progressGoal ?? 100}%</span> : <span>{formatDuration(target.plannedMinutes)} time goal</span>}
+          {target.trackingMode !== "progress" && chapterProgress > 0 && <span className="progress-text">· {chapterProgress}% chapter</span>}
           {minutes > 0 && <span className="logged">· {formatDuration(minutes)} logged</span>}
-          {progress > 0 && !done && <span className="progress-text">· {progress}%</span>}
-          {target.topic && <span className="topic">· {target.topic}</span>}
+          {target.trackingMode !== "progress" && progress > 0 && !done && <span className="progress-text">· {progress}%</span>}
+          {target.topic && !target.chapterId && <span className="topic">· {target.topic}</span>}
         </div>
       </div>
       <div className="target-actions">

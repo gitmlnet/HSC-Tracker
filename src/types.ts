@@ -3,6 +3,7 @@ export type SyllabusEntry = { id: string; name: string; papers: { id: string; na
 export type Theme = "light" | "dark";
 export type Group = "science" | "commerce" | "arts";
 export type TargetSource = "manual" | "template" | "auto" | "copy" | "quick";
+export type TrackingMode = "time" | "progress";
 
 export type CustomSubject = { id: string; name: string };
 
@@ -26,7 +27,12 @@ export type Target = {
   paperId: string;
   chapterId: string;
   topic: string;
+  /** Old targets omit this and are treated as time-based. */
+  trackingMode?: TrackingMode;
   plannedMinutes: number;
+  /** Absolute chapter completion goal for progress-based targets. */
+  progressStart?: number;
+  progressGoal?: number;
   priority: "normal" | "high";
   source: TargetSource;
   createdAt: string;
@@ -45,7 +51,10 @@ export type StudySession = {
   end: string;
   duration: number;
   topic: string;
+  /** Completion of this planned target, from 0–100. */
   progress?: number;
+  /** Absolute chapter completion snapshot, from 0–100. */
+  chapterProgress?: number;
   focusRating?: 1 | 2 | 3;
   createdAt: string;
   updatedAt: string;

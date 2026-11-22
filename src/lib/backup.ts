@@ -15,7 +15,7 @@ export function exportJson(data: AppData) {
 }
 
 export function exportCsv(data: AppData) {
-  const head = ["Date", "Subject", "Paper", "Chapter", "From", "To", "Duration (min)", "Target completion (%)", "Topic"];
+  const head = ["Date", "Subject", "Paper", "Chapter", "From", "To", "Duration (min)", "Target completion (%)", "Chapter completion (%)", "Topic"];
   const q = (v: unknown) => `"${String(v ?? "").replaceAll('"', '""')}"`;
   const rows = [...data.sessions].sort((a, b) => (b.date + b.start).localeCompare(a.date + a.start)).map(s => [
     s.date,
@@ -26,6 +26,7 @@ export function exportCsv(data: AppData) {
     s.end,
     s.duration,
     s.progress ?? "",
+    s.chapterProgress ?? "",
     s.topic
   ].map(q).join(","));
   download(`hsc-study-history-${new Date().toISOString().slice(0, 10)}.csv`, [head.map(q).join(","), ...rows].join("\n"), "text/csv;charset=utf-8");

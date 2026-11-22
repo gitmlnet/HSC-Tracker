@@ -1,41 +1,30 @@
 import { useEffect, useMemo, useState } from "react";
 import type { DragEvent } from "react";
-import { ArrowLeft, ArrowRight, CheckCircle2, ClipboardCopy, Copy, Layers3, Plus, RotateCcw, Sparkles, Trash2, WandSparkles } from "lucide-react";
+import { ArrowLeft, ArrowRight, CheckCircle2, ClipboardCopy, Copy, Layers3, Plus, Sparkles, Trash2, WandSparkles } from "lucide-react";
 import type { AppData, Target } from "../types";
 import type { AppActions } from "../lib/appTypes";
-import type { Draft } from "../lib/parser";
 import type { PlanStyle } from "../lib/autoPlan";
-import { DAY_NAMES, addDays, formatDuration, localDate, prettyDate, reducedMotion, uid, weekDates, weekStart } from "../lib/storage";
+import { DAY_NAMES, addDays, formatDuration, localDate, prettyDate, uid, weekDates, weekStart } from "../lib/storage";
 import { buildWeek, copyWeek, STYLE_INFO } from "../lib/autoPlan";
-import { quickLogSession } from "../lib/targetActions";
 import { daySummary, isDone, weekSummary } from "../lib/selectors";
-import { Card, Meter, SectionTitle, SmartInput, TargetRow } from "../components/UI";
+import { Card, Meter, SectionTitle, TargetRow } from "../components/UI";
 
 const STYLES: PlanStyle[] = ["balanced", "exam", "revision", "light"];
 
-export default function Planner({ data, actions, anchor, setAnchor, focusTargetId }: {
+export default function Planner({ data, actions, anchor, setAnchor }: {
   data: AppData;
   actions: AppActions;
   anchor: string;
   setAnchor: (date: string) => void;
-  focusTargetId?: string | null;
 }) {
   const start = weekStart(anchor);
   const dates = useMemo(() => weekDates(start), [start]);
   const today = localDate();
   const week = weekSummary(dates, data);
-  const [texts, setTexts] = useState<Record<string, string>>({});
-  const [editingId, setEditingId] = useState<string | null>(null);
   const [dismissedSetup, setDismissedSetup] = useState(false);
   const [confirmClear, setConfirmClear] = useState(false);
 
-  useEffect(() => { setDismissedSetup(false); setEditingId(focusTargetId || null); }, [start]);
-  useEffect(() => {
-    if (!focusTargetId) return;
-    setEditingId(focusTargetId);
-    const id = window.requestAnimationFrame(() => document.querySelector(".target-editor")?.scrollIntoView?.({ block: "nearest", behavior: reducedMotion() ? "auto" : "smooth" }));
-    return () => window.cancelAnimationFrame(id);
-  }, [focusTargetId]);
+  useEffect(() => { setDismissedSetup(false); }, [start]);
 
   const showSetup = week.count === 0 && !dismissedSetup;
 
@@ -108,34 +97,6 @@ export default function Planner({ data, actions, anchor, setAnchor, focusTargetI
     actions.notify(`${copies.length} unfinished target${copies.length > 1 ? "s" : ""} moved to next week`);
   };
 
-  const addEntry = (columnDate: string, draft: Draft) => {
-    const date = dates.includes(draft.date) ? draft.date : columnDate;
-    if (draft.intent === "log") {
-      const session = quickLogSession({ ...draft, date });
-      const match = data.targets.find(t => t.date === date && !isDone(t, data.sessions)
-        && t.subjectId === session.subjectId && t.paperId === session.paperId && t.chapterId === session.chapterId);
-      actions.setData(prev => ({ ...prev, sessions: [...prev.sessions, match ? { ...session, targetId: match.id } : session] }));
-      actions.notify(`${formatDuration(draft.minutes)} logged for ${prettyDate(date)}`);
-      return;
-    }
-    const now = new Date().toISOString();
-    const target: Target = {
-      id: uid(),
-      date,
-      subjectId: draft.subjectId,
-      paperId: draft.paperId,
-      chapterId: draft.chapterId,
-      topic: draft.topic,
-      plannedMinutes: draft.minutes,
-      priority: "normal",
-      source: "manual",
-      createdAt: now,
-      updatedAt: now
-    };
-    actions.setData(prev => ({ ...prev, targets: [...prev.targets, target] }));
-    setDismissedSetup(true);
-    actions.notify(`Target added for ${prettyDate(target.date)}`, () => actions.setData(prev => ({ ...prev, targets: prev.targets.filter(t => t.id !== target.id) })));
-  };
 
   const patchTarget = (id: string, patch: Partial<Target>) => {
     actions.setData(prev => ({
@@ -148,7 +109,6 @@ export default function Planner({ data, actions, anchor, setAnchor, focusTargetI
     const target = data.targets.find(t => t.id === id);
     if (!target || protectsTimer([target])) return;
     actions.setData(prev => ({ ...prev, targets: prev.targets.filter(t => t.id !== id) }));
-    setEditingId(null);
     actions.notify("Target removed", () => actions.setData(prev => ({ ...prev, targets: [...prev.targets, target] })));
   };
 
@@ -179,9 +139,10 @@ export default function Planner({ data, actions, anchor, setAnchor, focusTargetI
         <div className="week-range">
           <span className="eyebrow">{prettyDate(dates[0])} — {prettyDate(dates[6])}</span>
           <h2>{week.count ? `${week.count} targets planned` : "An open week"}</h2>
-          <p>{week.count ? `${week.done} completed · ${formatDuration(week.plannedMinutes)} planned · ${formatDuration(week.loggedMinutes)} studied` : "Choose a starting point below or build the week target by target."}</p>
+          <p>{week.count ? `${week.done} completed · ${week.plannedMinutes ? `${formatDuration(week.plannedMinutes)} timed` : ""}${week.progressCount ? `${week.plannedMinutes ? " · " : ""}${week.progressCount} chapter progress` : ""} · ${formatDuration(week.loggedMinutes)} studied` : "Choose a template or add study targets with a few taps."}</p>
         </div>
         <div className="week-toolbar">
+          <button className="btn primary" onClick={() => actions.openStudyWizard("plan", dates[0])}><Plus size={16} /> Plan a target</button>
           <button className="btn secondary" onClick={copyPrevious}><Copy size={15} /> Copy last week</button>
           <button className="btn secondary" onClick={() => applyStyle("balanced")}><WandSparkles size={15} /> Auto-plan</button>
           <button className={`btn ghost danger ${confirmClear ? "confirm" : ""}`} onClick={clearWeek} onBlur={() => setConfirmClear(false)}>
@@ -224,7 +185,7 @@ export default function Planner({ data, actions, anchor, setAnchor, focusTargetI
                 <span className="day-count">{s.done}/{s.count}</span>
               </div>
               <Meter value={s.plannedMinutes} max={data.settings.dailyGoalMinutes} tone={s.plannedMinutes > data.settings.dailyGoalMinutes ? "warn" : "accent"} />
-              <div className="day-capacity">{formatDuration(s.plannedMinutes)} of {formatDuration(data.settings.dailyGoalMinutes)} goal</div>
+              <div className="day-capacity">{s.plannedMinutes ? `${formatDuration(s.plannedMinutes)} timed · ${formatDuration(data.settings.dailyGoalMinutes)} daily goal` : s.progressCount ? `${s.progressCount} chapter progress goal${s.progressCount === 1 ? "" : "s"}` : `No timed study planned`}</div>
 
               <div className="day-targets">
                 {targets.map(target => (
@@ -234,32 +195,17 @@ export default function Planner({ data, actions, anchor, setAnchor, focusTargetI
                       data={data}
                       actions={actions}
                       compact
-                      onEdit={() => setEditingId(editingId === target.id ? null : target.id)}
+                      onEdit={() => actions.openStudyWizard("plan", target.date, target.id)}
                       onDelete={() => removeTarget(target.id)}
                       onDragStart={e => e.dataTransfer.setData("text/plain", target.id)}
                     />
-                    {editingId === target.id && (
-                      <div className="target-editor">
-                        <label>Minutes<input type="number" min="5" max="480" step="5" value={target.plannedMinutes} onChange={e => patchTarget(target.id, { plannedMinutes: Math.max(5, Number(e.target.value) || 5) })} /></label>
-                        <label>Topic<input value={target.topic} placeholder="Optional detail" onChange={e => patchTarget(target.id, { topic: e.target.value })} /></label>
-                        <label>Day<select value={target.date} onChange={e => patchTarget(target.id, { date: e.target.value })}>{dates.map(d => <option key={d} value={d}>{DAY_NAMES[dates.indexOf(d)]}, {prettyDate(d)}</option>)}</select></label>
-                        <label className="editor-check"><input type="checkbox" checked={target.priority === "high"} onChange={e => patchTarget(target.id, { priority: e.target.checked ? "high" : "normal" })} /> Priority target</label>
-                      </div>
-                    )}
+
                   </div>
                 ))}
                 {!targets.length && <div className="day-empty">No targets yet</div>}
               </div>
 
-              <div className="day-add">
-                <SmartInput
-                  settings={data.settings}
-                  value={texts[date] || ""}
-                  onChange={value => setTexts(prev => ({ ...prev, [date]: value }))}
-                  onSubmit={draft => addEntry(date, draft)}
-                  placeholder="+ type a target…"
-                />
-              </div>
+              <button className="day-add-button" onClick={() => actions.openStudyWizard("plan", date)} aria-label={`Add a target for ${DAY_NAMES[index]}, ${prettyDate(date)}`}><Plus size={15} /> Add target</button>
               {isToday && (
                 <button className="day-jump" onClick={() => actions.go("today")}>Go to today <ArrowRight size={13} /></button>
               )}

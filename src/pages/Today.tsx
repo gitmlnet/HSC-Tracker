@@ -1,16 +1,11 @@
-import { useState } from "react";
-import { ArrowRight, BookOpen, CalendarPlus, Clock3, Flame, Target, Timer, TrendingUp } from "lucide-react";
+import { ArrowRight, BookOpen, CalendarPlus, Clock3, Flame, Plus, Target, Timer, TrendingUp } from "lucide-react";
 import type { AppData } from "../types";
 import type { AppActions } from "../lib/appTypes";
-import type { Draft } from "../lib/parser";
-import { DAY_NAMES, daysBetween, formatDuration, localDate, prettyDate, uid, weekDates, weekStart } from "../lib/storage";
-import { coverage, daySummary, isDone, streakDays, weekSummary } from "../lib/selectors";
-import { quickLogSession } from "../lib/targetActions";
-import { Card, EmptyState, Meter, ProgressRing, SectionTitle, SmartInput, TargetRow } from "../components/UI";
+import { DAY_NAMES, daysBetween, formatDuration, localDate, prettyDate, weekDates, weekStart } from "../lib/storage";
+import { coverage, daySummary, streakDays, weekSummary } from "../lib/selectors";
+import { Card, EmptyState, Meter, ProgressRing, SectionTitle, TargetRow } from "../components/UI";
 
 export default function Today({ data, actions }: { data: AppData; actions: AppActions }) {
-  const [planText, setPlanText] = useState("");
-  const [logText, setLogText] = useState("");
   const today = localDate();
   const dates = weekDates(weekStart(today));
   const summary = daySummary(today, data);
@@ -22,40 +17,6 @@ export default function Today({ data, actions }: { data: AppData; actions: AppAc
   const hour = new Date().getHours();
   const greeting = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
 
-  const dayLabel = (date: string) => date === today ? "today" : prettyDate(date, { weekday: "short", day: "numeric", month: "short" });
-
-  const addPlan = (draft: Draft) => {
-    const now = new Date().toISOString();
-    if (draft.intent === "log") { addLog(draft); return; }
-    const target = {
-      id: uid(),
-      date: draft.date,
-      subjectId: draft.subjectId,
-      paperId: draft.paperId,
-      chapterId: draft.chapterId,
-      topic: draft.topic,
-      plannedMinutes: draft.minutes,
-      priority: "normal" as const,
-      source: "quick" as const,
-      createdAt: now,
-      updatedAt: now
-    };
-    actions.setData(prev => ({ ...prev, targets: [...prev.targets, target] }));
-    actions.notify(`Added to ${dayLabel(target.date)}'s plan`, () => actions.setData(prev => ({
-      ...prev, targets: prev.targets.filter(t => t.id !== target.id)
-    })));
-  };
-
-  const addLog = (draft: Draft) => {
-    const session = quickLogSession(draft);
-    const match = data.targets.find(t => t.date === draft.date && !isDone(t, data.sessions)
-      && t.subjectId === session.subjectId && t.paperId === session.paperId && t.chapterId === session.chapterId);
-    actions.setData(prev => ({
-      ...prev,
-      sessions: [...prev.sessions, match ? { ...session, targetId: match.id } : session]
-    }));
-    actions.notify(`${formatDuration(draft.minutes)} logged for ${dayLabel(draft.date)} · ${match ? "target completed" : "extra study"}`);
-  };
 
   return (
     <div className="page today-page">
@@ -89,7 +50,7 @@ export default function Today({ data, actions }: { data: AppData; actions: AppAc
       </Card>
 
       {week.count === 0 && (
-        <button className="setup-banner" onClick={() => actions.go("planner")}>
+        <button className="setup-banner" onClick={() => actions.openStudyWizard("plan")}>
           <span className="banner-icon"><CalendarPlus size={22} /></span>
           <span><b>Your week is still open</b><small>Plan Saturday to Friday in one sitting — you can change anything, anytime.</small></span>
           <span className="banner-cta">Plan this week <ArrowRight size={16} /></span>
@@ -102,25 +63,24 @@ export default function Today({ data, actions }: { data: AppData; actions: AppAc
             <SectionTitle
               eyebrow="EXECUTE"
               title="Today's targets"
-              detail="Start a timer on any target; logging happens automatically."
+              detail="Tap a target to log actual time or update chapter progress."
               action={<button className="btn ghost" onClick={() => actions.go("planner")}>Open planner <ArrowRight size={15} /></button>}
             />
             {targets.length ? (
               <div className="target-list">
-                {targets.map(t => <TargetRow key={t.id} target={t} data={data} actions={actions} onEdit={() => actions.go("planner", t.date, t.id)} />)}
+                {targets.map(t => <TargetRow key={t.id} target={t} data={data} actions={actions} onEdit={() => actions.openStudyWizard("plan", t.date, t.id)} />)}
               </div>
             ) : (
-              <EmptyState icon={Target} title="Nothing planned for today" text="Add a target below, or set the whole week in the planner." />
+              <EmptyState icon={Target} title="Nothing planned for today" text="Choose a subject, chapter and goal—no typing required." />
             )}
             <div className="inline-add">
-              <label>Add a target</label>
-              <SmartInput settings={data.settings} value={planText} onChange={setPlanText} onSubmit={addPlan} placeholder="e.g. Physics ch 3, 45 min tomorrow" />
+              <button className="btn secondary add-target-btn" onClick={() => actions.openStudyWizard("plan", today)}><Plus size={16} /> Add a target</button>
             </div>
           </Card>
 
           <Card>
-            <SectionTitle eyebrow="CAPTURE" title="Quick log" detail="Studied something outside the plan? One line is enough. Add a day to log another date." />
-            <SmartInput settings={data.settings} value={logText} onChange={setLogText} onSubmit={addLog} defaultIntent="log" placeholder="e.g. did Chemistry organic 30 min" />
+            <SectionTitle eyebrow="CAPTURE" title="Quick log" detail="Log study outside your plan with a few taps." />
+            <button className="quick-log-cta" onClick={() => actions.openStudyWizard("log", today)}><span><Clock3 size={16} /></span><b>Choose a subject and chapter</b><small>Record minutes or update chapter completion</small><ArrowRight size={16} /></button>
           </Card>
         </div>
 

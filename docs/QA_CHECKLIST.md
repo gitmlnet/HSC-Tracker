@@ -5,12 +5,13 @@ Verification performed on this branch. Every item below was checked against the 
 ## Correctness
 
 - [x] TypeScript strict check and Vite production build pass; `npm audit` reports 0 vulnerabilities (Vite pinned to 8.3.8).
-- [x] Setup → week template → inline quick add → timer start/finish → history → insights flow passes with no console or runtime errors.
-- [x] Completing a target logs a session and shows an Undo toast; Undo restores the previous state.
-- [x] Clicking a target on Today opens that exact target's editor in the weekly planner.
+- [x] Production-bundle guided planning/logging flow: select subject and built-in chapter, save time/progress goals, repeat one target on multiple dates, and log an absolute chapter estimate; jsdom interaction run reports no runtime errors.
+- [x] Target logging opens directly in the wizard; the focus timer still logs actual elapsed minutes and its stop flow works.
+- [x] Progress semantics verified: an overall chapter estimate of 100% does not complete a time target; a progress goal completes at its cumulative milestone; timer minutes alone do not complete a progress target.
+- [x] Today target edit controls open the exact target in the guided planner; History displays and edits chapter snapshots separately from target completion.
 - [x] Copy last week, carry-forward, drag between days and weekly review are wired to the same target store.
-- [x] v1 → v2 migration preserves plans, sessions, progress, theme and session→target links; original v1 payload is kept in localStorage.
-- [x] A named day in quick entry is honoured on Today and in the weekly board; a logged line is never silently turned into a plan (or vice versa).
+- [x] v1 migration preserves plans, sessions, progress and theme; v2 records without tracking-mode fields default to time, completed legacy links gain an absolute 100% chapter snapshot, and session→target links are repaired where possible.
+- [x] Multi-date planning creates distinct targets on the selected Saturday–Friday dates; single-date planning remains available.
 - [x] Undo is surgical: reversing a completion no longer overwrites unrelated edits made while the toast is visible.
 - [x] A target with an active timer cannot be deleted or removed by clearing/replacing its week; no logged minutes are silently lost.
 - [x] Past-dated logs use a timestamp from that day instead of the current time.
@@ -36,8 +37,9 @@ Verification performed on this branch. Every item below was checked against the 
 - [x] Touch controls enlarged on phones; target actions are always visible on touch devices instead of hover-only.
 - [x] Subject colour rails make targets scannable without adding text.
 - [x] Focus-visible rings, aria labels, dialog roles and polite live hints are in place.
-- [x] Every dialog (setup, command palette, install guide) traps Tab focus, closes on Escape and returns focus to its trigger; global shortcuts stay quiet while a dialog is open.
-- [x] Page, toast, dialog and check transitions use one easing curve and respect `prefers-reduced-motion`, including programmatic scrolls.
+- [x] Every dialog (setup, command palette, install guide and study wizard) traps Tab focus, closes on Escape and returns focus to its trigger; the study wizard's open/Escape/focus-return path is verified in the production bundle.
+- [x] Page, toast, dialog and check transitions respect `prefers-reduced-motion`, including wizard transitions and programmatic scrolls.
+- [x] Study wizard has a full-height small-screen layout, independently scrollable content and safe-area padding; physical Android/tablet visual testing was not available in this sandbox.
 
 ## Platform limits (by design)
 

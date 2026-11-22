@@ -67,7 +67,7 @@ export default function HistoryPage({ data, actions }: { data: AppData; actions:
               <div className="history-item" key={s.id}>
                 <div className="history-main" onClick={() => startEdit(s)}>
                   <div className="history-title"><b>{subjectName(s.subjectId, data.settings)}</b><span>{chapterName(s, data.settings) || s.topic || "Custom topic"}</span></div>
-                  <div className="history-meta"><span>{s.date}</span><span>{formatTime(s.start)} – {formatTime(s.end)}</span><span>{formatDuration(s.duration)}</span>{s.progress !== undefined && <span>{s.progress}% complete</span>}</div>
+                  <div className="history-meta"><span>{s.date}</span><span>{formatTime(s.start)} – {formatTime(s.end)}</span><span>{formatDuration(s.duration)}</span>{s.progress !== undefined && <span>{s.progress}% target</span>}{s.chapterProgress !== undefined && <span>{s.chapterProgress}% chapter</span>}</div>
                 </div>
                 <div className="row-actions">
                   <button className="icon-btn" onClick={() => startEdit(s)} aria-label="Edit session"><Pencil size={16} /></button>
@@ -78,9 +78,10 @@ export default function HistoryPage({ data, actions }: { data: AppData; actions:
                     <label>Date<input type="date" value={draft.date} onChange={e => setDraft({ ...draft, date: e.target.value })} /></label>
                     <label>From<input type="time" value={draft.start} onChange={e => setDraft({ ...draft, start: e.target.value })} /></label>
                     <label>To<input type="time" value={draft.end} onChange={e => setDraft({ ...draft, end: e.target.value })} /></label>
-                    <label>Minutes<input type="number" min="1" value={draft.duration} onChange={e => setDraft({ ...draft, duration: Number(e.target.value) || 1 })} /></label>
+                    <label>Minutes<input type="number" min="0" value={draft.duration} onChange={e => setDraft({ ...draft, duration: Math.max(0, Number(e.target.value) || 0) })} /></label>
                     <label>Topic<input value={draft.topic} onChange={e => setDraft({ ...draft, topic: e.target.value })} /></label>
-                    <label>Completion (%)<input type="range" min="0" max="100" step="5" value={draft.progress ?? 0} onChange={e => setDraft({ ...draft, progress: Number(e.target.value) })} /></label>
+                    {draft.progress !== undefined && <label>Target completion (%)<input type="range" min="0" max="100" step="5" value={draft.progress} onChange={e => setDraft({ ...draft, progress: Number(e.target.value) })} /></label>}
+                    {draft.chapterProgress !== undefined && <label>Chapter completion (%)<input type="range" min="0" max="100" step="5" value={draft.chapterProgress} onChange={e => setDraft({ ...draft, chapterProgress: Number(e.target.value) })} /></label>}
                     <div className="editor-actions"><button className="btn ghost" onClick={() => { setEditingId(null); setDraft(null); }}>Cancel</button><button className="btn primary" onClick={saveEdit}>Save changes</button></div>
                   </div>
                 )}

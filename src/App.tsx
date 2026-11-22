@@ -11,6 +11,7 @@ import InstallDialog from "./components/InstallDialog";
 import GuideDialog from "./components/GuideDialog";
 import { PAGE_GUIDE } from "./data/guide";
 import { promptInstall, usePwaInstall } from "./lib/pwaInstall";
+import StudyWizard from "./components/StudyWizard";
 import Today from "./pages/Today";
 import Planner from "./pages/Planner";
 import Insights from "./pages/Insights";
@@ -36,7 +37,6 @@ export default function App() {
     return NAV.some(([id]) => id === hash) ? hash as Page : "today";
   });
   const [anchor, setAnchor] = useState(localDate());
-  const [focusTargetId, setFocusTargetId] = useState<string | null>(null);
   const [ready, setReady] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
@@ -46,6 +46,7 @@ export default function App() {
   const [installInfoOpen, setInstallInfoOpen] = useState(false);
   const [guideOpen, setGuideOpen] = useState(false);
   const [guideSection, setGuideSection] = useState("start");
+  const [studyWizard, setStudyWizard] = useState<{ mode: "plan" | "log"; date: string; targetId?: string } | null>(null);
   const [toast, setToast] = useState<Toast | null>(null);
   const installState = usePwaInstall();
   const [now, setNow] = useState(Date.now());
@@ -83,9 +84,14 @@ export default function App() {
     setPaletteOpen(false);
   }, []);
 
-  const go = useCallback((next: Page, date?: string, targetId?: string) => {
+  const openStudyWizard = useCallback((mode: "plan" | "log", date?: string, targetId?: string) => {
+    setStudyWizard({ mode, date: date || (mode === "plan" ? weekStart(anchor) : localDate()), targetId });
+    setMenuOpen(false);
+    setPaletteOpen(false);
+  }, [anchor]);
+
+  const go = useCallback((next: Page, date?: string) => {
     if (date) setAnchor(date);
-    setFocusTargetId(targetId || null);
     setPage(next);
     setMenuOpen(false);
     window.scrollTo({ top: 0, behavior: reducedMotion() ? "auto" : "smooth" });
@@ -126,21 +132,21 @@ export default function App() {
       start: timeBefore(duration),
       end: clockNow(),
       duration,
-      ...(mode === "full" ? { progress: 100 } : {})
+      ...(mode === "full" && target.trackingMode !== "progress" ? { progress: 100 } : {})
     });
     setData(prev => ({ ...prev, sessions: [...prev.sessions, session] }));
-    notify(mode === "full" ? `${duration} min logged · target complete` : `${duration} min logged`);
+    notify(mode === "full" && target.trackingMode !== "progress" ? `${duration} min logged · target complete` : `${duration} min logged`);
     setTimer(null);
   }, [timer, data.targets, notify]);
 
   const actions = useMemo(() => ({
-    setData, notify, timer, elapsedMs, startTimer, pauseTimer, stopTimer, go, openGuide
-  }), [notify, timer, elapsedMs, startTimer, pauseTimer, stopTimer, go, openGuide]);
+    setData, notify, timer, elapsedMs, startTimer, pauseTimer, stopTimer, go, openGuide, openStudyWizard
+  }), [notify, timer, elapsedMs, startTimer, pauseTimer, stopTimer, go, openGuide, openStudyWizard]);
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
       const typing = event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement || event.target instanceof HTMLSelectElement;
-      const otherDialog = installInfoOpen || guideOpen || !data.settings.onboarded;
+      const otherDialog = installInfoOpen || guideOpen || Boolean(studyWizard) || !data.settings.onboarded;
       if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k" && !otherDialog) {
         event.preventDefault();
         setPaletteOpen(v => !v);
@@ -153,7 +159,7 @@ export default function App() {
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [paletteOpen, installInfoOpen, guideOpen, data.settings.onboarded]);
+  }, [paletteOpen, installInfoOpen, guideOpen, studyWizard, data.settings.onboarded]);
 
   useEffect(() => {
     if (!ready || !data.settings.reminders.enabled) return;
@@ -215,13 +221,13 @@ export default function App() {
               if (installState.prompt) void promptInstall();
               else setInstallInfoOpen(true);
             }} aria-label={installState.installed ? "App is installed" : "Install app"} title={installState.installed ? "App is installed" : undefined}><Download size={16} /> <span>{installState.installed ? "Installed" : "Install app"}</span></button>
-            <button className="btn primary" onClick={() => go("planner")}><CalendarRange size={17} /> <span>Plan week</span></button>
+            <button className="btn primary" onClick={() => openStudyWizard("plan")}><CalendarRange size={17} /> <span>Plan week</span></button>
           </div>
         </header>
 
         <main>
           {page === "today" && <Today data={data} actions={actions} />}
-          {page === "planner" && <Planner data={data} actions={actions} anchor={anchor} setAnchor={setAnchor} focusTargetId={focusTargetId} />}
+          {page === "planner" && <Planner data={data} actions={actions} anchor={anchor} setAnchor={setAnchor} />}
           {page === "insights" && <Insights data={data} />}
           {page === "history" && <HistoryPage data={data} actions={actions} />}
           {page === "settings" && <SettingsPage data={data} actions={actions} />}
@@ -229,12 +235,21 @@ export default function App() {
       </div>
 
       {!data.settings.onboarded && <Setup data={data} actions={actions} />}
-      {paletteOpen && <CommandPalette data={data} actions={actions} onClose={() => setPaletteOpen(false)} />}
+      {paletteOpen && <CommandPalette actions={actions} onClose={() => setPaletteOpen(false)} />}
       {guideOpen && <GuideDialog initialSection={guideSection} actions={actions} onClose={() => setGuideOpen(false)} />}
       {installInfoOpen && <InstallDialog canInstall={Boolean(installState.prompt)} installed={installState.installed} onClose={() => setInstallInfoOpen(false)} onInstall={async () => {
         const result = await promptInstall();
         if (result === "accepted") setInstallInfoOpen(false);
       }} />}
+      {studyWizard && <StudyWizard
+        key={`${studyWizard.mode}:${studyWizard.targetId || "new"}:${studyWizard.date}`}
+        data={data}
+        actions={actions}
+        mode={studyWizard.mode}
+        initialDate={studyWizard.date}
+        target={studyWizard.targetId ? data.targets.find(target => target.id === studyWizard.targetId) : undefined}
+        onClose={() => setStudyWizard(null)}
+      />}
       <TimerDock data={data} actions={actions} />
       {toast && (
         <div className="toast" role="status">

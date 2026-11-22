@@ -35,7 +35,7 @@ export const GUIDE_SECTIONS: GuideSection[] = [
         items: [
           { title: "Set your profile once", text: "Choose your group, subjects, exam date and a realistic daily goal. You can change all of it later in Settings." },
           { title: "Plan Saturday to Friday", text: "At the start of the week, open Weekly Planner and apply a template, auto-plan, copy last week, or add targets one by one. The whole week lives on one board." },
-          { title: "Work from Today", text: "Today shows only what matters now: your targets, the daily goal, the exam countdown, your streak, and a one-line quick entry. Start a timer on a target and finish to log it." },
+          { title: "Work from Today", text: "Today shows your targets, daily goal, exam countdown and streak. Use the tap-first Log study flow or start a timer on a target; finishing the timer records actual elapsed time." },
           { title: "Review and adjust", text: "Insights shows the honest numbers; History lets you correct any session. Unfinished targets can be carried into next week from the planner's weekly review." }
         ]
       },
@@ -58,7 +58,7 @@ export const GUIDE_SECTIONS: GuideSection[] = [
         title: "The three steps",
         items: [
           { title: "Choose your group", text: "Science, Commerce, or Arts & Humanities. This fills in the usual subjects for that group." },
-          { title: "Pick your subjects", text: "Tap a subject to add or remove it. Only chosen subjects appear in plans, quick entry and insights." },
+          { title: "Pick your subjects", text: "Tap a subject to add or remove it. Only chosen subjects appear in the planner, guided study flow and insights." },
           { title: "Set the exam date and daily goal", text: "The date powers the countdown. The goal powers the daily progress meter and the capacity bar on each planner day. 150 minutes a day is a reasonable starting point." }
         ]
       },
@@ -105,7 +105,7 @@ export const GUIDE_SECTIONS: GuideSection[] = [
         items: [
           { title: "Start with a shape", text: "When the week is empty, choose Balanced week, Exam sprint, Revision week, or Light week. Auto-plan applies the balanced shape immediately." },
           { title: "Copy if you prefer continuity", text: "Copy last week duplicates the previous week's targets into the same weekdays with new IDs." },
-          { title: "Build it yourself", text: "Dismiss the setup panel and type targets directly into any day's input line. Press Enter or the return-arrow button." },
+          { title: "Build it yourself", text: "Dismiss the setup panel and tap Plan a target on the board. Choose one or more dates, a subject, chapter and a time or chapter-progress goal." },
           { title: "Clear and restart", text: "Clear week needs two clicks to protect against accidents. Undo is available in the toast for five seconds." }
         ]
       },
@@ -113,8 +113,9 @@ export const GUIDE_SECTIONS: GuideSection[] = [
         kind: "bullets",
         title: "Working inside a day",
         items: [
-          "Click a target (or its arrow button) to edit minutes, topic, day and priority. Priority targets sort to the top and show a dot.",
-          "Drag a target onto another day column to move it. The day dropdown in the editor does the same thing with a keyboard or on touch.",
+          "Tap a target (or its edit button) to adjust its date, subject, chapter and goal in the guided flow.",
+          "Drag-and-drop can move a target to another day, but it is optional; the guided flow supports tap-first planning.",
+          "Time goals track planned and logged minutes. Chapter-progress goals track an overall cumulative chapter estimate and complete only at their saved milestone.",
           "Use the trash button to remove a target; Undo brings it back.",
           "The small bar shows planned minutes against your daily goal. Amber means the day is over capacity.",
           "Templates with two or more targets a day give Friday one fewer target; a one-a-day light week stays at one."
@@ -139,44 +140,26 @@ export const GUIDE_SECTIONS: GuideSection[] = [
   },
   {
     id: "quick-entry",
-    title: "Quick entry: type one line, get a full target or session",
-    nav: "Quick entry",
+    title: "Guided planning: tap through dates, subjects and goals",
+    nav: "Planning & logging",
     group: "Planning",
     icon: "sparkles",
     page: "planner",
-    intro: "The magic-wand input understands a subject, a chapter, a duration, an intent and a day from plain language. A live preview shows exactly what will be created before you press Enter.",
-    keywords: "smart input parser alias chapter duration intent date examples type",
+    intro: "Plan one day or a whole Saturday–Friday week without routine typing. The guided flow lets you select dates, a subject, a built-in chapter and either a time or cumulative chapter-progress goal.",
+    keywords: "wizard guided plan week date subject chapter tap progress percentage cumulative log typing",
     blocks: [
       {
-        kind: "examples",
-        title: "Try these",
+        kind: "steps",
+        title: "Plan a target",
         items: [
-          { code: "Physics ch 3 45m", text: "Plans a 45-minute Physics chapter 3 target" },
-          { code: "log Chemistry organic 30 min", text: "Logs 30 minutes of study and links it to a matching target" },
-          { code: "plan Math ch 4 1h tomorrow", text: "Plans an hour of mathematics for tomorrow" },
-          { code: "Bio 1.5h Sunday", text: "Plans a 90-minute Biology target on Sunday" },
-          { code: "go planner", text: "Jumps to the weekly planner (inside the command palette)" }
+          { title: "Choose the day", text: "Pick one date or expand Repeat this target on other days to select several dates in the same Saturday–Friday week." },
+          { title: "Choose subject and chapter", text: "Tap a subject and then a built-in syllabus chapter. Custom topics are optional; subjects without a syllabus include General study and Past paper practice." },
+          { title: "Choose a goal", text: "Time uses quick duration buttons and a slider. Chapter progress uses a percentage milestone that completes only when the overall chapter estimate reaches it." },
+          { title: "Log progress", text: "Use Log study from Today or the target's circle. Select a chapter and record actual time or its new overall completion percentage." }
         ]
       },
-      {
-        kind: "bullets",
-        title: "What the parser understands",
-        items: [
-          "Subjects by full name or short alias: phy, chem, bio, math / maths / higher math.",
-          "Chapters by number (ch 3, chapter 3) or by a couple of recognisable name words.",
-          "Paper hints: 1st / p1 / paper one, or 2nd / p2 / paper two. If no hint is given, the chapter is searched across papers.",
-          "Durations: 45m, 45 min, 1h, 1.5h, 1h 30m. Values are capped at 8 hours and default to 45 minutes when omitted.",
-          "Days: today, tomorrow, Saturday through Friday, or an exact YYYY-MM-DD date. A named weekday means the next occurrence from today.",
-          "Intent: log / studied / did / spent creates a study session; plan / schedule / target creates a target. The input you are typing in sets the default when no prefix is used."
-        ]
-      },
-      {
-        kind: "note",
-        tone: "tip",
-        title: "One rule to remember",
-        text: "If the preview line is green and shows the right intent, subject, duration and day, pressing Enter will do exactly that. If you change your mind, edit the text instead of cleaning up afterwards."
-      },
-      { kind: "text", text: "In Today there are two separate inputs: Add a target and Quick log. In a planner day column, the input plans by default but a log prefix creates a session on that day. The command palette accepts both plus page navigation." }
+      { kind: "note", tone: "tip", title: "Percentages are cumulative", text: "If a chapter is estimated at 45% and later 70%, its current progress is 70%, not 115%. Finishing a time target does not claim the chapter is complete, and time alone does not complete a progress target." },
+      { kind: "text", text: "The command palette still supports page navigation (go planner) and guide topics (help timer). Drag-and-drop on the weekly board is optional; the guided flow is the primary way to plan." }
     ]
   },
   {
@@ -186,7 +169,7 @@ export const GUIDE_SECTIONS: GuideSection[] = [
     group: "Daily study",
     icon: "target",
     page: "today",
-    intro: "Today is the only screen you need while studying. It shows the day's targets, the daily goal, the week at a glance, and both quick entry lines in one place.",
+    intro: "Today is the execution screen. It shows the day's targets, daily goal, week at a glance, and a tap-first way to log study without routine typing.",
     keywords: "today targets streak countdown progress week strip quick log checklist execute",
     blocks: [
       {
@@ -195,8 +178,8 @@ export const GUIDE_SECTIONS: GuideSection[] = [
         items: [
           { title: "Header", text: "The date, greeting, exam countdown and current streak. The streak counts consecutive days with at least one logged session." },
           { title: "Today at a glance", text: "Targets done, minutes studied against your daily goal, chapter coverage, a progress ring and a daily goal meter." },
-          { title: "Today's targets", text: "High-priority targets come first. Tick the circle to mark a target complete — a session is logged automatically and Undo is offered. Press play to start a focus timer. Click the target text to open its editor in the planner." },
-          { title: "Quick add and Quick log", text: "Add a target for today (or a named day) with one line, or log study that was not in the plan. Both use the same natural language parser." },
+          { title: "Today's targets", text: "High-priority targets come first. Use the circle to log study for a target, press play to start a focus timer, or open the target to adjust it in the planner." },
+          { title: "Plan and Log study", text: "The guided flows use taps for dates, subjects, chapters, quick durations and progress goals. Custom topic names are optional; you can log study that was not already planned." },
           { title: "This week strip", text: "Seven small day cards show done/total and a fill bar for studied versus planned minutes. Click any day to open that day in the planner." }
         ]
       },
@@ -218,12 +201,12 @@ export const GUIDE_SECTIONS: GuideSection[] = [
         items: [
           { title: "Start", text: "Press the play button on a target. The floating dock shows the target and elapsed time. Only one timer can run at a time." },
           { title: "Pause and resume", text: "Pause keeps the accumulated time; the pause button in the dock or on the target row becomes a resume button." },
-          { title: "Finish", text: "Finish logs the time and marks the target complete. Sessions are rounded to whole minutes, with a minimum of one minute." },
+          { title: "Finish", text: "Finish logs the time. A full timer finish completes a time-based target; minutes alone never complete a progress-based target. Sessions are rounded to whole minutes, with a minimum of one minute." },
           { title: "Log partial", text: "Use this when you stop early: the minutes are saved but the target stays open so you can continue later." }
         ]
       },
       { kind: "bullets", title: "Good to know", items: ["The timer keeps running while you move between Today, Planner, Insights and Settings.", "Finishing adds a real session to History, linked to the target.", "A target with a running timer is protected from deletion and week-clearing."] },
-      { kind: "note", tone: "tip", title: "Ticking the circle is different", text: "Manually completing a target logs that target's planned minutes as a completion session. The timer logs the minutes you actually spent." }
+      { kind: "note", tone: "tip", title: "Logging and timing", text: "The target circle opens its logger for actual time or an absolute chapter estimate. The timer records elapsed minutes; it does not change chapter progress." }
     ]
   },
   {
@@ -245,12 +228,12 @@ export const GUIDE_SECTIONS: GuideSection[] = [
           "Target completion: percentage of all targets that reached 100%.",
           "Current streak: consecutive days ending today with at least one session.",
           "Where your time goes: minutes per subject, largest first.",
-          "Chapter coverage: distinct chapters with a completed target, counted only from subjects with a chapter list. Science subjects include the NCTB-style chapter list; custom Commerce and Arts subjects do not have a chapter list yet, so they show 0% until chapter data is added. Their study time is still tracked everywhere else.",
+          "Chapter coverage: distinct syllabus chapters with an explicit 100% overall chapter estimate, counted only from subjects with a chapter list. Completing a timed target or an intermediate progress milestone does not claim full chapter coverage. Science subjects include the NCTB-style chapter list; custom Commerce and Arts subjects do not have a chapter list yet.",
           "Planned vs studied: eight weeks of planned minutes beside actually studied minutes.",
           "Study consistency: a 12-week heatmap; brighter squares mean more minutes studied that day."
         ]
       },
-      { kind: "note", tone: "info", title: "If a number looks wrong", text: "Check History. Sessions can be edited there — date, time, minutes, topic and completion percentage — and every insight updates immediately." }
+      { kind: "note", tone: "info", title: "If a number looks wrong", text: "Check History. Sessions can be edited there — date, time, minutes, topic, target completion and absolute chapter percentage — and every insight updates immediately." }
     ]
   },
   {
@@ -268,12 +251,12 @@ export const GUIDE_SECTIONS: GuideSection[] = [
         title: "Find and fix a session",
         items: [
           { title: "Filter", text: "Combine free-text search with date, subject, chapter, a minimum number of minutes, and newest/longest sorting." },
-          { title: "Edit", text: "Click a row or its pencil button. Change the date, start and end times, minutes, topic, and completion percentage, then Save changes." },
+          { title: "Edit", text: "Click a row or its pencil button. Change the date, start and end times, minutes, topic, target completion or the absolute chapter percentage (when present), then Save changes." },
           { title: "Delete", text: "The trash button removes a session and offers Undo in the toast." },
           { title: "Export", text: "Export CSV downloads the study log for spreadsheets or your own archive. A full JSON backup is in Settings." }
         ]
       },
-      { kind: "note", tone: "warn", title: "Completion percentage matters", text: "A session at 100% marks its linked target complete. Lowering it in History reopens that target and changes coverage and completion statistics." }
+      { kind: "note", tone: "warn", title: "Two percentages, two meanings", text: "Target completion controls whether a linked time target is done. Absolute chapter completion updates the chapter estimate; only 100% contributes full chapter coverage. Progress targets complete at their own cumulative goal." }
     ]
   },
   {
@@ -338,8 +321,8 @@ export const GUIDE_SECTIONS: GuideSection[] = [
         title: "Shortcuts",
         items: [
           { code: "Ctrl / ⌘ + K", text: "Open or close the command palette from anywhere" },
-          { code: "N", text: "Open quick entry when you are not typing in a field" },
-          { code: "Enter", text: "Submit the line you are typing in any smart input" },
+          { code: "N", text: "Open quick actions when you are not typing in a field" },
+          { code: "Enter", text: "Run a matching command or guide search in the palette" },
           { code: "Esc", text: "Close the guide, palette, install dialog or setup" },
           { code: "Tab / Shift + Tab", text: "Move through controls; focus stays inside an open dialog" },
           { code: "Sidebar button", text: "On desktop, collapse or expand the left icon rail. On phones, open the slide-in navigation drawer; Escape also closes it." }
@@ -376,7 +359,7 @@ export const GUIDE_SECTIONS: GuideSection[] = [
           "Where did my old data go? Version 1 plans and sessions were migrated automatically into targets and sessions. A copy of the original record is kept in localStorage.",
           "Why is chapter coverage 0% for Commerce or Arts? Only subjects with a chapter list can be counted. Time, targets, streaks and insights still work normally.",
           "Can I use it on two devices? Yes — export a JSON backup on one device and import it on the other. There is no automatic cloud sync.",
-          "Why did a completion add minutes I did not study? Ticking the circle is a shortcut that logs the target's planned minutes. Use the timer for real elapsed time, or edit/delete the session in History.",
+          "Does chapter progress finish a timed target? No. Time and progress targets use separate completion rules: chapter percentages do not complete timed targets, and logged minutes do not complete progress targets.",
           "Can I move a target to a day outside this week? Yes, edit its day; the weekly board follows the week you are viewing.",
           "Is anything sent online? No. There is no account, tracking or server-side study data."
         ]

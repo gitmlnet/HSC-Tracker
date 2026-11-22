@@ -7,7 +7,7 @@ This manual explains every screen, control and concept in the app. The same guid
 1. [The idea and the weekly method](#1-the-idea-and-the-weekly-method)
 2. [First-time setup](#2-first-time-setup)
 3. [Weekly Planner](#3-weekly-planner)
-4. [Quick entry syntax](#4-quick-entry-syntax)
+4. [Tap-first planning and logging](#4-tap-first-planning-and-logging)
 5. [Today](#5-today)
 6. [Focus timer and logging](#6-focus-timer-and-logging)
 7. [Insights](#7-insights)
@@ -41,7 +41,7 @@ The first screen asks three things:
 | Step | What you choose | Why it matters |
 | --- | --- | --- |
 | 1 | Student group — Science, Commerce, or Arts & Humanities | Fills in the usual subjects |
-| 2 | Subjects | Only chosen subjects appear in plans, quick entry and insights |
+| 2 | Subjects | Only chosen subjects appear in plans, guided logging and insights |
 | 3 | HSC exam date and daily study goal | Powers the countdown, daily meter and each day's capacity bar |
 
 **Skip for now** applies defaults (Science subjects, 150 minutes a day) and drops you straight into the planner. Everything can be changed later in **Settings**.
@@ -56,7 +56,7 @@ The planner is the heart of the app. On desktop, use the panel control beside th
 - completed / total targets;
 - a capacity bar comparing planned minutes with your daily goal (amber means over capacity);
 - target rows, with high-priority targets first;
-- a one-line input for adding to that day.
+- a tap-first **Plan a target** button for adding to that day.
 
 ### Creating a week
 
@@ -69,16 +69,16 @@ The planner is the heart of the app. On desktop, use the panel control beside th
 | **Auto-plan** | Applies the balanced shape immediately |
 | **Copy last week** | Duplicates the previous week's targets on the same weekdays with new IDs |
 | **Clear week** | Requires a second click; Undo is offered in the toast |
-| **Start with a blank week** | Dismisses the setup panel so you can add targets manually |
+| **Start with a blank week** | Dismisses the setup panel; add targets any time with the guided tap-through flow |
 
 The shape uses your subjects and daily goal to pick chapters and minutes. Friday always receives one fewer target.
 
 ### Working with a target
 
-- **Click the row or its arrow** to edit minutes, topic, day and priority. Priority targets sort to the top and show a dot.
-- **Drag the row** onto another day, or use the **Day** dropdown in the editor — useful on touch and with a keyboard.
+- **Tap the row or its edit button** to adjust its date, subject, chapter and goal in the guided flow.
+- **Drag the row** onto another day if you prefer; drag-and-drop is optional.
 - **Trash** removes the target; **Undo** restores it for five seconds.
-- **Circle** marks it complete and logs a session automatically; **Undo** reopens it.
+- **Circle** opens the target's logging flow for actual time or chapter progress.
 - **Play** starts the focus timer on that target.
 - The coloured rail on the left of each row identifies the subject at a glance.
 
@@ -96,31 +96,27 @@ At the bottom of the planner:
 
 ---
 
-## 4. Quick entry syntax
+## 4. Tap-first planning and logging
 
-Any input with the magic-wand icon understands one plain sentence. A live hint previews the intent, subject, duration and day before you press **Enter**.
+Use **Plan week**, **Plan a target**, or **Log study** to open the guided flow. The normal planning and logging path is designed for tapping—typing is only needed if you choose to add an optional custom topic.
 
-### Examples
+### Plan one day or several days
 
-| Type | Result |
-| --- | --- |
-| `Physics ch 3 45m` | 45-minute Physics chapter 3 target |
-| `log Chemistry organic 30 min` | 30-minute logged session, linked to a matching target |
-| `plan Math ch 4 1h tomorrow` | One-hour mathematics target tomorrow |
-| `Bio 1.5h Sunday` | 90-minute Biology target on Sunday |
-| `go planner` | Switches to the planner (command palette only) |
-| `help timer` | Opens the guide at the timer chapter |
+1. Pick a day from the current Saturday–Friday week.
+2. Optionally expand **Repeat this target on other days** and tap any additional dates.
+3. Tap a subject, then a syllabus chapter or built-in study block.
+4. Choose a **Time** goal or a **Chapter progress** milestone. Time goals have quick duration buttons and a 15-minute slider; progress goals use percentage buttons and a slider.
+5. Save. The repeated dates each get their own target.
 
-### What is recognised
+Custom topic names are optional. For subjects without a built-in syllabus, choose General study or Past paper practice. Drag-and-drop in the weekly board remains optional; all planning controls also work by tap.
 
-- **Subjects:** full names and aliases — `phy`, `chem`, `bio`, `math`, `maths`, `higher math`.
-- **Chapters:** number (`ch 3`, `chapter 3`) or at least two distinctive name words. If no paper is specified, all papers are searched.
-- **Papers:** `1st`, `p1`, `paper one`, `2nd`, `p2`, `paper two`.
-- **Durations:** `45m`, `45 min`, `1h`, `1.5h`, `1h 30m`. Capped at 8 hours; defaults to 45 minutes.
-- **Days:** `today`, `tomorrow`, any weekday name, or `YYYY-MM-DD`. A weekday means the next occurrence from today.
-- **Intent:** `log / studied / did / spent` creates a session; `plan / schedule / target` creates a target. The input you are using supplies the default when no prefix is typed.
+### Log a study session
 
-**Today** has two inputs: **Add a target** and **Quick log**. A planner day input plans by default but respects a `log` prefix. The command palette accepts both plus page navigation.
+Tap **Log study** on Today or the circle beside a target. Choose a date, subject and chapter, then tap a quick time value or save the chapter's current overall percentage. For a linked target, the target action opens its log directly. The timer remains available on any target.
+
+A chapter percentage is **cumulative**: logging 45% and later 70% means the current estimate is 70%, not 115%. A progress target completes when the chapter reaches its saved percentage goal. A time target completes only when its planned time is explicitly completed; chapter progress does not complete it, and logged minutes do not complete a progress target.
+
+The command palette still supports page navigation (`go planner`) and guide topics (`help timer`).
 
 ---
 
@@ -132,7 +128,7 @@ Today is the execution screen — the only one you need while studying.
 | --- | --- |
 | Header | Date, greeting, exam countdown, consecutive-day streak |
 | Today at a glance | Targets done, minutes studied vs daily goal, chapter coverage, progress ring, daily goal meter |
-| Today's targets | Priority-sorted checklist with complete, timer, edit and quick-add |
+| Today's targets | Priority-sorted checklist with logging, timer and target-edit controls |
 | Quick log | One-line capture for study outside the plan |
 | This week | Seven day cards with done/total and studied-vs-planned fill; click one to open that day in the planner |
 | Setup banner | Appears when the week is empty and invites you to plan Saturday to Friday |
@@ -147,10 +143,10 @@ A timer belongs to one target and follows you across pages. It survives a refres
 
 1. **Start** with the play button on a target. The floating dock shows the target and elapsed time. Only one timer can run at a time.
 2. **Pause / resume** keeps accumulated time. The dock and the target row both offer this control.
-3. **Finish** logs the real elapsed time and marks the target complete.
+3. **Finish** logs the real elapsed time. On a time-based target, a full timer finish also marks the target complete; on a progress-based target, minutes alone never complete it.
 4. **Log partial** saves the minutes but leaves the target open for later.
 
-Sessions are rounded to whole minutes with a minimum of one minute. Finishing creates a real, editable session in History. Manually ticking a target's circle is different: it logs the target's **planned** minutes as a completion shortcut. Use the timer when you want honest elapsed time.
+Sessions are rounded to whole minutes with a minimum of one minute. Finishing creates a real, editable session in History. Use the target's circle to open the guided logger and record actual time or cumulative chapter progress.
 
 ---
 
@@ -165,7 +161,7 @@ Every number comes from your own targets and sessions.
 | Target completion | Percentage of targets that reached 100% |
 | Current streak | Consecutive days ending today with at least one session |
 | Where your time goes | Minutes per subject, largest first |
-| Chapter coverage | Distinct chapters with a completed target, from subjects with a chapter list |
+| Chapter coverage | Distinct syllabus chapters with an explicit 100% overall chapter estimate; finishing a time target or intermediate progress milestone does not claim full coverage |
 | Planned vs studied | Eight-week comparison of planned and logged minutes |
 | Study consistency | 12-week daily heatmap; brighter means more minutes |
 
@@ -178,11 +174,11 @@ Science subjects include an NCTB-style chapter list. Custom Commerce and Arts su
 History is the ledger behind every statistic.
 
 - **Filter** by text, date, subject, chapter, minimum minutes, and newest / longest sorting.
-- **Edit** a session's date, start and end time, minutes, topic and completion percentage. Every insight recalculates immediately.
+- **Edit** a session's date, start and end time, minutes, topic, target completion and (when present) absolute chapter completion. Every insight recalculates immediately.
 - **Delete** a session; Undo appears in the toast.
 - **Export CSV** for spreadsheets. A full JSON backup is in Settings.
 
-A session at **100%** marks its linked target complete. Lowering that percentage reopens the target and changes completion and coverage figures.
+Target completion and chapter completion are separate. A target-completion value can complete a timed target; chapter coverage changes only when an absolute chapter estimate reaches 100%. Progress-goal targets complete when the chapter's current overall estimate reaches that target's goal.
 
 ---
 
@@ -236,8 +232,8 @@ A static web app cannot reliably run in the background. Reminders are checked wh
 | --- | --- |
 | `Ctrl/⌘ + K` | Open or close the command palette anywhere |
 | Sidebar control beside the page title | Collapse/expand the desktop sidebar; the choice is remembered on this device |
-| `N` | Open quick entry when no field is being edited |
-| `Enter` | Submit the current smart input line |
+| `N` | Open the quick-actions palette when no field is being edited |
+| `Enter` | Run a matching command or guide search in the palette |
 | `Esc` | Close the guide, palette, install dialog or setup |
 | `Tab` / `Shift + Tab` | Move between controls; focus stays inside dialogs |
 
@@ -255,7 +251,7 @@ Accessibility details: descriptive button labels, polite announcements for smart
 
 **Can I use two devices?** Yes — export JSON on one and import it on the other. There is no automatic cloud sync.
 
-**Why did completing a target add minutes I did not study?** Ticking the circle is a shortcut that logs the planned minutes. Use the timer for real time, or edit/delete the session in History.
+**Does chapter progress finish a timed target?** No. Time targets and chapter-progress targets use separate completion rules: percentage updates never finish a time target, and minutes alone never finish a progress target.
 
 **Can I move a target outside this week?** Yes — edit its day; navigate to that week on the planner board.
 

@@ -112,8 +112,17 @@ export function migrate(raw: unknown): AppData {
         reminders: { ...defaults.reminders, ...(s.reminders || {}) },
         onboarded: s.onboarded !== false
       },
-      targets: source.targets as Target[],
-      sessions: source.sessions as StudySession[],
+      targets: (source.targets as Target[]).map(target => ({ ...target, trackingMode: target.trackingMode || "time" })),
+      sessions: (source.sessions as StudySession[]).map(session => {
+        const linked = (source.targets as Target[]).find(target => target.id === session.targetId
+          || (!session.targetId && legacyKey(target) === legacyKey(session)));
+        // Earlier versions treated a completed target as a completed chapter.
+        // Preserve that visible coverage once, while new time targets stay independent.
+        const linkedSession = linked && !session.targetId ? { ...session, targetId: linked.id } : session;
+        return linked && session.chapterProgress === undefined && !linked.trackingMode && (session.progress ?? 0) >= 100
+          ? { ...linkedSession, chapterProgress: 100 }
+          : linkedSession;
+      }),
       revisions: Array.isArray(source.revisions) ? source.revisions as AppData["revisions"] : []
     };
   }
@@ -146,6 +155,7 @@ export function migrate(raw: unknown): AppData {
       duration: Number(s.duration) || 0,
       topic: str(s.topic),
       ...(progress !== undefined ? { progress } : {}),
+      ...(linked && progress !== undefined && progress >= 100 ? { chapterProgress: 100 } : {}),
       createdAt: str(s.createdAt, new Date().toISOString()),
       updatedAt: str(s.updatedAt, new Date().toISOString())
     };
