@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { ArrowRight, BarChart3, Bell, BookOpen, CalendarRange, Command, Download, History as HistoryIcon, LayoutDashboard, Menu, PanelLeftClose, PanelLeftOpen, Settings as SettingsIcon, X } from "lucide-react";
+import { ArrowRight, BarChart3, Bell, BookOpen, CalendarRange, Command, Download, History as HistoryIcon, LayoutDashboard, Menu, PanelLeftClose, PanelLeftOpen, Settings as SettingsIcon, X, Zap } from "lucide-react";
 import type { AppData } from "./types";
 import type { Page, TimerState } from "./lib/appTypes";
 import { emptyData, loadData, saveData, localDate, timeBefore, clockNow, weekStart, weekDates, reducedMotion } from "./lib/storage";
@@ -12,6 +12,7 @@ import GuideDialog from "./components/GuideDialog";
 import { PAGE_GUIDE } from "./data/guide";
 import { promptInstall, usePwaInstall } from "./lib/pwaInstall";
 import StudyWizard from "./components/StudyWizard";
+import FastPlan from "./components/FastPlan";
 import Today from "./pages/Today";
 import Planner from "./pages/Planner";
 import Insights from "./pages/Insights";
@@ -47,6 +48,7 @@ export default function App() {
   const [guideOpen, setGuideOpen] = useState(false);
   const [guideSection, setGuideSection] = useState("start");
   const [studyWizard, setStudyWizard] = useState<{ mode: "plan" | "log"; date: string; targetId?: string } | null>(null);
+  const [fastPlanDate, setFastPlanDate] = useState<string | null>(null);
   const [toast, setToast] = useState<Toast | null>(null);
   const installState = usePwaInstall();
   const [now, setNow] = useState(Date.now());
@@ -86,6 +88,12 @@ export default function App() {
 
   const openStudyWizard = useCallback((mode: "plan" | "log", date?: string, targetId?: string) => {
     setStudyWizard({ mode, date: date || (mode === "plan" ? weekStart(anchor) : localDate()), targetId });
+    setMenuOpen(false);
+    setPaletteOpen(false);
+  }, [anchor]);
+
+  const openFastPlan = useCallback((date?: string) => {
+    setFastPlanDate(date || weekStart(anchor));
     setMenuOpen(false);
     setPaletteOpen(false);
   }, [anchor]);
@@ -140,13 +148,13 @@ export default function App() {
   }, [timer, data.targets, notify]);
 
   const actions = useMemo(() => ({
-    setData, notify, timer, elapsedMs, startTimer, pauseTimer, stopTimer, go, openGuide, openStudyWizard
-  }), [notify, timer, elapsedMs, startTimer, pauseTimer, stopTimer, go, openGuide, openStudyWizard]);
+    setData, notify, timer, elapsedMs, startTimer, pauseTimer, stopTimer, go, openGuide, openStudyWizard, openFastPlan
+  }), [notify, timer, elapsedMs, startTimer, pauseTimer, stopTimer, go, openGuide, openStudyWizard, openFastPlan]);
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
       const typing = event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement || event.target instanceof HTMLSelectElement;
-      const otherDialog = installInfoOpen || guideOpen || Boolean(studyWizard) || !data.settings.onboarded;
+      const otherDialog = installInfoOpen || guideOpen || Boolean(studyWizard) || Boolean(fastPlanDate) || !data.settings.onboarded;
       if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k" && !otherDialog) {
         event.preventDefault();
         setPaletteOpen(v => !v);
@@ -159,7 +167,7 @@ export default function App() {
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [paletteOpen, installInfoOpen, guideOpen, studyWizard, data.settings.onboarded]);
+  }, [paletteOpen, installInfoOpen, guideOpen, studyWizard, fastPlanDate, data.settings.onboarded]);
 
   useEffect(() => {
     if (!ready || !data.settings.reminders.enabled) return;
@@ -221,7 +229,8 @@ export default function App() {
               if (installState.prompt) void promptInstall();
               else setInstallInfoOpen(true);
             }} aria-label={installState.installed ? "App is installed" : "Install app"} title={installState.installed ? "App is installed" : undefined}><Download size={16} /> <span>{installState.installed ? "Installed" : "Install app"}</span></button>
-            <button className="btn primary" onClick={() => openStudyWizard("plan")}><CalendarRange size={17} /> <span>Plan week</span></button>
+            <button className="btn secondary fast-plan-launch" onClick={() => openFastPlan()} aria-label="Open fast plan" title="Fast plan"><Zap size={16} /> <span>Fast plan</span></button>
+            <button className="btn primary" onClick={() => openStudyWizard("plan")}><CalendarRange size={17} /> <span>Plan a target</span></button>
           </div>
         </header>
 
@@ -250,6 +259,7 @@ export default function App() {
         target={studyWizard.targetId ? data.targets.find(target => target.id === studyWizard.targetId) : undefined}
         onClose={() => setStudyWizard(null)}
       />}
+      {fastPlanDate && <FastPlan data={data} actions={actions} initialDate={fastPlanDate} onClose={() => setFastPlanDate(null)} />}
       <TimerDock data={data} actions={actions} />
       {toast && (
         <div className="toast" role="status">

@@ -9,6 +9,8 @@ Verification performed on this branch. Every item below was checked against the 
 - [x] Target logging opens directly in the wizard; the focus timer still logs actual elapsed minutes and its stop flow works.
 - [x] Progress semantics verified: an overall chapter estimate of 100% does not complete a time target; a progress goal completes at its cumulative milestone; timer minutes alone do not complete a progress target.
 - [x] Today target edit controls open the exact target in the guided planner; History displays and edits chapter snapshots separately from target completion.
+- [x] Fast plan DOM flow verifies the seven-day rail, day selection, subject/chapter/goal panes, immediate schedule update, multi-target planning, week navigation, Today navigation, and Escape close.
+- [x] Weekly Planner no longer shows the Week Setup panel; Planner text is larger, and Today plan/log actions use styled card controls with concise labels.
 - [x] Copy last week, carry-forward, drag between days and weekly review are wired to the same target store.
 - [x] v1 migration preserves plans, sessions, progress and theme; v2 records without tracking-mode fields default to time, completed legacy links gain an absolute 100% chapter snapshot, and session→target links are repaired where possible.
 - [x] Multi-date planning creates distinct targets on the selected Saturday–Friday dates; single-date planning remains available.
@@ -37,7 +39,7 @@ Verification performed on this branch. Every item below was checked against the 
 - [x] Touch controls enlarged on phones; target actions are always visible on touch devices instead of hover-only.
 - [x] Subject colour rails make targets scannable without adding text.
 - [x] Focus-visible rings, aria labels, dialog roles and polite live hints are in place.
-- [x] Every dialog (setup, command palette, install guide and study wizard) traps Tab focus, closes on Escape and returns focus to its trigger; the study wizard's open/Escape/focus-return path is verified in the production bundle.
+- [x] Every dialog (setup, command palette, install guide, study wizard and Fast plan) traps Tab focus, closes on Escape and returns focus to its trigger; both planning dialogs' open/Escape/focus paths are verified in the production bundle.
 - [x] Page, toast, dialog and check transitions respect `prefers-reduced-motion`, including wizard transitions and programmatic scrolls.
 - [x] Study wizard has a full-height small-screen layout, independently scrollable content and safe-area padding; physical Android/tablet visual testing was not available in this sandbox.
 

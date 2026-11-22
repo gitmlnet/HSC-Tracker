@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import type { DragEvent } from "react";
-import { ArrowLeft, ArrowRight, CheckCircle2, ClipboardCopy, Copy, Layers3, Plus, Sparkles, Trash2, WandSparkles } from "lucide-react";
+import { ArrowLeft, ArrowRight, CheckCircle2, ClipboardCopy, Copy, Plus, Sparkles, Trash2, WandSparkles, Zap } from "lucide-react";
 import type { AppData, Target } from "../types";
 import type { AppActions } from "../lib/appTypes";
 import type { PlanStyle } from "../lib/autoPlan";
@@ -8,8 +8,6 @@ import { DAY_NAMES, addDays, formatDuration, localDate, prettyDate, uid, weekDat
 import { buildWeek, copyWeek, STYLE_INFO } from "../lib/autoPlan";
 import { daySummary, isDone, weekSummary } from "../lib/selectors";
 import { Card, Meter, SectionTitle, TargetRow } from "../components/UI";
-
-const STYLES: PlanStyle[] = ["balanced", "exam", "revision", "light"];
 
 export default function Planner({ data, actions, anchor, setAnchor }: {
   data: AppData;
@@ -21,12 +19,7 @@ export default function Planner({ data, actions, anchor, setAnchor }: {
   const dates = useMemo(() => weekDates(start), [start]);
   const today = localDate();
   const week = weekSummary(dates, data);
-  const [dismissedSetup, setDismissedSetup] = useState(false);
   const [confirmClear, setConfirmClear] = useState(false);
-
-  useEffect(() => { setDismissedSetup(false); }, [start]);
-
-  const showSetup = week.count === 0 && !dismissedSetup;
 
   // A target with a live timer holds unsaved minutes; never remove it silently.
   const protectsTimer = (targets: Target[]) => {
@@ -45,7 +38,6 @@ export default function Planner({ data, actions, anchor, setAnchor }: {
       ...prev,
       targets: [...prev.targets.filter(t => !dates.includes(t.date)), ...targets]
     }));
-    setDismissedSetup(true);
     actions.notify(message, () => actions.setData(prev => ({
       ...prev,
       targets: [...prev.targets.filter(t => !dates.includes(t.date)), ...previous]
@@ -61,7 +53,6 @@ export default function Planner({ data, actions, anchor, setAnchor }: {
     const quietest = dates.reduce((best, date) => daySummary(date, data).plannedMinutes < daySummary(best, data).plannedMinutes ? date : best, dates[6]);
     const additions = buildWeek("revision", [quietest], data, false).targets;
     actions.setData(prev => ({ ...prev, targets: [...prev.targets, ...additions] }));
-    setDismissedSetup(true);
     actions.notify(`Revision targets added to ${prettyDate(quietest)}`);
   };
 
@@ -139,10 +130,11 @@ export default function Planner({ data, actions, anchor, setAnchor }: {
         <div className="week-range">
           <span className="eyebrow">{prettyDate(dates[0])} — {prettyDate(dates[6])}</span>
           <h2>{week.count ? `${week.count} targets planned` : "An open week"}</h2>
-          <p>{week.count ? `${week.done} completed · ${week.plannedMinutes ? `${formatDuration(week.plannedMinutes)} timed` : ""}${week.progressCount ? `${week.plannedMinutes ? " · " : ""}${week.progressCount} chapter progress` : ""} · ${formatDuration(week.loggedMinutes)} studied` : "Choose a template or add study targets with a few taps."}</p>
+          <p>{week.count ? `${week.done} completed · ${week.plannedMinutes ? `${formatDuration(week.plannedMinutes)} timed` : ""}${week.progressCount ? `${week.plannedMinutes ? " · " : ""}${week.progressCount} chapter progress` : ""} · ${formatDuration(week.loggedMinutes)} studied` : "Build your week in Fast plan, or add a single target."}</p>
         </div>
         <div className="week-toolbar">
-          <button className="btn primary" onClick={() => actions.openStudyWizard("plan", dates[0])}><Plus size={16} /> Plan a target</button>
+          <button className="btn primary fast-plan-launch" onClick={() => actions.openFastPlan(dates[0])}><Zap size={16} /> Fast plan</button>
+          <button className="btn secondary" onClick={() => actions.openStudyWizard("plan", dates[0])}><Plus size={16} /> Plan a target</button>
           <button className="btn secondary" onClick={copyPrevious}><Copy size={15} /> Copy last week</button>
           <button className="btn secondary" onClick={() => applyStyle("balanced")}><WandSparkles size={15} /> Auto-plan</button>
           <button className={`btn ghost danger ${confirmClear ? "confirm" : ""}`} onClick={clearWeek} onBlur={() => setConfirmClear(false)}>
@@ -150,23 +142,6 @@ export default function Planner({ data, actions, anchor, setAnchor }: {
           </button>
         </div>
       </Card>
-
-      {showSetup && (
-        <Card className="setup-panel">
-          <SectionTitle eyebrow="WEEK SETUP" title="How do you want this week to look?" detail="Everything below is editable after you apply it." />
-          <div className="template-grid">
-            {STYLES.map(style => (
-              <button key={style} className="template" onClick={() => applyStyle(style)}>
-                <span className="template-icon"><Layers3 size={19} /></span>
-                <b>{STYLE_INFO[style].name}</b>
-                <small>{STYLE_INFO[style].detail}</small>
-                <span className="template-apply">Use template <ArrowRight size={14} /></span>
-              </button>
-            ))}
-          </div>
-          <button className="btn ghost" onClick={() => setDismissedSetup(true)}>Start with a blank week</button>
-        </Card>
-      )}
 
       <div className="planner-board">
         {dates.map((date, index) => {

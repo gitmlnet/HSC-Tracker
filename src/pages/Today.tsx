@@ -74,13 +74,22 @@ export default function Today({ data, actions }: { data: AppData; actions: AppAc
               <EmptyState icon={Target} title="Nothing planned for today" text="Choose a subject, chapter and goal—no typing required." />
             )}
             <div className="inline-add">
-              <button className="btn secondary add-target-btn" onClick={() => actions.openStudyWizard("plan", today)}><Plus size={16} /> Add a target</button>
+              <button className="today-plan-cta" onClick={() => actions.openStudyWizard("plan", today)}>
+                <span className="today-action-icon plan"><Plus size={20} /></span>
+                <span className="today-action-copy"><b>Plan a session</b><small>Choose a day, subject, chapter and goal</small></span>
+                <ArrowRight size={18} />
+              </button>
             </div>
           </Card>
 
           <Card>
-            <SectionTitle eyebrow="CAPTURE" title="Quick log" detail="Log study outside your plan with a few taps." />
-            <button className="quick-log-cta" onClick={() => actions.openStudyWizard("log", today)}><span><Clock3 size={16} /></span><b>Choose a subject and chapter</b><small>Record minutes or update chapter completion</small><ArrowRight size={16} /></button>
+            <SectionTitle eyebrow="CAPTURE" title="Quick log" detail="For study outside your plan." />
+            <button className="quick-log-cta" onClick={() => actions.openStudyWizard("log", today)}>
+              <span className="today-action-icon log"><Clock3 size={19} /></span>
+              <span className="today-action-copy"><b>Log study</b><small>Record time or chapter progress</small></span>
+              <span className="quick-log-pill">QUICK LOG</span>
+              <ArrowRight size={18} />
+            </button>
           </Card>
         </div>
 

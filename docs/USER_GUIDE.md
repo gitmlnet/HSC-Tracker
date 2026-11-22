@@ -25,9 +25,9 @@ HSC Study Planner is built around a single workflow: **decide the whole week onc
 
 A planning week always runs **Saturday → Friday**. That matches a typical HSC study week and keeps the seven days visible together on one board.
 
-1. **Saturday — decide the week.** Apply a template or auto-plan, then remove unrealistic items and add what must happen.
+1. **Saturday — decide the week.** Use Fast plan to fill the week by hand, or apply Auto-plan and then adjust anything unrealistic.
 2. **Sunday to Thursday — execute and adjust.** Work from **Today**. If a subject takes longer than expected, change its minutes, move it to another day or add an extra target. Nothing is locked.
-3. **Friday — lighter review.** Templates that schedule two or more targets a day give Friday one fewer target. Use the weekly review to see what is unfinished.
+3. **Friday — lighter review.** Auto-plan may give Friday one fewer target. Use the weekly review to see what is unfinished.
 4. **Next week — carry forward.** Copy unfinished targets into next week. The originals remain in the current week so history stays truthful.
 
 The point is concentration: you should never have to hunt across screens to know **what is next**.
@@ -62,16 +62,13 @@ The planner is the heart of the app. On desktop, use the panel control beside th
 
 | Control | What it does |
 | --- | --- |
-| **Balanced week** | Two targets on most days, spread across chosen subjects |
-| **Exam sprint** | Three heavier targets per day |
-| **Revision week** | Short recall-focused targets |
-| **Light week** | One calm target per day |
-| **Auto-plan** | Applies the balanced shape immediately |
+| **Fast plan** | Opens a full-screen weekly view: choose a day, subject, chapter and goal, then add targets without leaving the screen |
+| **Plan a target** | Opens the guided flow for a single target or a repeated set of dates |
+| **Auto-plan** | Applies a balanced set of targets to the week |
 | **Copy last week** | Duplicates the previous week's targets on the same weekdays with new IDs |
 | **Clear week** | Requires a second click; Undo is offered in the toast |
-| **Start with a blank week** | Dismisses the setup panel; add targets any time with the guided tap-through flow |
 
-The shape uses your subjects and daily goal to pick chapters and minutes. Friday always receives one fewer target.
+Auto-plan uses your subjects and daily goal to pick chapters and minutes. Fast plan is the direct, tap-first option for building a schedule yourself.
 
 ### Working with a target
 

@@ -732,3 +732,162 @@ h1, h2, h3, h4 { font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display
 .wizard-priority-toggle svg { color: var(--amber); }
 .wizard-priority-toggle small { margin-left: auto; color: var(--muted); font-size: 9.5px; font-weight: 500; }
 .wizard-priority-toggle.selected { border-color: color-mix(in srgb, var(--amber) 45%, var(--line)); color: var(--amber); background: var(--amber-soft); }
+
+/* Clear, card-like planning actions replace the browser-default controls. */
+.today-plan-cta, .quick-log-cta {
+  display: flex; align-items: center; gap: 13px; width: 100%; min-height: 74px; padding: 13px 15px;
+  border: 1px solid var(--line); border-radius: 16px; color: var(--text); background: var(--card-2);
+  text-align: left; transition: border-color .16s ease, background .16s ease, transform .16s ease, box-shadow .16s ease;
+}
+.today-plan-cta { border-style: dashed; border-color: color-mix(in srgb, var(--accent) 42%, var(--line)); background: color-mix(in srgb, var(--accent-soft) 42%, var(--card)); }
+.today-plan-cta:hover, .quick-log-cta:hover { border-color: var(--accent); background: var(--accent-soft); transform: translateY(-1px); box-shadow: var(--shadow); }
+.today-action-icon { display: grid; place-items: center; flex: none; width: 42px; height: 42px; border-radius: 13px; }
+.today-action-icon.plan { color: var(--accent); background: var(--accent-soft); }
+.today-action-icon.log { color: var(--green); background: var(--green-soft); }
+.today-action-copy { display: grid; gap: 4px; min-width: 0; flex: 1; }
+.today-action-copy b { font-size: 13px; }
+.today-action-copy small { color: var(--muted); font-size: 11px; line-height: 1.4; }
+.today-plan-cta > svg, .quick-log-cta > svg { flex: none; color: var(--accent); }
+.quick-log-pill { flex: none; padding: 5px 7px; border-radius: 7px; color: var(--green); background: var(--green-soft); font-size: 9px; font-weight: 800; letter-spacing: .08em; }
+
+/* Fast plan: seven-day schedule rail above a three-pane planning workspace. */
+.fast-plan-backdrop { position: fixed; inset: 0; z-index: 1100; display: grid; place-items: center; padding: 12px; background: rgba(8, 12, 22, .68); backdrop-filter: blur(8px); animation: wizard-fade .16s ease-out; }
+.fast-plan-dialog { display: grid; grid-template-rows: 37% minmax(0, 1fr); width: min(1640px, 100%); height: min(1080px, 100%); min-height: 0; overflow: hidden; border: 1px solid var(--line); border-radius: 23px; background: var(--card); box-shadow: var(--shadow-lg); animation: wizard-rise .2s ease-out; }
+.fast-plan-top { display: grid; grid-template-rows: auto minmax(0, 1fr); min-height: 0; padding: 15px 20px 14px; border-bottom: 1px solid var(--line); background: var(--card); }
+.fast-plan-header { display: flex; align-items: center; justify-content: space-between; gap: 18px; padding-bottom: 12px; }
+.fast-plan-heading { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.fast-plan-mark { display: grid; flex: none; place-items: center; width: 39px; height: 39px; border-radius: 12px; color: var(--accent); background: var(--accent-soft); }
+.fast-plan-heading .eyebrow { color: var(--accent); font-size: 9px; }
+.fast-plan-heading h2 { margin-top: 3px; font-size: clamp(17px, 2vw, 22px); }
+.fast-plan-heading p { margin-top: 4px; color: var(--muted); font-size: 10.5px; }
+.fast-plan-week-nav { display: flex; align-items: center; gap: 7px; flex: none; }
+.fast-plan-week-nav .icon-btn { width: 34px; height: 34px; }
+.fast-plan-today { min-height: 34px; font-size: 11px; }
+.fast-plan-close { margin-left: 7px; }
+.fast-plan-days { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 8px; min-height: 0; }
+.fast-plan-day { display: grid; grid-template-rows: auto minmax(0, 1fr); min-width: 0; overflow: hidden; border: 1px solid var(--line); border-radius: 13px; background: var(--card-2); }
+.fast-plan-day.selected { border-color: var(--accent); box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent) 18%, transparent); background: color-mix(in srgb, var(--accent-soft) 40%, var(--card)); }
+.fast-plan-day.is-today .fast-plan-day-button > span { color: var(--accent); }
+.fast-plan-day-button { display: grid; grid-template-columns: 1fr auto; grid-template-rows: auto auto; align-items: center; gap: 2px 5px; width: 100%; min-height: 51px; padding: 7px 9px; border: 0; border-bottom: 1px solid var(--line); color: var(--text); background: transparent; text-align: left; }
+.fast-plan-day-button > span { color: var(--muted); font-size: 9px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+.fast-plan-day-button > b { grid-column: 2; grid-row: 1 / span 2; font-family: "Plus Jakarta Sans", sans-serif; font-size: 19px; }
+.fast-plan-day-button > small { color: var(--muted); font-size: 9px; }
+.fast-plan-day.selected .fast-plan-day-button > b { color: var(--accent); }
+.fast-plan-day-tasks { display: grid; align-content: start; gap: 4px; min-height: 0; overflow-y: auto; padding: 6px; }
+.fast-plan-task { display: grid; grid-template-columns: 6px minmax(0, 1fr) auto; align-items: center; gap: 5px; min-height: 23px; padding: 3px 5px; border-radius: 7px; background: var(--card); }
+.fast-plan-task.done { opacity: .58; }
+.fast-plan-task-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--accent); }
+.fast-plan-task-name { overflow: hidden; color: var(--text); font-size: 9px; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
+.fast-plan-task small { color: var(--muted); font-size: 8px; white-space: nowrap; }
+.fast-plan-empty, .fast-plan-more { padding: 4px 3px; color: var(--muted); font-size: 9px; }
+.fast-plan-more { color: var(--accent); font-weight: 800; }
+.fast-plan-workspace { display: grid; grid-template-columns: minmax(210px, .95fr) minmax(300px, 1.25fr) minmax(270px, 1fr); gap: 12px; min-height: 0; overflow: auto; padding: 13px 16px 16px; background: var(--card-2); }
+.fast-plan-pane { display: flex; flex-direction: column; min-width: 0; min-height: 0; overflow: hidden; padding: 13px; border: 1px solid var(--line); border-radius: 16px; background: var(--card); }
+.fast-plan-pane-title { display: flex; align-items: center; gap: 9px; flex: none; margin-bottom: 10px; }
+.fast-plan-pane-title > span { display: grid; place-items: center; flex: none; width: 25px; height: 25px; border-radius: 8px; color: var(--accent); background: var(--accent-soft); font-size: 9px; font-weight: 900; }
+.fast-plan-pane-title h3 { font-size: 13px; }
+.fast-plan-pane-title small { display: block; margin-top: 2px; color: var(--muted); font-size: 9px; }
+.fast-plan-subject-list { display: grid; align-content: start; gap: 6px; min-height: 0; overflow-y: auto; padding-right: 2px; }
+.fast-plan-subject { display: flex; align-items: center; gap: 9px; width: 100%; min-height: 51px; padding: 7px 9px; border: 1px solid var(--line); border-radius: 11px; color: var(--text); background: var(--card); text-align: left; }
+.fast-plan-subject:hover, .fast-plan-chapter:hover { border-color: var(--accent); }
+.fast-plan-subject.selected, .fast-plan-chapter.selected { border-color: var(--accent); background: var(--accent-soft); }
+.fast-plan-subject-icon { display: grid; place-items: center; flex: none; width: 31px; height: 31px; border-radius: 10px; color: var(--accent); background: var(--accent-soft); font-size: 12px; font-weight: 900; }
+.fast-plan-subject > span:nth-child(2) { display: grid; gap: 3px; min-width: 0; flex: 1; }
+.fast-plan-subject b { font-size: 10.5px; }
+.fast-plan-subject small { color: var(--muted); font-size: 8.5px; }
+.fast-plan-subject > svg { flex: none; opacity: 0; color: var(--accent); }
+.fast-plan-subject.selected > svg { opacity: 1; }
+.fast-plan-paper-tabs { display: flex; flex: none; gap: 5px; margin: 0 0 8px; overflow-x: auto; }
+.fast-plan-paper-tabs button { min-height: 29px; padding: 0 8px; border: 1px solid var(--line); border-radius: 8px; color: var(--muted); background: var(--card); font-size: 9px; font-weight: 700; white-space: nowrap; }
+.fast-plan-paper-tabs button.selected { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
+.fast-plan-chapter-list, .fast-plan-study-blocks { display: grid; align-content: start; gap: 5px; min-height: 0; overflow-y: auto; padding-right: 2px; }
+.fast-plan-chapter { display: grid; grid-template-columns: 24px minmax(0, 1fr) 14px; align-items: center; gap: 7px; width: 100%; min-height: 37px; padding: 6px 8px; border: 1px solid var(--line); border-radius: 9px; color: var(--text); background: var(--card); text-align: left; }
+.fast-plan-chapter > span { color: var(--accent); font-size: 8.5px; font-weight: 900; }
+.fast-plan-chapter b { font-size: 9.5px; line-height: 1.3; }
+.fast-plan-chapter > svg { color: var(--accent); opacity: 0; }
+.fast-plan-chapter.selected > svg { opacity: 1; }
+.fast-plan-custom { flex: none; margin-top: 6px; }
+.fast-plan-custom-toggle { border: 0; padding: 5px 0; color: var(--accent); background: transparent; font-size: 9.5px; font-weight: 800; }
+.fast-plan-custom label { display: grid; gap: 5px; margin-top: 4px; color: var(--muted); font-size: 9px; }
+.fast-plan-custom input { min-height: 34px; padding: 0 9px; border: 1px solid var(--line); border-radius: 8px; color: var(--text); background: var(--card); font-size: 10px; }
+.fast-plan-mode-toggle { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; flex: none; margin-bottom: 9px; }
+.fast-plan-mode-toggle button { display: flex; align-items: center; justify-content: center; gap: 6px; min-height: 34px; border: 1px solid var(--line); border-radius: 9px; color: var(--muted); background: var(--card); font-size: 10px; font-weight: 800; }
+.fast-plan-mode-toggle button svg { color: var(--accent); }
+.fast-plan-mode-toggle button.selected { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
+.fast-plan-goal-control { display: grid; align-content: start; gap: 8px; }
+.fast-plan-goal-value { display: flex; align-items: baseline; justify-content: center; gap: 7px; padding: 2px 0 4px; }
+.fast-plan-goal-value b { color: var(--accent); font-family: "Plus Jakarta Sans", sans-serif; font-size: 25px; }
+.fast-plan-goal-value span { color: var(--muted); font-size: 9px; }
+.fast-plan-current { color: var(--muted); font-size: 9px; line-height: 1.4; text-align: center; }
+.fast-plan-current strong { color: var(--text); }
+.fast-plan-quick-values { display: flex; flex-wrap: wrap; justify-content: center; gap: 5px; }
+.fast-plan-quick-values button { min-height: 29px; padding: 0 7px; border: 1px solid var(--line); border-radius: 7px; color: var(--text); background: var(--card); font-size: 9px; font-weight: 700; }
+.fast-plan-quick-values button.selected { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
+.fast-plan-quick-values button:disabled { opacity: .35; cursor: not-allowed; }
+.fast-plan-range { display: grid; gap: 4px; color: var(--muted); font-size: 9px; font-weight: 700; }
+.fast-plan-range input { width: 100%; accent-color: var(--accent); }
+.fast-plan-priority { display: flex; align-items: center; gap: 6px; flex: none; min-height: 30px; margin-top: 7px; padding: 0 8px; border: 1px solid var(--line); border-radius: 8px; color: var(--muted); background: var(--card); font-size: 9px; font-weight: 700; }
+.fast-plan-priority svg { color: var(--amber); }
+.fast-plan-priority.selected { border-color: color-mix(in srgb, var(--amber) 45%, var(--line)); color: var(--amber); background: var(--amber-soft); }
+.fast-plan-submit-area { display: grid; gap: 5px; margin-top: auto; padding-top: 8px; }
+.fast-plan-submit { display: grid; grid-template-columns: 20px 1fr auto; align-items: center; gap: 1px 7px; width: 100%; min-height: 46px; padding: 6px 10px; border-radius: 11px; text-align: left; }
+.fast-plan-submit svg { grid-row: span 2; }
+.fast-plan-submit span { font-size: 10.5px; }
+.fast-plan-submit small { grid-column: 2; color: color-mix(in srgb, var(--accent-ink) 76%, transparent); font-size: 8.5px; }
+.fast-plan-submit:disabled { opacity: .45; cursor: not-allowed; }
+.fast-plan-error { color: var(--red); font-size: 9px; line-height: 1.4; }
+.fast-plan-feedback { color: var(--green); font-size: 9px; line-height: 1.4; }
+.fast-plan-empty-state { padding: 12px; border-radius: 10px; color: var(--muted); background: var(--card-2); font-size: 10px; line-height: 1.5; }
+
+/* Make the weekly board noticeably easier to read. */
+.planner-page .day-head small { font-size: 11.5px; }
+.planner-page .day-head b { font-size: 15.5px; }
+.planner-page .today-tag { font-size: 10px; }
+.planner-page .day-count { font-size: 13px; }
+.planner-page .day-capacity { font-size: 11.5px; }
+.planner-page .day-empty { font-size: 12.5px; }
+.planner-page .target-row.compact .target-name strong { font-size: 13.5px; }
+.planner-page .target-row.compact .target-meta { font-size: 12px; }
+.day-add-button { display: flex; align-items: center; justify-content: center; gap: 7px; width: 100%; min-height: 40px; margin-top: 9px; padding: 7px 9px; border: 1px dashed color-mix(in srgb, var(--accent) 45%, var(--line)); border-radius: 10px; color: var(--accent); background: var(--accent-soft); font-size: 11px; font-weight: 800; transition: border-color .15s ease, background .15s ease, transform .15s ease; }
+.day-add-button:hover { border-style: solid; border-color: var(--accent); background: color-mix(in srgb, var(--accent-soft) 74%, var(--card)); transform: translateY(-1px); }
+.fast-plan-launch { flex: none; }
+
+@media (max-width: 980px) {
+  .fast-plan-workspace { grid-template-columns: repeat(3, minmax(230px, 1fr)); }
+}
+@media (max-width: 720px) {
+  .fast-plan-backdrop { padding: 0; }
+  .fast-plan-dialog { width: 100%; height: 100dvh; grid-template-rows: 40dvh minmax(0, 1fr); border: 0; border-radius: 0; }
+  .fast-plan-top { padding: max(10px, env(safe-area-inset-top)) 11px 9px; }
+  .fast-plan-header { align-items: flex-start; gap: 8px; padding-bottom: 8px; }
+  .fast-plan-heading { align-items: flex-start; gap: 8px; }
+  .fast-plan-mark { width: 31px; height: 31px; border-radius: 9px; }
+  .fast-plan-heading h2 { font-size: 15px; }
+  .fast-plan-heading p { max-width: 220px; font-size: 9px; }
+  .fast-plan-week-nav { gap: 4px; }
+  .fast-plan-week-nav .icon-btn { width: 30px; height: 30px; }
+  .fast-plan-today { min-height: 30px; padding: 0 7px; font-size: 9px; }
+  .fast-plan-close { margin-left: 0; }
+  .fast-plan-days { grid-template-columns: repeat(7, minmax(104px, 1fr)); gap: 6px; overflow-x: auto; overscroll-behavior-x: contain; }
+  .fast-plan-day-button { min-height: 43px; padding: 6px; }
+  .fast-plan-day-button > span { font-size: 8px; }
+  .fast-plan-day-button > b { font-size: 16px; }
+  .fast-plan-day-button > small { font-size: 8px; }
+  .fast-plan-day-tasks { padding: 4px; }
+  .fast-plan-task { min-height: 21px; }
+  .fast-plan-task-name { font-size: 8px; }
+  .fast-plan-task small { font-size: 7px; }
+  .fast-plan-workspace { grid-template-columns: 1fr; align-content: start; gap: 9px; padding: 10px 11px max(14px, env(safe-area-inset-bottom)); }
+  .fast-plan-pane { min-height: 225px; padding: 11px; }
+  .fast-plan-subject-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .fast-plan-subject { min-height: 48px; padding: 6px; }
+  .fast-plan-subject b { font-size: 9.5px; }
+  .fast-plan-chapters { min-height: 260px; }
+  .fast-plan-chapter-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .fast-plan-goals { min-height: 255px; }
+  .fast-plan-launch span { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fast-plan-backdrop, .fast-plan-dialog { animation: none !important; }
+  .today-plan-cta, .quick-log-cta, .day-add-button { transition: none; }
+}

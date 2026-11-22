@@ -22,4 +22,5 @@ export type AppActions = {
   go: (page: Page, date?: string) => void;
   openGuide: (section?: string) => void;
   openStudyWizard: (mode: "plan" | "log", date?: string, targetId?: string) => void;
+  openFastPlan: (date?: string) => void;
 };
