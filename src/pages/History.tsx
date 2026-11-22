@@ -29,7 +29,21 @@ export default function HistoryPage({ data, actions }: { data: AppData; actions:
   const startEdit = (session: StudySession) => { setEditingId(session.id); setDraft({ ...session }); };
   const saveEdit = () => {
     if (!draft) return;
-    actions.setData(prev => ({ ...prev, sessions: prev.sessions.map(s => s.id === draft.id ? draft : s) }));
+    const original = data.sessions.find(session => session.id === draft.id);
+    const duration = Math.max(0, Number(draft.duration) || 0);
+    const shouldSyncEnd = original && draft.duration !== original.duration && draft.start === original.start && draft.end === original.end;
+    const startMinutes = draft.start.split(":").reduce((hours, part) => hours * 60 + Number(part || 0), 0);
+    const endMinutes = (startMinutes + duration) % (24 * 60);
+    const syncedEnd = `${String(Math.floor(endMinutes / 60)).padStart(2, "0")}:${String(endMinutes % 60).padStart(2, "0")}`;
+    const corrected: StudySession = {
+      ...draft,
+      duration,
+      ...(shouldSyncEnd ? { end: syncedEnd } : {}),
+      ...(draft.progress !== undefined ? { progress: Math.min(100, Math.max(0, Number(draft.progress) || 0)) } : {}),
+      ...(draft.chapterProgress !== undefined ? { chapterProgress: Math.min(100, Math.max(0, Number(draft.chapterProgress) || 0)) } : {}),
+      updatedAt: new Date().toISOString()
+    };
+    actions.setData(prev => ({ ...prev, sessions: prev.sessions.map(s => s.id === corrected.id ? corrected : s) }));
     setEditingId(null);
     setDraft(null);
     actions.notify("Session updated");
@@ -80,8 +94,8 @@ export default function HistoryPage({ data, actions }: { data: AppData; actions:
                     <label>To<input type="time" value={draft.end} onChange={e => setDraft({ ...draft, end: e.target.value })} /></label>
                     <label>Minutes<input type="number" min="0" value={draft.duration} onChange={e => setDraft({ ...draft, duration: Math.max(0, Number(e.target.value) || 0) })} /></label>
                     <label>Topic<input value={draft.topic} onChange={e => setDraft({ ...draft, topic: e.target.value })} /></label>
-                    {draft.progress !== undefined && <label>Target completion (%)<input type="range" min="0" max="100" step="5" value={draft.progress} onChange={e => setDraft({ ...draft, progress: Number(e.target.value) })} /></label>}
-                    {draft.chapterProgress !== undefined && <label>Chapter completion (%)<input type="range" min="0" max="100" step="5" value={draft.chapterProgress} onChange={e => setDraft({ ...draft, chapterProgress: Number(e.target.value) })} /></label>}
+                    {draft.progress !== undefined && <label>Target completion (%)<div className="history-percent-controls"><input type="range" min="0" max="100" step="1" value={draft.progress} onChange={e => setDraft({ ...draft, progress: Number(e.target.value) })} /><input aria-label="Target completion percent" type="number" min="0" max="100" step="1" value={draft.progress} onChange={e => setDraft({ ...draft, progress: Math.min(100, Math.max(0, Number(e.target.value) || 0)) })} /></div></label>}
+                    {draft.chapterProgress !== undefined && <label>Chapter completion (%)<div className="history-percent-controls"><input type="range" min="0" max="100" step="1" value={draft.chapterProgress} onChange={e => setDraft({ ...draft, chapterProgress: Number(e.target.value) })} /><input aria-label="Chapter completion percent" type="number" min="0" max="100" step="1" value={draft.chapterProgress} onChange={e => setDraft({ ...draft, chapterProgress: Math.min(100, Math.max(0, Number(e.target.value) || 0)) })} /></div></label>}
                     <div className="editor-actions"><button className="btn ghost" onClick={() => { setEditingId(null); setDraft(null); }}>Cancel</button><button className="btn primary" onClick={saveEdit}>Save changes</button></div>
                   </div>
                 )}

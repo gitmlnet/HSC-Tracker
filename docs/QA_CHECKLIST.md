@@ -15,7 +15,9 @@ Verification performed on this branch. Every item below was checked against the 
 - [x] Logging a planned target keeps its selected metric primary and displays the optional secondary measure beside it in the same panel; both measures save in one session.
 - [x] The target-row check always opens its logger (including completed time targets); logged time is edited as a cumulative target total and only the increase is appended, while saving an unchanged total is blocked.
 - [x] Target rows expose only timer controls; clicking the task opens its adjust flow, where Delete requires a second confirmation and preserves existing history.
-- [x] Weekly dashboard offers week navigation, seven selectable days, target/time/progress summaries, and selected-day plan/log/planner actions.
+- [x] Weekly dashboard offers week navigation, seven selectable days, target/time/progress summaries, and selected-day plan/log/planner actions; it is the first major panel after the Today greeting.
+- [x] HSC timeline follows the dashboard, computes elapsed days/percentage and remaining days from configurable Settings start/end dates, and handles unset, future, active, and completed windows.
+- [x] History edits a saved session's duration and exact one-percent target/chapter progress; duration corrections synchronize the end time when the time range was otherwise untouched, and Today links directly to the correction screen.
 - [x] Planner day task lists are height-capped with aligned day columns, so a busy day does not stretch the weekly board indefinitely.
 - [x] Stopping a timer before a full minute records no fabricated one-minute session.
 - [x] Settings privacy footer includes a build date and time without an explanatory label.

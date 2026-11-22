@@ -11,6 +11,8 @@ export type Settings = {
   group: Group;
   subjects: string[];
   customSubjects: CustomSubject[];
+  examStartDate: string;
+  /** HSC exam period end date; kept under examDate for existing backup compatibility. */
   examDate: string;
   dailyGoalMinutes: number;
   theme: Theme;

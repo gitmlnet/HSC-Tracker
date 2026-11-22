@@ -27,6 +27,7 @@ export const defaultSettings = (overrides: Partial<Settings> = {}): Settings => 
     { id: "a-history", name: "History" },
     { id: "a-civics", name: "Civics & Social Science" }
   ],
+  examStartDate: "",
   examDate: "",
   dailyGoalMinutes: DEFAULT_GOAL,
   theme: "light",
@@ -166,6 +167,8 @@ export function migrate(raw: unknown): AppData {
     version: 2,
     settings: defaultSettings({
       theme: oldSettings.theme === "dark" ? "dark" : "light",
+      examStartDate: str(oldSettings.examStartDate),
+      examDate: str(oldSettings.examDate),
       onboarded: targets.length > 0 || sessions.length > 0
     }),
     targets,

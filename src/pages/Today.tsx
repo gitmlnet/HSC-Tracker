@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowLeft, ArrowRight, BookOpen, CalendarPlus, Clock3, Flame, Plus, Sparkles, Target, Timer, TrendingUp } from "lucide-react";
+import { ArrowLeft, ArrowRight, BookOpen, CalendarPlus, Clock3, Flame, Pencil, Plus, Sparkles, Target, Timer, TrendingUp } from "lucide-react";
 import type { AppData } from "../types";
 import type { AppActions } from "../lib/appTypes";
 import { DAY_NAMES, addDays, daysBetween, formatDuration, localDate, prettyDate, weekDates, weekStart } from "../lib/storage";
@@ -41,7 +41,18 @@ export default function Today({ data, actions }: { data: AppData; actions: AppAc
   const targets = data.targets.filter(t => t.date === today).sort((a, b) => Number(b.priority === "high") - Number(a.priority === "high"));
   const streak = streakDays(data.sessions, today);
   const cov = coverage(data.settings, data);
-  const examDays = data.settings.examDate ? daysBetween(today, data.settings.examDate) : null;
+  const examStartDate = data.settings.examStartDate;
+  const examEndDate = data.settings.examDate;
+  const examSpanDays = examStartDate && examEndDate ? daysBetween(examStartDate, examEndDate) + 1 : 0;
+  const hasValidExamPeriod = Number.isFinite(examSpanDays) && examSpanDays > 0;
+  const elapsedExamDays = hasValidExamPeriod
+    ? Math.min(examSpanDays, Math.max(0, daysBetween(examStartDate, today) + 1))
+    : 0;
+  const examElapsedPercent = hasValidExamPeriod ? Math.round(elapsedExamDays / examSpanDays * 100) : 0;
+  const examDaysRemaining = hasValidExamPeriod ? Math.max(0, daysBetween(today, examEndDate)) : 0;
+  const examDaysUntilStart = hasValidExamPeriod ? Math.max(0, daysBetween(today, examStartDate)) : 0;
+  const examPeriodStarted = hasValidExamPeriod && today >= examStartDate;
+  const examPeriodEnded = hasValidExamPeriod && today > examEndDate;
   const hour = new Date().getHours();
   const greeting = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
 
@@ -55,35 +66,9 @@ export default function Today({ data, actions }: { data: AppData; actions: AppAc
           <p>{summary.count ? `${summary.progressPercent}% average progress across ${summary.count} target${summary.count === 1 ? "" : "s"} today.` : "A clear plan makes a calm mind. Start with today."}</p>
         </div>
         <div className="head-pills">
-          {examDays !== null && <span className="countdown"><b>{examDays > 0 ? examDays : 0}</b> days to HSC</span>}
           <span className="streak-pill"><Flame size={16} /> {streak}-day streak</span>
         </div>
       </div>
-
-      <Card className="hero-card">
-        <div className="hero-left">
-          <span className="eyebrow">TODAY AT A GLANCE</span>
-          <h2>{summary.count ? `${summary.count} targets on your plate` : "No targets for today yet"}</h2>
-          <p>{summary.loggedMinutes > 0
-            ? `You have studied ${formatDuration(summary.loggedMinutes)} against a ${formatDuration(data.settings.dailyGoalMinutes)} daily goal.`
-            : `Your daily goal is ${formatDuration(data.settings.dailyGoalMinutes)}. One session is enough to begin.`}</p>
-          <div className="hero-stats">
-            <div><Target size={17} /><span><b>{summary.done}/{summary.count}</b> complete</span></div>
-            <div><Clock3 size={17} /><span><b>{formatDuration(summary.loggedMinutes)}</b> studied</span></div>
-            <div><TrendingUp size={17} /><span><b>{cov.percent}%</b> syllabus covered</span></div>
-          </div>
-          <Meter value={summary.loggedMinutes} max={data.settings.dailyGoalMinutes} />
-        </div>
-        <ProgressRing value={summary.progressPercent} size={132} sub="average progress" />
-      </Card>
-
-      {currentWeekSummary.count === 0 && (
-        <button className="setup-banner" onClick={() => actions.openStudyWizard("plan")}>
-          <span className="banner-icon"><CalendarPlus size={22} /></span>
-          <span><b>Your week is still open</b><small>Plan Saturday to Friday in one sitting — you can change anything, anytime.</small></span>
-          <span className="banner-cta">Plan this week <ArrowRight size={16} /></span>
-        </button>
-      )}
 
       <Card className="weekly-dashboard-card">
         <SectionTitle eyebrow={`YOUR WEEK · ${DAY_NAMES[0]} TO ${DAY_NAMES[6]}`} title={weekStart(dashboardWeek) === weekStart(today) ? "Your week at a glance" : "Weekly overview"} detail={`${prettyDate(dates[0], { day: "numeric", month: "short" })} – ${prettyDate(dates[6], { day: "numeric", month: "short" })}`} action={<div className="dashboard-week-nav" aria-label="Choose dashboard week"><button className="icon-btn" onClick={() => changeDashboardWeek(-1)} aria-label="Previous week"><ArrowLeft size={17} /></button><button className="icon-btn" onClick={showCurrentDashboardWeek} aria-label="Current week" title="Current week"><CalendarPlus size={16} /></button><button className="icon-btn" onClick={() => changeDashboardWeek(1)} aria-label="Next week"><ArrowRight size={17} /></button></div>} />
@@ -145,6 +130,49 @@ export default function Today({ data, actions }: { data: AppData; actions: AppAc
           </div>
         </Card>
 
+      <Card className="exam-timeline-card">
+        <div className="exam-timeline-copy">
+          <span className="eyebrow">HSC EXAM WINDOW</span>
+          <h2>{hasValidExamPeriod ? examPeriodEnded ? "Your HSC exam window is complete" : examPeriodStarted ? "Your exam days are in motion" : "Your countdown starts soon" : "Set your HSC dates"}</h2>
+          <p>{hasValidExamPeriod
+            ? `${prettyDate(examStartDate, { day: "numeric", month: "short", year: "numeric" })} – ${prettyDate(examEndDate, { day: "numeric", month: "short", year: "numeric" })}`
+            : examStartDate || examEndDate ? "Set both dates, with the end on or after the start, to see your timeline." : "Add the exam period start and end in Settings to track the days together."}</p>
+          {!hasValidExamPeriod && <button className="btn ghost exam-date-settings" onClick={() => actions.go("settings")}><CalendarPlus size={15} /> Set dates in Settings</button>}
+        </div>
+        <div className="exam-timeline-chart" role="img" aria-label={hasValidExamPeriod ? `${examElapsedPercent}% of the HSC exam period elapsed` : "HSC exam period dates are not set"} style={{ background: `conic-gradient(var(--accent) ${examElapsedPercent}%, var(--line) ${examElapsedPercent}% 100%)` }}>
+          <div><strong>{hasValidExamPeriod ? `${examElapsedPercent}%` : "—"}</strong><span>elapsed</span></div>
+        </div>
+        <div className="exam-timeline-stats">
+          <div><small>{examPeriodStarted ? "DAYS ELAPSED" : "TOTAL WINDOW"}</small><b>{hasValidExamPeriod ? examPeriodStarted ? `${elapsedExamDays} / ${examSpanDays}` : `${examSpanDays} days` : "—"}</b></div>
+          <div><small>{examPeriodEnded ? "STATUS" : examPeriodStarted ? "DAYS REMAINING" : "UNTIL START"}</small><b>{hasValidExamPeriod ? examPeriodEnded ? "Complete" : examPeriodStarted ? `${examDaysRemaining} days` : `${examDaysUntilStart} days` : "Add dates"}</b></div>
+        </div>
+      </Card>
+
+      {currentWeekSummary.count === 0 && (
+        <button className="setup-banner" onClick={() => actions.openStudyWizard("plan")}>
+          <span className="banner-icon"><CalendarPlus size={22} /></span>
+          <span><b>Your week is still open</b><small>Plan Saturday to Friday in one sitting — you can change anything, anytime.</small></span>
+          <span className="banner-cta">Plan this week <ArrowRight size={16} /></span>
+        </button>
+      )}
+
+      <Card className="hero-card">
+        <div className="hero-left">
+          <span className="eyebrow">TODAY AT A GLANCE</span>
+          <h2>{summary.count ? `${summary.count} targets on your plate` : "No targets for today yet"}</h2>
+          <p>{summary.loggedMinutes > 0
+            ? `You have studied ${formatDuration(summary.loggedMinutes)} against a ${formatDuration(data.settings.dailyGoalMinutes)} daily goal.`
+            : `Your daily goal is ${formatDuration(data.settings.dailyGoalMinutes)}. One session is enough to begin.`}</p>
+          <div className="hero-stats">
+            <div><Target size={17} /><span><b>{summary.done}/{summary.count}</b> complete</span></div>
+            <div><Clock3 size={17} /><span><b>{formatDuration(summary.loggedMinutes)}</b> studied</span></div>
+            <div><TrendingUp size={17} /><span><b>{cov.percent}%</b> syllabus covered</span></div>
+          </div>
+          <Meter value={summary.loggedMinutes} max={data.settings.dailyGoalMinutes} />
+        </div>
+        <ProgressRing value={summary.progressPercent} size={132} sub="average progress" />
+      </Card>
+
       <div className="today-grid">
         <div className="today-main">
           <Card>
@@ -178,6 +206,7 @@ export default function Today({ data, actions }: { data: AppData; actions: AppAc
               <span className="quick-log-pill">QUICK LOG</span>
               <ArrowRight size={18} />
             </button>
+            <button className="btn ghost history-correction-link" onClick={() => actions.go("history")}><Pencil size={14} /> Correct a saved time or chapter percentage</button>
           </Card>
         </div>
 

@@ -1246,3 +1246,115 @@ label, .field-label { font-size: var(--type-small); line-height: 1.45; }
   .week-strip-dashboard .week-strip-day em { font-size: 8px; }
   .dashboard-target-list { grid-template-columns: 1fr; }
 }
+
+/* Put the weekly overview in the first viewport and keep the exam window beside it in the flow. */
+.today-page { gap: 13px; }
+.today-head { align-items: center; }
+.today-head h1 { font-size: clamp(23px, 2.5vw, 30px); margin-top: 3px; }
+.today-head p { margin-top: 4px; font-size: 12px; }
+.weekly-dashboard-card { padding: clamp(15px, 2vw, 23px); }
+.weekly-dashboard-card > .section-title { margin-bottom: 12px; }
+.weekly-dashboard-card > .section-title h2 { font-size: clamp(20px, 2.1vw, 25px); }
+.weekly-dashboard-card > .section-title p { font-size: 12px; }
+.dashboard-week-nav .icon-btn { width: 35px; height: 35px; }
+.dashboard-week-stats { gap: 8px; margin-bottom: 10px; }
+.dashboard-week-stats > div { padding: 8px 10px; border-radius: 11px; }
+.dashboard-week-stats b { font-size: 19px; }
+.dashboard-week-stats span { font-size: 10px; }
+.dashboard-motivation { grid-template-columns: minmax(130px, 175px) minmax(0, 1fr); gap: 12px; margin-bottom: 10px; padding: 10px; border-radius: 14px; }
+.dashboard-points-card { min-height: 92px; padding: 8px; border-radius: 12px; }
+.dashboard-points-icon { width: 28px; height: 28px; margin-bottom: 3px; border-radius: 9px; }
+.dashboard-points-icon svg { width: 17px; height: 17px; }
+.dashboard-points-card small { font-size: 8px; }
+.dashboard-points-card strong { font-size: 28px; }
+.dashboard-points-card > span:last-child { font-size: 9px; }
+.dashboard-motivation-main { padding: 3px 4px; }
+.dashboard-motivation-main h3 { font-size: clamp(16px, 1.8vw, 20px); }
+.dashboard-motivation-main > p { margin: 4px 0 8px; font-size: 11px; line-height: 1.4; }
+.dashboard-reward-label { margin-bottom: 4px; font-size: 10px; }
+.dashboard-reward-meter { height: 8px; }
+.dashboard-motivation-main > small { margin-top: 5px; font-size: 9px; }
+.week-strip-dashboard { gap: 6px; }
+.week-strip-dashboard .week-strip-day { min-height: 82px; padding: 7px 2px 6px; gap: 3px; border-radius: 10px; }
+.week-strip-dashboard .week-strip-day small { font-size: 10px; }
+.week-strip-dashboard .week-strip-day b { font-size: 17px; }
+.week-strip-dashboard .week-strip-day span { font-size: 9px; }
+.week-strip-dashboard .week-strip-day em { font-size: 8px; }
+.dashboard-day-detail { gap: 7px; margin-top: 10px; padding-top: 9px; }
+.dashboard-day-summary small { font-size: 10px; }
+.dashboard-day-summary b { font-size: 15px; }
+.dashboard-day-summary strong { font-size: 14px; }
+.dashboard-target-list { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 5px; }
+.dashboard-target { min-height: 39px; gap: 7px; padding: 6px 8px; }
+.dashboard-target b { font-size: 10.5px; }
+.dashboard-target small { font-size: 9px; }
+.dashboard-day-actions { gap: 5px; }
+.dashboard-day-actions .btn { min-height: 33px; padding: 0 9px; font-size: 10px; }
+
+.exam-timeline-card { display: grid; grid-template-columns: minmax(0, 1fr) 78px minmax(230px, .75fr); align-items: center; gap: 16px; padding: 15px 21px; background: linear-gradient(115deg, var(--card), color-mix(in srgb, var(--accent-soft) 46%, var(--card))); }
+.exam-timeline-copy { min-width: 0; }
+.exam-timeline-copy h2 { margin-top: 3px; font-size: clamp(17px, 1.8vw, 21px); }
+.exam-timeline-copy p { margin-top: 4px; color: var(--muted); font-size: 11px; line-height: 1.4; }
+.exam-date-settings { min-height: 29px; margin-top: 5px; padding: 0 4px; font-size: 10px; }
+.exam-date-settings svg { width: 13px; }
+.exam-timeline-chart { display: grid; place-items: center; width: 76px; aspect-ratio: 1; border-radius: 50%; box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--line) 80%, transparent); }
+.exam-timeline-chart > div { display: grid; place-content: center; width: 58px; aspect-ratio: 1; border-radius: 50%; background: var(--card); text-align: center; }
+.exam-timeline-chart strong { font-family: "Plus Jakarta Sans", sans-serif; font-size: 16px; line-height: 1.1; }
+.exam-timeline-chart span { color: var(--muted); font-size: 8px; }
+.exam-timeline-stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.exam-timeline-stats > div { display: grid; gap: 4px; padding: 9px 11px; border: 1px solid var(--line); border-radius: 11px; background: color-mix(in srgb, var(--card) 82%, transparent); }
+.exam-timeline-stats small { color: var(--muted); font-size: 8px; font-weight: 800; letter-spacing: .08em; }
+.exam-timeline-stats b { color: var(--accent); font-size: 14px; }
+.history-correction-link { min-height: 31px; margin-top: 5px; padding: 0 3px; font-size: 10px; }
+.history-correction-link svg { width: 13px; }
+.history-percent-controls { display: grid; grid-template-columns: minmax(0, 1fr) 70px; align-items: center; gap: 8px; }
+.history-percent-controls input[type="range"] { width: 100%; min-height: 20px; padding: 0; }
+.history-percent-controls input[type="number"] { min-height: 36px; }
+
+@media (max-width: 700px) {
+  .today-page { gap: 11px; }
+  .today-head { gap: 8px; }
+  .today-head p { font-size: 11px; }
+  .weekly-dashboard-card { padding: 14px 11px; }
+  .weekly-dashboard-card > .section-title { margin-bottom: 9px; }
+  .weekly-dashboard-card > .section-title h2 { font-size: 18px; }
+  .weekly-dashboard-card > .section-title p { font-size: 10px; }
+  .dashboard-week-nav { gap: 1px; }
+  .dashboard-week-nav .icon-btn { width: 30px; height: 30px; }
+  .dashboard-week-stats { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; margin-bottom: 8px; }
+  .dashboard-week-stats > div { padding: 6px 4px; }
+  .dashboard-week-stats b { font-size: 14px; }
+  .dashboard-week-stats span { font-size: 8px; line-height: 1.15; }
+  .dashboard-motivation { grid-template-columns: 82px minmax(0, 1fr); gap: 8px; margin-bottom: 8px; padding: 7px; }
+  .dashboard-points-card { min-height: 92px; padding: 6px 3px; }
+  .dashboard-points-icon { width: 24px; height: 24px; }
+  .dashboard-points-card strong { font-size: 25px; }
+  .dashboard-points-card small { font-size: 7px; }
+  .dashboard-points-card > span:last-child { font-size: 8px; }
+  .dashboard-motivation-main h3 { font-size: 14px; }
+  .dashboard-motivation-main > p { margin: 3px 0 6px; font-size: 9px; }
+  .dashboard-reward-label { gap: 3px; font-size: 8px; }
+  .dashboard-reward-label b { font-size: 8px; }
+  .dashboard-motivation-main > small { font-size: 8px; }
+  .week-strip-dashboard { gap: 3px; }
+  .week-strip-dashboard .week-strip-day { min-height: 70px; padding: 5px 0 4px; gap: 2px; }
+  .week-strip-dashboard .week-strip-day small { font-size: 8px; }
+  .week-strip-dashboard .week-strip-day b { font-size: 14px; }
+  .week-strip-dashboard .week-strip-day span { font-size: 8px; }
+  .week-strip-dashboard .week-strip-day em { font-size: 7px; }
+  .dashboard-day-detail { margin-top: 8px; padding-top: 7px; }
+  .dashboard-day-summary small { font-size: 9px; }
+  .dashboard-target-list { grid-template-columns: 1fr; }
+  .dashboard-day-actions .btn { flex: 1; min-height: 31px; padding: 0 4px; font-size: 9px; }
+  .exam-timeline-card { grid-template-columns: minmax(0, 1fr) 62px; gap: 9px; padding: 12px; }
+  .exam-timeline-copy h2 { font-size: 16px; }
+  .exam-timeline-copy p { font-size: 9px; }
+  .exam-timeline-chart { width: 60px; }
+  .exam-timeline-chart > div { width: 46px; }
+  .exam-timeline-chart strong { font-size: 13px; }
+  .exam-timeline-chart span { font-size: 7px; }
+  .exam-timeline-stats { grid-column: 1 / -1; gap: 6px; }
+  .exam-timeline-stats > div { gap: 3px; padding: 6px 8px; }
+  .exam-timeline-stats small { font-size: 7px; }
+  .exam-timeline-stats b { font-size: 12px; }
+}

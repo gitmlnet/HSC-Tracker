@@ -56,7 +56,7 @@ export default function SettingsPage({ data, actions }: { data: AppData; actions
       <div className="page-head">
         <span className="eyebrow">SETTINGS</span>
         <h1>Make the planner yours</h1>
-        <p>Your group, subjects, exam date and goals shape every recommendation.</p>
+        <p>Your group, subjects, HSC exam window and goals shape your study timeline.</p>
       </div>
 
       <Card>
@@ -67,7 +67,8 @@ export default function SettingsPage({ data, actions }: { data: AppData; actions
               {(Object.keys(GROUP_LABELS) as Group[]).map(g => <option key={g} value={g}>{GROUP_LABELS[g]}</option>)}
             </select>
           </label>
-          <label>HSC exam date<input type="date" value={s.examDate} onChange={e => patch({ examDate: e.target.value })} /></label>
+          <label>HSC exam period starts<input type="date" value={s.examStartDate} max={s.examDate || undefined} onChange={e => patch({ examStartDate: e.target.value })} /></label>
+          <label>HSC exam period ends<input type="date" value={s.examDate} min={s.examStartDate || undefined} onChange={e => patch({ examDate: e.target.value })} /></label>
           <label>Daily study goal (minutes)<input type="number" min="15" max="720" step="15" value={s.dailyGoalMinutes} onChange={e => patch({ dailyGoalMinutes: Math.max(15, Number(e.target.value) || 150) })} /></label>
         </div>
         <div className="subject-picker">

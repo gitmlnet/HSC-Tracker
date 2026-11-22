@@ -42,7 +42,7 @@ The first screen asks three things:
 | --- | --- | --- |
 | 1 | Student group — Science, Commerce, or Arts & Humanities | Fills in the usual subjects |
 | 2 | Subjects | Only chosen subjects appear in plans, guided logging and insights |
-| 3 | HSC exam date and daily study goal | Powers the countdown, daily meter and each day's capacity bar |
+| 3 | HSC exam period start/end dates and daily study goal | Powers the exam-window progress card, daily meter and each day's capacity bar |
 
 **Skip for now** applies defaults (Science subjects, 150 minutes a day) and drops you straight into the planner. Everything can be changed later in **Settings**.
 
@@ -118,15 +118,18 @@ The command palette still supports page navigation (`go planner`) and guide topi
 
 Today is the execution screen — the only one you need while studying.
 
-The full-width weekly dashboard sits near the top of Today. Use the arrows to review another Saturday–Friday week, select a day to inspect its targets, and use its Plan target, Log study or Planner actions. It shows target completion, study time, active days and each day's progress. Focus points are earned at 10 per 15 logged minutes plus 15 for each completed target, with a progress bar toward the next 100-point milestone. These points are a motivational summary of saved study activity, not a grade.
+The full-width weekly dashboard is the first major panel on Today, directly below the greeting. Use the arrows to review another Saturday–Friday week, select a day to inspect its targets, and use its Plan target, Log study or Planner actions. It shows target completion, study time, active days and each day's progress. Focus points are earned at 10 per 15 logged minutes plus 15 for each completed target, with a progress bar toward the next 100-point milestone. These points are a motivational summary of saved study activity, not a grade.
+
+Immediately below the week is the HSC exam-window tracker. Set the start and end dates in **Settings**; the circular chart shows the percentage of calendar days elapsed, alongside elapsed and remaining days. If dates are missing or reversed, open Settings from the card to correct them.
 
 | Area | What it shows |
 | --- | --- |
-| Header | Date, greeting, exam countdown, consecutive-day streak |
+| Header | Date, greeting and consecutive-day streak |
 | Today at a glance | Targets done, minutes studied vs daily goal, chapter coverage, progress ring, daily goal meter |
 | Today's targets | Priority-sorted checklist with logging, timer and target-edit controls |
 | Quick log | One-line capture for study outside the plan |
-| This week | Seven day cards with done/total and studied-vs-planned fill; click one to open that day in the planner |
+| Weekly dashboard | Seven interactive day cards, week navigation, weekly metrics, selectable-day summary and plan/log/planner actions |
+| HSC exam window | Elapsed-day percentage pie and elapsed/remaining day counts from the dates in Settings |
 | Setup banner | Appears when the week is empty and invites you to plan Saturday to Friday |
 
 Clicking a target's text opens **that exact target's editor** in the weekly planner. There is also a guide card in the side column for a full walkthrough.
@@ -142,7 +145,7 @@ A timer belongs to one target and follows you across pages. It survives a refres
 3. **Finish** logs the real elapsed time. On a time-based target, a full timer finish also marks the target complete; on a progress-based target, minutes alone never complete it.
 4. **Log partial** saves the minutes but leaves the target open for later.
 
-Only complete elapsed minutes are logged; stopping before one minute records no session. Finishing creates a real, editable session in History. Use the target's circle to open the guided logger and record actual time or cumulative chapter progress. A completed time target stays checked if you tap its green check; use the separate Reopen control when you intentionally want to reopen it.
+Only complete elapsed minutes are logged; stopping before one minute records no session. Finishing creates a real, editable session in History. Use the target's circle to open the guided logger and record actual time or cumulative chapter progress. If you save an incorrect duration or percentage, open **History** (also linked from Today) and edit that session; minutes and progress can be corrected after saving.
 
 ---
 
@@ -170,7 +173,7 @@ Science subjects include an NCTB-style chapter list. Custom Commerce and Arts su
 History is the ledger behind every statistic.
 
 - **Filter** by text, date, subject, chapter, minimum minutes, and newest / longest sorting.
-- **Edit** a session's date, start and end time, minutes, topic, target completion and (when present) absolute chapter completion. Every insight recalculates immediately.
+- **Edit** a session's date, start and end time, minutes, topic, target completion and (when present) absolute chapter completion. If you change only the duration, the end time updates to match; every insight recalculates immediately.
 - **Delete** a session; Undo appears in the toast.
 - **Export CSV** for spreadsheets. A full JSON backup is in Settings.
 
@@ -182,7 +185,7 @@ Target completion and chapter completion are separate. A target-completion value
 
 ### Profile and preferences
 
-- Student group, exam date and daily study goal.
+- Student group, HSC exam period start and end dates, and daily study goal. Set either date when known; the timeline stays unset until the date range is valid.
 - Subject chips: tap to add or remove.
 - Light / dark theme, applied instantly.
 - Gentle reminders: a daily digest checked **while the app is open**, with explicit browser permission.

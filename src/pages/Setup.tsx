@@ -10,12 +10,13 @@ export default function Setup({ data, actions }: { data: AppData; actions: AppAc
   const [step, setStep] = useState(0);
   const [group, setGroup] = useState<Group>(data.settings.group);
   const [subjects, setSubjects] = useState<string[]>(data.settings.subjects);
+  const [examStartDate, setExamStartDate] = useState(data.settings.examStartDate);
   const [examDate, setExamDate] = useState(data.settings.examDate);
   const [goal, setGoal] = useState(data.settings.dailyGoalMinutes);
   const dialogRef = useRef<HTMLDivElement>(null);
   const finish = () => actions.setData(prev => ({
     ...prev,
-    settings: { ...prev.settings, group, subjects: subjects.length ? subjects : GROUP_SUBJECTS[group], examDate, dailyGoalMinutes: goal, onboarded: true }
+    settings: { ...prev.settings, group, subjects: subjects.length ? subjects : GROUP_SUBJECTS[group], examStartDate, examDate, dailyGoalMinutes: goal, onboarded: true }
   }));
   useDialogFocus(dialogRef, finish);
 
@@ -50,7 +51,8 @@ export default function Setup({ data, actions }: { data: AppData; actions: AppAc
           <h1>When is your exam?</h1>
           <p>A countdown and a realistic daily goal keep the plan honest.</p>
           <div className="setup-final">
-            <label>HSC exam date<input type="date" value={examDate} onChange={e => setExamDate(e.target.value)} /></label>
+            <label>HSC exam period starts<input type="date" value={examStartDate} max={examDate || undefined} onChange={e => setExamStartDate(e.target.value)} /></label>
+            <label>HSC exam period ends<input type="date" value={examDate} min={examStartDate || undefined} onChange={e => setExamDate(e.target.value)} /></label>
             <label>Daily study goal<input type="number" min="15" max="720" step="15" value={goal} onChange={e => setGoal(Number(e.target.value) || 150)} /><small>minutes a day · around {Math.round(goal / 60 * 10) / 10} hours</small></label>
           </div>
         </>}
