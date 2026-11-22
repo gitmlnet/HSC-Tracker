@@ -314,9 +314,10 @@ export const GUIDE_SECTIONS: GuideSection[] = [
         kind: "steps",
         title: "Install",
         items: [
-          { title: "Use the Install app button", text: "It is always visible in the top bar. If the browser supports the install prompt, the native dialog opens." },
-          { title: "Follow the platform steps otherwise", text: "Android/Chrome: three-dot menu → Install app. iPhone/iPad Safari: Share → Add to Home Screen. Desktop Chrome/Edge: address-bar install icon or menu → Cast, save & share → Install page as app." },
-          { title: "Open from the home screen", text: "The app launches full-screen, without the browser toolbar, and uses the same local data." }
+          { title: "Use the Install app button", text: "It is always visible in the top bar. When supported, the app captures the browser's native install prompt before React mounts and launches it directly." },
+          { title: "Check browser readiness", text: "Without a native prompt, the dialog checks HTTPS, same-origin manifest scope, standalone display, actual 192/512 PNG icon files and the active service worker. Open the public URL in a supported full browser, not an embedded or private window." },
+          { title: "Follow the platform installation flow", text: "Android/Chrome: menu → Install app. iPhone/iPad Safari: Share → Add to Home Screen. Desktop Chrome/Edge: address-bar install icon or menu → Install page as app. Do not use Create shortcut as a substitute." },
+          { title: "Open the installed app", text: "After installation, it launches in its own app window and uses the same local data. iOS uses Apple's Add to Home Screen flow instead of beforeinstallprompt." }
         ]
       },
       { kind: "bullets", title: "Offline behaviour", items: ["The interface, icons, manifest, CSS and JavaScript are cached by a versioned service worker.", "All study data is stored on the device in IndexedDB, with a localStorage fallback.", "Planning and logging work with no connection; anything exported can be moved to another device manually."] },
@@ -340,7 +341,8 @@ export const GUIDE_SECTIONS: GuideSection[] = [
           { code: "N", text: "Open quick entry when you are not typing in a field" },
           { code: "Enter", text: "Submit the line you are typing in any smart input" },
           { code: "Esc", text: "Close the guide, palette, install dialog or setup" },
-          { code: "Tab / Shift + Tab", text: "Move through controls; focus stays inside an open dialog" }
+          { code: "Tab / Shift + Tab", text: "Move through controls; focus stays inside an open dialog" },
+          { code: "Sidebar button", text: "On desktop, collapse or expand the left icon rail. On phones, open the slide-in navigation drawer; Escape also closes it." }
         ]
       },
       {
@@ -350,6 +352,7 @@ export const GUIDE_SECTIONS: GuideSection[] = [
           "Every dialog traps focus while open and returns focus to its trigger when closed.",
           "Buttons have descriptive labels; smart-input previews are announced politely.",
           "Focus rings are visible, touch targets are enlarged on phones, and target actions do not depend on hover on touchscreens.",
+          "The desktop sidebar can collapse to a remembered, labelled icon rail; the mobile drawer remains separately operable with backdrop and Escape.",
           "All motion respects the system Reduce Motion setting, including programmatic scrolling.",
           "Text and status colours meet at least 4.5:1 contrast on their backgrounds."
         ]

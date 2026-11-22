@@ -21,12 +21,15 @@ Verification performed on this branch. Every item below was checked against the 
 ## PWA
 
 - [x] Manifest served at `/manifest.webmanifest` with `standalone` display, 192/512 PNG icons, shortcuts and relative scope.
-- [x] Service worker registers in production from first load and contains a `fetch` handler.
-- [x] Cache version bumped when the shell changes; old caches are removed on activate.
+- [x] The `beforeinstallprompt` event is captured at module load (before React effects), retained until the user clicks Install, and its accepted/dismissed result is handled without losing the native prompt.
+- [x] The Install dialog checks HTTPS, same-origin manifest scope, standalone display, both actual PNG icon dimensions/content types, and an activated service worker; it gives platform-correct install steps and explains that a webpage cannot force an unsupported browser to install.
+- [x] Service worker registers in production and contains a `fetch` handler; offline shell and assets are cached under a versioned cache and old caches are removed on activate.
 - [x] Stable Vercel alias serves the current manifest and service worker; per-deployment URLs are SSO-protected by the Vercel team.
 - [x] Relative Vite base verified by serving `dist/` at `/HSC-Tracker/`: HTML, manifest, icons, JS/CSS and SW all resolve.
 
 ## Interface
+
+- [x] Desktop sidebar collapses to a persistent, keyboard-accessible icon rail and expands from the top-bar control; mobile retains its independent slide-in drawer, backdrop, close control and Escape handling.
 
 - [x] Typography uses the platform system font stack on Apple devices, including headings.
 - [x] Every tinted foreground/background pair used for small text meets at least 4.5:1 contrast (light muted 4.73:1, accent 5.37:1, success 4.81:1, warning 5.01:1, danger 5.14:1).
@@ -39,5 +42,5 @@ Verification performed on this branch. Every item below was checked against the 
 ## Platform limits (by design)
 
 - Browser notifications are checked while the app is open; a static PWA cannot guarantee delivery after the browser is closed.
-- The native install prompt appears only when the browser offers `beforeinstallprompt`; the in-app Install button falls back to exact platform instructions.
+- Native install UX is browser/platform controlled: Chromium can offer `beforeinstallprompt`; iOS uses Safari Share → Add to Home Screen. If a browser offers only “Create shortcut”, the app no longer describes that as installation and instead shows readiness checks and actionable browser guidance. Native OS installation itself cannot be automated from this headless test environment.
 - GitHub Pages must be enabled in repository settings before its workflow can publish.

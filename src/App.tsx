@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { ArrowRight, BarChart3, Bell, BookOpen, CalendarRange, Command, Download, History as HistoryIcon, LayoutDashboard, Menu, Settings as SettingsIcon, X } from "lucide-react";
+import { ArrowRight, BarChart3, Bell, BookOpen, CalendarRange, Command, Download, History as HistoryIcon, LayoutDashboard, Menu, PanelLeftClose, PanelLeftOpen, Settings as SettingsIcon, X } from "lucide-react";
 import type { AppData } from "./types";
 import type { Page, TimerState } from "./lib/appTypes";
 import { emptyData, loadData, saveData, localDate, timeBefore, clockNow, weekStart, weekDates, reducedMotion } from "./lib/storage";
@@ -10,6 +10,7 @@ import CommandPalette from "./components/CommandPalette";
 import InstallDialog from "./components/InstallDialog";
 import GuideDialog from "./components/GuideDialog";
 import { PAGE_GUIDE } from "./data/guide";
+import { promptInstall, usePwaInstall } from "./lib/pwaInstall";
 import Today from "./pages/Today";
 import Planner from "./pages/Planner";
 import Insights from "./pages/Insights";
@@ -38,12 +39,15 @@ export default function App() {
   const [focusTargetId, setFocusTargetId] = useState<string | null>(null);
   const [ready, setReady] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
+    try { return localStorage.getItem("hsc-sidebar-collapsed") === "true"; } catch { return false; }
+  });
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [installInfoOpen, setInstallInfoOpen] = useState(false);
   const [guideOpen, setGuideOpen] = useState(false);
   const [guideSection, setGuideSection] = useState("start");
   const [toast, setToast] = useState<Toast | null>(null);
-  const [installPrompt, setInstallPrompt] = useState<Event | null>(null);
+  const installState = usePwaInstall();
   const [now, setNow] = useState(Date.now());
   const [timer, setTimer] = useState<TimerState | null>(() => {
     try { const raw = localStorage.getItem(TIMER_KEY); return raw ? JSON.parse(raw) as TimerState : null; } catch { return null; }
@@ -145,7 +149,7 @@ export default function App() {
         event.preventDefault();
         setPaletteOpen(true);
       }
-      if (event.key === "Escape") { setPaletteOpen(false); setGuideOpen(false); }
+      if (event.key === "Escape") { setPaletteOpen(false); setGuideOpen(false); setMenuOpen(false); }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
@@ -170,10 +174,8 @@ export default function App() {
   }, [ready, data.settings.reminders, data]);
 
   useEffect(() => {
-    const onPrompt = (event: Event) => { event.preventDefault(); setInstallPrompt(event); };
-    window.addEventListener("beforeinstallprompt", onPrompt);
-    return () => window.removeEventListener("beforeinstallprompt", onPrompt);
-  }, []);
+    try { localStorage.setItem("hsc-sidebar-collapsed", String(sidebarCollapsed)); } catch { /* Keep the current layout for this session. */ }
+  }, [sidebarCollapsed]);
 
   if (!ready) return <div className="boot"><div className="boot-logo">ST</div><b>Opening your planner…</b></div>;
 
@@ -181,38 +183,38 @@ export default function App() {
   return (
     <div className="app-shell">
       {menuOpen && <button className="sidebar-backdrop" onClick={() => setMenuOpen(false)} aria-label="Close navigation" />}
-      <aside className={`sidebar ${menuOpen ? "open" : ""}`}>
-        <div className="brand"><div className="brand-mark"><span>ST</span></div><div><strong>HSC Study Planner</strong><small>Plan the week. Own the day.</small></div>
+      <aside id="primary-sidebar" className={`sidebar${menuOpen ? " open" : ""}${sidebarCollapsed ? " collapsed" : ""}`} aria-label="Primary navigation">
+        <div className="brand"><div className="brand-mark" aria-hidden="true"><span>ST</span></div><div className="brand-copy"><strong>HSC Study Planner</strong><small>Plan the week. Own the day.</small></div>
           <button className="icon-btn sidebar-close" onClick={() => setMenuOpen(false)} aria-label="Close navigation"><X size={18} /></button>
         </div>
         <nav>
           {NAV.map(([id, label, Icon]) => (
-            <button key={id} className={page === id ? "active" : ""} onClick={() => go(id)} aria-current={page === id ? "page" : undefined}>
-              <Icon size={18} /><span>{label}</span>
+            <button key={id} className={page === id ? "active" : ""} onClick={() => go(id)} aria-label={label} title={sidebarCollapsed ? label : undefined} aria-current={page === id ? "page" : undefined}>
+              <Icon size={18} aria-hidden="true" /><span>{label}</span>
             </button>
           ))}
         </nav>
         <div className="sidebar-foot">
-          <button className="command-link" onClick={() => setPaletteOpen(true)}><Command size={15} /> Quick commands <kbd>Ctrl K</kbd></button>
-          <button className="command-link guide-link" onClick={() => openGuide("start")}><BookOpen size={15} /> User guide <ArrowRight size={14} /></button>
+          <button className="command-link" onClick={() => setPaletteOpen(true)} aria-label="Quick commands" title={sidebarCollapsed ? "Quick commands" : undefined}><Command size={15} aria-hidden="true" /><span className="command-text">Quick commands</span><kbd>Ctrl K</kbd></button>
+          <button className="command-link guide-link" onClick={() => openGuide("start")} aria-label="User guide" title={sidebarCollapsed ? "User guide" : undefined}><BookOpen size={15} aria-hidden="true" /><span className="command-text">User guide</span><ArrowRight className="guide-arrow" size={14} /></button>
           <p>Built for one honest plan at a time.</p>
         </div>
       </aside>
 
       <div className="main-area">
         <header className="topbar">
-          <button className="icon-btn menu-btn" onClick={() => setMenuOpen(v => !v)} aria-label="Open navigation"><Menu size={20} /></button>
+          <button className="icon-btn menu-btn" onClick={() => setMenuOpen(v => !v)} aria-label={menuOpen ? "Close navigation" : "Open navigation"} aria-expanded={menuOpen}><Menu size={20} /></button>
+          <button className="icon-btn sidebar-toggle" onClick={() => setSidebarCollapsed(value => !value)} aria-label={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"} title={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"} aria-controls="primary-sidebar" aria-expanded={!sidebarCollapsed}>
+            {sidebarCollapsed ? <PanelLeftOpen size={18} /> : <PanelLeftClose size={18} />}
+          </button>
           <div className="topbar-title"><span className="eyebrow">HSC STUDY PLANNER</span><h1>{currentLabel}</h1></div>
           <div className="topbar-actions">
             <button className="btn ghost guide-btn" onClick={() => openGuide(PAGE_GUIDE[page])} title={`${currentLabel} guide`} aria-label="Open user guide"><BookOpen size={16} /> <span>Guide</span></button>
             <button className="icon-btn" onClick={() => setPaletteOpen(true)} title="Quick commands" aria-label="Quick commands"><Command size={18} /></button>
             <button className="btn ghost install" onClick={() => {
-              if (installPrompt) {
-                const event = installPrompt as Event & { prompt?: () => Promise<void> };
-                event.prompt?.().catch(() => undefined);
-                setInstallPrompt(null);
-              } else setInstallInfoOpen(true);
-            }}><Download size={16} /> <span>Install app</span></button>
+              if (installState.prompt) void promptInstall();
+              else setInstallInfoOpen(true);
+            }} aria-label={installState.installed ? "App is installed" : "Install app"} title={installState.installed ? "App is installed" : undefined}><Download size={16} /> <span>{installState.installed ? "Installed" : "Install app"}</span></button>
             <button className="btn primary" onClick={() => go("planner")}><CalendarRange size={17} /> <span>Plan week</span></button>
           </div>
         </header>
@@ -229,11 +231,9 @@ export default function App() {
       {!data.settings.onboarded && <Setup data={data} actions={actions} />}
       {paletteOpen && <CommandPalette data={data} actions={actions} onClose={() => setPaletteOpen(false)} />}
       {guideOpen && <GuideDialog initialSection={guideSection} actions={actions} onClose={() => setGuideOpen(false)} />}
-      {installInfoOpen && <InstallDialog prompt={installPrompt} onClose={() => setInstallInfoOpen(false)} onInstall={() => {
-        const event = installPrompt as Event & { prompt?: () => Promise<void> } | null;
-        event?.prompt?.().catch(() => undefined);
-        setInstallPrompt(null);
-        setInstallInfoOpen(false);
+      {installInfoOpen && <InstallDialog canInstall={Boolean(installState.prompt)} installed={installState.installed} onClose={() => setInstallInfoOpen(false)} onInstall={async () => {
+        const result = await promptInstall();
+        if (result === "accepted") setInstallInfoOpen(false);
       }} />}
       <TimerDock data={data} actions={actions} />
       {toast && (

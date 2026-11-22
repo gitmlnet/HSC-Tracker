@@ -50,7 +50,7 @@ The first screen asks three things:
 
 ## 3. Weekly Planner
 
-The planner is the heart of the app. Each of the seven day columns shows:
+The planner is the heart of the app. On desktop, use the panel control beside the page title to collapse the left navigation to an icon rail or expand it again; the preference is remembered locally. Icon buttons retain accessible names and hover/focus labels. On phones, the separate menu button opens a slide-in navigation drawer; tap outside it, choose a destination or press Escape to close it. Each of the seven day columns shows:
 
 - the weekday and date, with a **Today** tag on the current day;
 - completed / total targets;
@@ -212,13 +212,13 @@ Everything stays on the device in IndexedDB, with a localStorage fallback. There
 
 ### Install as a real app
 
-The **Install app** button is always visible in the top bar. If the browser offers its native install prompt, the button opens it. Otherwise the dialog gives exact steps:
+The **Install app** button is always visible in the top bar. When the browser exposes its native install prompt, the button opens that real install flow directly. Otherwise the dialog checks HTTPS, the manifest and start URL/scope, both downloaded PNG icons and the active service worker, then gives platform-specific steps and browser troubleshooting. A web page cannot force a browser to expose an install prompt:
 
-- **Android / Chrome:** three-dot menu → **Install app** or **Add to Home Screen**.
-- **iPhone / iPad / Safari:** **Share** → **Add to Home Screen**.
-- **Desktop Chrome / Edge:** address-bar install icon, or menu → **Cast, save & share** → **Install page as app**.
+- **Android / Chrome:** open the URL directly in Chrome → three-dot menu → **Install app**.
+- **iPhone / iPad / Safari:** open in Safari → **Share** → **Add to Home Screen**.
+- **Desktop Chrome / Edge:** use the address-bar install icon, or the menu action named **Install HSC Study Planner** / **Install page as app**.
 
-This is a real PWA: manifest, standalone display, 192/512 PNG icons, shortcuts and a versioned service worker. It opens full-screen without a browser toolbar. If a browser only offers **Create shortcut**, use the address-bar install option or another browser.
+The site is configured as a PWA with a manifest, standalone display, 192/512 PNG icons, shortcuts and a versioned service worker. A successful install opens full-screen without a browser toolbar. If a browser only offers **Create shortcut**, do not choose that as a substitute: open the public site in the latest supported full browser (not an embedded or private window), confirm the in-app checks pass, reload and use the browser's **Install app / Install page as app** action. On iPhone and iPad, **Share → Add to Home Screen** in Safari is Apple's PWA installation flow.
 
 ### Offline
 
@@ -235,6 +235,7 @@ A static web app cannot reliably run in the background. Reminders are checked wh
 | Shortcut | Action |
 | --- | --- |
 | `Ctrl/⌘ + K` | Open or close the command palette anywhere |
+| Sidebar control beside the page title | Collapse/expand the desktop sidebar; the choice is remembered on this device |
 | `N` | Open quick entry when no field is being edited |
 | `Enter` | Submit the current smart input line |
 | `Esc` | Close the guide, palette, install dialog or setup |
@@ -246,7 +247,7 @@ Accessibility details: descriptive button labels, polite announcements for smart
 
 ## 12. FAQ and troubleshooting
 
-**Why does Chrome only say "Create shortcut"?** Use the in-app Install button or the address-bar install icon. Some managed browsers hide full installation even for a valid PWA.
+**Why does Chrome only say "Create shortcut"?** Open the public URL directly in a current full Chrome browser (not an embedded or private window), use the in-app **Install app** checks, reload, and look for **Install app / Install page as app**. Do not choose **Create shortcut** as a replacement. The browser controls whether it exposes PWA installation.
 
 **Where did my old data go?** Version 1 plans and sessions were migrated into targets and sessions. The original record is kept in localStorage.
 

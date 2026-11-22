@@ -1,5 +1,5 @@
 /* HSC Study Planner offline app shell. Bump VERSION for every release. */
-const VERSION = "v7";
+const VERSION = "v8";
 const CACHE_PREFIX = "hsc-study-planner-";
 const CACHE_NAME = CACHE_PREFIX + VERSION;
 const APP_SCOPE = new URL("./", self.location.href);

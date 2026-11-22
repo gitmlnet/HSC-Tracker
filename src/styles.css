@@ -86,7 +86,7 @@ code { background: var(--accent-soft); color: var(--accent); border-radius: 6px;
 
 /* Shell */
 .app-shell { min-height: 100vh; display: flex; }
-.sidebar { width: 252px; flex: none; height: 100vh; position: sticky; top: 0; padding: 22px 14px; display: flex; flex-direction: column; background: linear-gradient(175deg, #131a2c 0%, #0d1423 100%); color: #eef2fa; z-index: 40; }
+.sidebar { width: 252px; flex: none; height: 100vh; position: sticky; top: 0; padding: 22px 14px; display: flex; flex-direction: column; background: linear-gradient(175deg, #131a2c 0%, #0d1423 100%); color: #eef2fa; z-index: 40; transition: width .24s var(--ease, cubic-bezier(.22, 1, .36, 1)); }
 .brand { display: flex; align-items: center; gap: 11px; padding: 2px 8px 26px; }
 .brand-mark { width: 40px; height: 40px; flex: none; border-radius: 12px; display: grid; place-items: center; background: linear-gradient(135deg, #8f7bff, #5b5bd6); color: #fff; font-family: "Plus Jakarta Sans", sans-serif; font-weight: 800; font-size: 15px; box-shadow: 0 8px 22px rgba(123, 104, 245, .35); }
 .brand strong { display: block; font-family: "Plus Jakarta Sans", sans-serif; font-size: 14px; letter-spacing: -.02em; }
@@ -109,6 +109,7 @@ code { background: var(--accent-soft); color: var(--accent); border-radius: 6px;
 .topbar-title .eyebrow { font-size: 9px; margin-bottom: 3px; }
 .topbar-actions { margin-left: auto; display: flex; align-items: center; gap: 8px; }
 .menu-btn { display: none; }
+.sidebar-toggle { width: 36px; height: 36px; }
 main { flex: 1; padding: 30px clamp(18px, 3vw, 38px) 90px; }
 .page { max-width: 1500px; margin: 0 auto; display: grid; gap: 20px; }
 .page-head h1, .planner-head h1, .today-head h1 { font-size: clamp(25px, 3vw, 34px); line-height: 1.15; margin-top: 7px; }
@@ -382,6 +383,7 @@ input::placeholder { color: color-mix(in srgb, var(--muted) 80%, transparent); }
   .sidebar-close { display: grid; margin-left: auto; }
   .sidebar-backdrop { display: block; position: fixed; inset: 0; z-index: 35; border: 0; background: rgba(6, 10, 20, .55); }
   .menu-btn { display: grid; }
+  .sidebar-toggle { display: none; }
   .topbar { height: 66px; padding: 0 16px; }
   .topbar .eyebrow { display: none; }
   .topbar-title h1 { font-size: 16px; }
@@ -551,4 +553,48 @@ h1, h2, h3, h4 { font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display
 }
 @media (prefers-reduced-motion: reduce) {
   .guide-dialog { animation: none !important; }
+}
+
+
+/* Desktop sidebar collapse — icon rail preserves every destination and action. */
+@media (min-width: 721px) {
+  .sidebar { overflow: hidden; }
+  .sidebar.collapsed { width: 76px; padding-inline: 10px; }
+  .sidebar.collapsed .brand { justify-content: center; padding-inline: 0; }
+  .sidebar.collapsed .brand-copy { display: none; }
+  .sidebar.collapsed nav button { justify-content: center; padding-inline: 0; }
+  .sidebar.collapsed nav button span { display: none; }
+  .sidebar.collapsed nav button.active::before { left: -10px; }
+  .sidebar.collapsed .sidebar-foot { padding-inline: 0; }
+  .sidebar.collapsed .command-link { justify-content: center; padding-inline: 0; }
+  .sidebar.collapsed .command-text, .sidebar.collapsed .command-link kbd,
+  .sidebar.collapsed .guide-arrow, .sidebar.collapsed .sidebar-foot p { display: none; }
+}
+
+/* Installability diagnostics are explicit, calm, and actionable. */
+.install-dialog { text-align: left; }
+.install-dialog > .install-badge, .install-dialog > .eyebrow, .install-dialog > h2,
+.install-dialog > p:not(.install-browser-note) { text-align: center; }
+.install-diagnostics { display: grid; gap: 7px; margin: 18px 0 16px; padding: 14px; border: 1px solid var(--line); border-radius: 14px; background: var(--card-2); }
+.install-diagnostics-title { display: grid; gap: 3px; margin: 0 0 4px; }
+.install-diagnostics-title b { color: var(--text); font-size: 12px; }
+.install-diagnostics-title span { color: var(--muted); font-size: 10.5px; line-height: 1.45; }
+.install-check { display: flex; align-items: center; gap: 8px; min-height: 28px; color: var(--muted); font-size: 10.8px; }
+.install-check svg, .install-check-dot { flex: none; }
+.install-check.pass { color: var(--green); }
+.install-check.fail { color: var(--amber); }
+.install-check.pending { color: var(--muted); }
+.install-check-dot { width: 13px; height: 13px; border: 2px solid currentColor; border-right-color: transparent; border-radius: 50%; animation: install-spin .8s linear infinite; }
+.install-check b { margin-left: auto; font-size: 10px; color: var(--text); white-space: nowrap; }
+.install-browser-note { display: flex; align-items: flex-start; gap: 8px; margin: 12px 0 16px !important; padding: 11px 12px; border: 1px solid color-mix(in srgb, var(--amber) 25%, var(--line)); border-radius: 11px; background: var(--amber-soft); color: var(--amber) !important; text-align: left !important; font-size: 11px !important; line-height: 1.55 !important; }
+.install-browser-note svg { flex: none; margin-top: 1px; }
+.install-steps { text-align: left; }
+.install-steps > div > svg { flex: none; }
+.install-foot { text-align: center; }
+@keyframes install-spin { to { transform: rotate(360deg); } }
+@media (max-width: 720px) {
+  .install-dialog { text-align: center; padding: 24px 20px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .install-check-dot { animation: none; }
 }
