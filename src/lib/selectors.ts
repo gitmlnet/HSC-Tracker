@@ -49,6 +49,10 @@ export function loggedMinutes(target: Target, sessions: StudySession[]): number 
   return sessionsFor(target, sessions).reduce((sum, session) => sum + session.duration, 0);
 }
 
+export function averageTargetProgress(targets: Target[], sessions: StudySession[]): number {
+  return targets.length ? Math.round(targets.reduce((sum, target) => sum + progressOf(target, sessions), 0) / targets.length) : 0;
+}
+
 export type DaySummary = {
   date: string;
   count: number;
@@ -56,6 +60,7 @@ export type DaySummary = {
   plannedMinutes: number;
   progressCount: number;
   loggedMinutes: number;
+  progressPercent: number;
 };
 
 export function daySummary(date: string, data: { targets: Target[]; sessions: StudySession[] }): DaySummary {
@@ -67,7 +72,8 @@ export function daySummary(date: string, data: { targets: Target[]; sessions: St
     done: targets.filter(target => isDone(target, data.sessions)).length,
     plannedMinutes: targets.reduce((sum, target) => sum + (target.trackingMode === "progress" ? 0 : target.plannedMinutes), 0),
     progressCount: targets.filter(target => target.trackingMode === "progress").length,
-    loggedMinutes: sessions.reduce((sum, session) => sum + session.duration, 0)
+    loggedMinutes: sessions.reduce((sum, session) => sum + session.duration, 0),
+    progressPercent: averageTargetProgress(targets, data.sessions)
   };
 }
 

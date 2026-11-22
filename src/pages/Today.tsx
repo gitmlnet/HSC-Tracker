@@ -24,7 +24,7 @@ export default function Today({ data, actions }: { data: AppData; actions: AppAc
         <div>
           <span className="eyebrow">{prettyDate(today, { weekday: "long", day: "numeric", month: "long" })}</span>
           <h1>{greeting}{data.settings.subjects.length ? "" : ", future scholar"}.</h1>
-          <p>{summary.count ? `${summary.done} of ${summary.count} targets done today. Keep the rhythm.` : "A clear plan makes a calm mind. Start with today."}</p>
+          <p>{summary.count ? `${summary.progressPercent}% average progress across ${summary.count} target${summary.count === 1 ? "" : "s"} today.` : "A clear plan makes a calm mind. Start with today."}</p>
         </div>
         <div className="head-pills">
           {examDays !== null && <span className="countdown"><b>{examDays > 0 ? examDays : 0}</b> days to HSC</span>}
@@ -46,7 +46,7 @@ export default function Today({ data, actions }: { data: AppData; actions: AppAc
           </div>
           <Meter value={summary.loggedMinutes} max={data.settings.dailyGoalMinutes} />
         </div>
-        <ProgressRing value={summary.count ? summary.done / summary.count * 100 : 0} size={132} sub="targets done" />
+        <ProgressRing value={summary.progressPercent} size={132} sub="average progress" />
       </Card>
 
       {week.count === 0 && (

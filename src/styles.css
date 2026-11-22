@@ -221,6 +221,7 @@ input::placeholder { color: color-mix(in srgb, var(--muted) 80%, transparent); }
 .planner-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 18px; }
 .week-nav { display: flex; align-items: center; gap: 7px; }
 .planner-controls { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
+.planner-header-actions { display: flex; align-items: center; justify-content: flex-end; gap: 7px; min-width: 0; flex-wrap: wrap; }
 .planner-current-week.selected { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
 .week-summary-card { display: flex; justify-content: space-between; align-items: center; gap: 20px; flex-wrap: wrap; }
 .week-range h2 { font-size: 19px; margin: 5px 0 5px; }
@@ -997,6 +998,7 @@ label, .field-label { font-size: var(--type-small); line-height: 1.45; }
 @media (max-width: 720px) {
   .planner-controls { align-items: stretch; flex-direction: column; gap: 10px; }
   .planner-controls .week-nav { justify-content: flex-end; }
+  .planner-header-actions { justify-content: flex-start; }
 }
 
 /* Weekly board: keep each target inside its day and make only the tiny board labels easier to scan. */
@@ -1031,3 +1033,11 @@ label, .field-label { font-size: var(--type-small); line-height: 1.45; }
   .fast-plan-task-name { font-size: 11px; }
   .fast-plan-task small { font-size: 10.5px; }
 }
+
+.wizard-secondary-toggle { display: flex; align-items: center; gap: 10px; min-height: 50px; margin: 0 0 13px; padding: 9px 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--card-2); cursor: pointer; }
+.wizard-secondary-toggle input { width: 18px; height: 18px; margin: 0; accent-color: var(--accent); flex: none; }
+.wizard-secondary-toggle span { display: grid; gap: 2px; }
+.wizard-secondary-toggle b { color: var(--text); font-size: 12px; }
+.wizard-secondary-toggle small { color: var(--muted); font-size: 10.5px; }
+.wizard-secondary-field { margin-top: 12px; border-style: dashed; }
+.wizard-secondary-heading { margin-bottom: 9px; color: var(--accent); font-size: 11px; font-weight: 800; }

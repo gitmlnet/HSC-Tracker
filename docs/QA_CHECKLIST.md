@@ -10,9 +10,10 @@ Verification performed on this branch. Every item below was checked against the 
 - [x] Progress semantics verified: an overall chapter estimate of 100% does not complete a time target; a progress goal completes at its cumulative milestone; timer minutes alone do not complete a progress target.
 - [x] Today target edit controls open the exact target in the guided planner; History displays and edits chapter snapshots separately from target completion.
 - [x] Fast plan DOM flow verifies the seven-day rail, day selection, subject/chapter/goal panes, immediate schedule update, multi-target planning, week navigation, Today navigation, and Escape close.
-- [x] Weekly Planner keeps weekday headers and week navigation without the Fast plan, Plan a target, Copy last week, Auto-plan or Clear week action buttons; each day retains its own Add target control. Target names and metadata stay within their day cards, with planner-only small-text contrast and sizing adjustments.
+- [x] Weekly Planner keeps weekday headers and week navigation; Fast plan, Plan a target, Copy last week, Auto-plan and Clear week are grouped in the planner header, while each day retains its own Add target control. Target names and metadata stay within their day cards, with planner-only small-text contrast and sizing adjustments.
+- [x] Today summarizes target progress proportionally: three targets at 80% show 80%, and targets at 50%, 60% and 70% average to 60%.
+- [x] Logging a planned target keeps its selected metric primary and can save the secondary metric in the same session.
 - [x] Settings privacy footer includes a build date and time without an explanatory label.
-- [x] Fast Plan and guided add are available from Quick Actions rather than persistent buttons above the page content.
 - [x] Fast Plan's seven-day overview makes every existing task an edit control; saving updates that target (including its date) without duplicating it, and adding a new plan remains available.
 - [x] Carry-forward, drag between days and weekly review are wired to the same target store.
 - [x] v1 migration preserves plans, sessions, progress and theme; v2 records without tracking-mode fields default to time, completed legacy links gain an absolute 100% chapter snapshot, and session→target links are repaired where possible.

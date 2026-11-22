@@ -107,7 +107,7 @@ Custom topic names are optional. For subjects without a built-in syllabus, choos
 
 ### Log a study session
 
-Tap **Log study** on Today or the circle beside a target. Choose a date, subject and chapter, then tap a quick time value or save the chapter's current overall percentage. For a linked target, the target action opens its log directly. The timer remains available on any target.
+Tap **Log study** on Today or the circle beside a target. A linked target keeps its planned metric as the primary log; optionally add the other metric too (time plus chapter progress, or chapter progress plus time). For an unplanned session, choose either metric first and optionally include the other. The timer remains available on any target.
 
 A chapter percentage is **cumulative**: logging 45% and later 70% means the current estimate is 70%, not 115%. A progress target completes when the chapter reaches its saved percentage goal. A time target completes only when its planned time is explicitly completed; chapter progress does not complete it, and logged minutes do not complete a progress target.
 

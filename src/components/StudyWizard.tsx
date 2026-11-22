@@ -39,10 +39,11 @@ export default function StudyWizard({
   const [minutes, setMinutes] = useState(() => mode === "log"
     ? Math.min(60, Math.max(15, target?.plannedMinutes || 30))
     : target?.plannedMinutes || 60);
-  const [progressGoal, setProgressGoal] = useState(() => target && mode === "log" && target.trackingMode === "progress"
+  const [progressGoal, setProgressGoal] = useState(() => target && mode === "log"
     ? chapterProgressOf(target, data.sessions)
     : mode === "log" ? 0 : target?.progressGoal || 25);
   const [quickKind, setQuickKind] = useState<TrackingMode>(target?.trackingMode || "time");
+  const [secondaryEnabled, setSecondaryEnabled] = useState(false);
   const [saved, setSaved] = useState(false);
   const [customInput, setCustomInput] = useState(target?.topic || "");
   const [error, setError] = useState("");
@@ -55,7 +56,10 @@ export default function StudyWizard({
   const chapters = paper?.chapters || [];
   const selectedChapter = chapters.find(item => item.id === chapterId);
   const currentChapterProgress = chapterProgressOf({ subjectId, paperId, chapterId, topic, progressStart: target?.progressStart }, data.sessions);
-  const activeMode = mode === "log" ? quickKind : trackingMode;
+  const activeMode = mode === "log" ? target?.trackingMode || quickKind : trackingMode;
+  const secondaryMode: TrackingMode = activeMode === "time" ? "progress" : "time";
+  const recordsTime = activeMode === "time" || (mode === "log" && secondaryEnabled && secondaryMode === "time");
+  const recordsProgress = activeMode === "progress" || (mode === "log" && secondaryEnabled && secondaryMode === "progress");
   const isEdit = mode === "plan" && Boolean(target);
   const hasLoggedTarget = Boolean(target && sessionsFor(target, data.sessions).length);
   const steps = mode === "log" && target ? [3] as Step[] : hasLoggedTarget ? [0, 3] as Step[] : [0, 1, 2, 3] as Step[];
@@ -160,14 +164,11 @@ export default function StudyWizard({
     }
 
     const logDate = target ? localDate() : date;
-    const logMinutes = activeMode === "time" ? minutes : 0;
+    const logMinutes = recordsTime ? minutes : 0;
     const start = logMinutes > 0 ? timeBefore(logMinutes) : clockNow();
-    const goal = target?.progressGoal || 100;
-    const baseline = target?.progressStart ?? currentChapterProgress;
-    const chapterSnapshot = activeMode === "progress" ? progressGoal : undefined;
-    const taskProgress = !target ? undefined : activeMode === "progress"
-      ? goal <= baseline ? 100 : Math.max(0, Math.min(100, Math.round((progressGoal - baseline) / (goal - baseline) * 100)))
-      : trackingMode === "time" && (loggedTargetMinutes + logMinutes >= target.plannedMinutes) ? 100 : undefined;
+    const taskProgress = target && target.trackingMode !== "progress" && logMinutes > 0
+      && loggedTargetMinutes + logMinutes >= target.plannedMinutes ? 100 : undefined;
+    const chapterSnapshot = recordsProgress ? progressGoal : undefined;
     const session = makeSession({
       ...(target ? { targetId: target.id } : {}),
       date: logDate,
@@ -182,7 +183,11 @@ export default function StudyWizard({
       ...(chapterSnapshot !== undefined ? { chapterProgress: chapterSnapshot } : {})
     });
     actions.setData(previous => ({ ...previous, sessions: [...previous.sessions, session] }));
-    actions.notify(activeMode === "time" ? `${formatDuration(logMinutes)} logged` : `Chapter progress saved at ${progressGoal}%`);
+    actions.notify(recordsTime && recordsProgress
+      ? `${formatDuration(logMinutes)} and ${progressGoal}% chapter progress logged`
+      : recordsTime
+        ? `${formatDuration(logMinutes)} logged`
+        : `Chapter progress saved at ${progressGoal}%`);
     onClose();
   };
 
@@ -272,15 +277,19 @@ export default function StudyWizard({
 
               {step === 3 && (
                 <section className="wizard-step-content">
-                  <div className="wizard-step-title"><Clock3 size={17} /><div><b>{mode === "plan" ? "Choose your goal" : "What did you achieve?"}</b><small>{mode === "plan" ? "Pick a time commitment or a chapter-progress goal." : target ? targetLabel(target, data.settings) : `${subject?.name || "Subject"} · ${activeChapterLabel}`}</small></div></div>
+                  <div className="wizard-step-title"><Clock3 size={17} /><div><b>{mode === "plan" ? "Choose your goal" : "What did you achieve?"}</b><small>{mode === "plan" ? "Pick a time commitment or a chapter-progress goal." : target ? `${targetLabel(target, data.settings)} · primary: planned ${activeMode === "time" ? "time" : "chapter progress"}` : `${subject?.name || "Subject"} · ${activeChapterLabel}`}</small></div></div>
                   {mode === "plan" && !hasLoggedTarget && <div className="wizard-mode-toggle" role="group" aria-label="Goal type">
                     <button type="button" aria-pressed={trackingMode === "time"} className={trackingMode === "time" ? "selected" : ""} onClick={() => { setTrackingMode("time"); setError(""); }}><Clock3 size={17} /><b>Time</b><small>Plan how long to study</small></button>
                     <button type="button" aria-pressed={trackingMode === "progress"} className={trackingMode === "progress" ? "selected" : ""} onClick={() => { setTrackingMode("progress"); setError(""); }}><Percent size={17} /><b>Chapter progress</b><small>Plan a completion milestone</small></button>
                   </div>}
-                  {mode === "log" && !target && <div className="wizard-mode-toggle" role="group" aria-label="Log type">
-                    <button type="button" aria-pressed={quickKind === "time"} className={quickKind === "time" ? "selected" : ""} onClick={() => setQuickKind("time")}><Clock3 size={17} /><b>Study time</b><small>Record actual minutes</small></button>
-                    <button type="button" aria-pressed={quickKind === "progress"} className={quickKind === "progress" ? "selected" : ""} onClick={() => setQuickKind("progress")}><Percent size={17} /><b>Chapter progress</b><small>Update completion</small></button>
+                  {mode === "log" && !target && <div className="wizard-mode-toggle" role="group" aria-label="Primary log type">
+                    <button type="button" aria-pressed={quickKind === "time"} className={quickKind === "time" ? "selected" : ""} onClick={() => setQuickKind("time")}><Clock3 size={17} /><b>Study time</b><small>Primary log</small></button>
+                    <button type="button" aria-pressed={quickKind === "progress"} className={quickKind === "progress" ? "selected" : ""} onClick={() => setQuickKind("progress")}><Percent size={17} /><b>Chapter progress</b><small>Primary log</small></button>
                   </div>}
+                  {mode === "log" && <label className="wizard-secondary-toggle">
+                    <input type="checkbox" checked={secondaryEnabled} onChange={event => setSecondaryEnabled(event.target.checked)} />
+                    <span><b>Also log {secondaryMode === "time" ? "study time" : "chapter progress"}</b><small>Optional secondary measure</small></span>
+                  </label>}
 
                   {activeMode === "time" ? <div className="wizard-time-goal">
                     <div className="wizard-value-display"><b>{formatDuration(minutes)}</b><span>{mode === "plan" ? "planned study time" : "actual study time"}</span></div>
@@ -293,6 +302,19 @@ export default function StudyWizard({
                     <div className="wizard-percent-picks">{[20, 40, 60, 80, 100].map(value => <button key={value} className={progressGoal === value ? "selected" : ""} onClick={() => setProgressGoal(value)} aria-pressed={progressGoal === value}>{value}%</button>)}</div>
                     <label className="wizard-slider-label">{mode === "plan" ? "Target chapter completion" : "Chapter completion now"}<input type="range" min="0" max="100" step="5" value={progressGoal} onChange={event => setProgressGoal(Number(event.target.value))} aria-label={mode === "plan" ? "Chapter progress goal" : "Current chapter completion"} /></label>
                     {mode === "plan" && <p className="wizard-note">This is the chapter's overall completion—not a percentage to add every time. Your target completes once the logged chapter estimate reaches {progressGoal}%.</p>}
+                  </div>}
+                  {mode === "log" && secondaryEnabled && secondaryMode === "time" && <div className="wizard-time-goal wizard-secondary-field">
+                    <div className="wizard-secondary-heading">Secondary · actual study time</div>
+                    <div className="wizard-value-display"><b>{formatDuration(minutes)}</b><span>time studied</span></div>
+                    <div className="wizard-preset-row">{[15, 30, 45, 60, 90, 120].map(value => <button key={value} className={minutes === value ? "selected" : ""} onClick={() => setMinutes(value)} aria-pressed={minutes === value}>{formatDuration(value)}</button>)}</div>
+                    <label className="wizard-slider-label">Adjust in 15-minute steps<input type="range" min="15" max="300" step="15" value={minutes} onChange={event => setMinutes(Number(event.target.value))} aria-label="Secondary actual study minutes" /></label>
+                  </div>}
+                  {mode === "log" && secondaryEnabled && secondaryMode === "progress" && <div className="wizard-progress-goal wizard-secondary-field">
+                    <div className="wizard-secondary-heading">Secondary · chapter progress</div>
+                    <div className="wizard-value-display"><b>{progressGoal}%</b><span>overall chapter completion</span></div>
+                    <p>Current chapter estimate: <strong>{currentChapterProgress}%</strong></p>
+                    <div className="wizard-percent-picks">{[0, 20, 40, 60, 80, 100].map(value => <button key={value} className={progressGoal === value ? "selected" : ""} onClick={() => setProgressGoal(value)} aria-pressed={progressGoal === value}>{value}%</button>)}</div>
+                    <label className="wizard-slider-label">Chapter completion now<input type="range" min="0" max="100" step="5" value={progressGoal} onChange={event => setProgressGoal(Number(event.target.value))} aria-label="Secondary chapter completion" /></label>
                   </div>}
                   {mode === "plan" && <button type="button" className={`wizard-priority-toggle ${priority === "high" ? "selected" : ""}`} aria-pressed={priority === "high"} onClick={() => setPriority(value => value === "high" ? "normal" : "high")}><Star size={15} /> High priority <small>{priority === "high" ? "Shown first in your plan" : "Optional · shown first in your plan"}</small></button>}
                   {error && <p className="wizard-error" role="alert">{error}</p>}
