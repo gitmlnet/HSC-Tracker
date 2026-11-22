@@ -10,7 +10,7 @@ Verification performed on this branch. Every item below was checked against the 
 - [x] Progress semantics verified: an overall chapter estimate of 100% does not complete a time target; a progress goal completes at its cumulative milestone; timer minutes alone do not complete a progress target.
 - [x] Today target edit controls open the exact target in the guided planner; History displays and edits chapter snapshots separately from target completion.
 - [x] Fast plan DOM flow verifies the seven-day rail, day selection, subject/chapter/goal panes, immediate schedule update, multi-target planning, week navigation, Today navigation, and Escape close.
-- [x] Weekly Planner no longer shows the Week Setup panel; Planner text is larger, and Today plan/log actions use styled card controls with concise labels.
+- [x] Weekly Planner hides the redundant heading, intro, date-range summary and open-week copy; week navigation and planning actions remain available. Today plan/log actions use styled card controls with concise labels.
 - [x] Copy last week, carry-forward, drag between days and weekly review are wired to the same target store.
 - [x] v1 migration preserves plans, sessions, progress and theme; v2 records without tracking-mode fields default to time, completed legacy links gain an absolute 100% chapter snapshot, and session→target links are repaired where possible.
 - [x] Multi-date planning creates distinct targets on the selected Saturday–Friday dates; single-date planning remains available.

@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import type { DragEvent } from "react";
-import { ArrowLeft, ArrowRight, CheckCircle2, ClipboardCopy, Copy, Plus, Sparkles, Trash2, WandSparkles, Zap } from "lucide-react";
+import { ArrowLeft, ArrowRight, CalendarDays, CheckCircle2, ClipboardCopy, Copy, Plus, Sparkles, Trash2, WandSparkles, Zap } from "lucide-react";
 import type { AppData, Target } from "../types";
 import type { AppActions } from "../lib/appTypes";
 import type { PlanStyle } from "../lib/autoPlan";
@@ -113,24 +113,11 @@ export default function Planner({ data, actions, anchor, setAnchor }: {
 
   return (
     <div className="page planner-page">
-      <div className="planner-head">
-        <div>
-          <span className="eyebrow">WEEKLY PLANNER</span>
-          <h1>Plan once. Follow it all week.</h1>
-          <p>Saturday to Friday, in one board. Add, move or change any target whenever you need to.</p>
-        </div>
-        <div className="week-nav">
-          <button className="icon-btn" onClick={() => setAnchor(addDays(start, -7))} aria-label="Previous week"><ArrowLeft size={18} /></button>
-          <button className={`btn secondary ${start === weekStart(today) ? "selected" : ""}`} onClick={() => setAnchor(today)}>This week</button>
-          <button className="icon-btn" onClick={() => setAnchor(addDays(start, 7))} aria-label="Next week"><ArrowRight size={18} /></button>
-        </div>
-      </div>
-
-      <Card className="week-summary-card">
-        <div className="week-range">
-          <span className="eyebrow">{prettyDate(dates[0])} — {prettyDate(dates[6])}</span>
-          <h2>{week.count ? `${week.count} targets planned` : "An open week"}</h2>
-          <p>{week.count ? `${week.done} completed · ${week.plannedMinutes ? `${formatDuration(week.plannedMinutes)} timed` : ""}${week.progressCount ? `${week.plannedMinutes ? " · " : ""}${week.progressCount} chapter progress` : ""} · ${formatDuration(week.loggedMinutes)} studied` : "Build your week in Fast plan, or add a single target."}</p>
+      <div className="planner-controls">
+        <div className="week-nav" aria-label="Week navigation">
+          <button className="icon-btn" onClick={() => setAnchor(addDays(start, -7))} aria-label="Previous week" title="Previous week"><ArrowLeft size={18} /></button>
+          <button className={`icon-btn planner-current-week ${start === weekStart(today) ? "selected" : ""}`} onClick={() => setAnchor(today)} aria-label="Go to current week" title="Go to current week"><CalendarDays size={17} /></button>
+          <button className="icon-btn" onClick={() => setAnchor(addDays(start, 7))} aria-label="Next week" title="Next week"><ArrowRight size={18} /></button>
         </div>
         <div className="week-toolbar">
           <button className="btn primary fast-plan-launch" onClick={() => actions.openFastPlan(dates[0])}><Zap size={16} /> Fast plan</button>
@@ -141,7 +128,7 @@ export default function Planner({ data, actions, anchor, setAnchor }: {
             <Trash2 size={15} /> {confirmClear ? "Click again to clear" : "Clear week"}
           </button>
         </div>
-      </Card>
+      </div>
 
       <div className="planner-board">
         {dates.map((date, index) => {
