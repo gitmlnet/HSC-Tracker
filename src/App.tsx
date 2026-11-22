@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { ArrowRight, BarChart3, Bell, BookOpen, CalendarRange, Command, Download, History as HistoryIcon, LayoutDashboard, Menu, PanelLeftClose, PanelLeftOpen, Settings as SettingsIcon, X, Zap } from "lucide-react";
+import { ArrowRight, BarChart3, Bell, BookOpen, CalendarRange, Command, Download, History as HistoryIcon, LayoutDashboard, Menu, PanelLeftClose, PanelLeftOpen, Settings as SettingsIcon, X } from "lucide-react";
 import type { AppData } from "./types";
 import type { Page, TimerState } from "./lib/appTypes";
 import { emptyData, loadData, saveData, localDate, timeBefore, clockNow, weekStart, weekDates, reducedMotion } from "./lib/storage";
@@ -229,8 +229,6 @@ export default function App() {
               if (installState.prompt) void promptInstall();
               else setInstallInfoOpen(true);
             }} aria-label={installState.installed ? "App is installed" : "Install app"} title={installState.installed ? "App is installed" : undefined}><Download size={16} /> <span>{installState.installed ? "Installed" : "Install app"}</span></button>
-            <button className="btn secondary fast-plan-launch" onClick={() => openFastPlan()} aria-label="Open fast plan" title="Fast plan"><Zap size={16} /> <span>Fast plan</span></button>
-            <button className="btn primary" onClick={() => openStudyWizard("plan")}><CalendarRange size={17} /> <span>Plan a target</span></button>
           </div>
         </header>
 

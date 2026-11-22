@@ -26,7 +26,7 @@ export const GUIDE_SECTIONS: GuideSection[] = [
     nav: "Start here",
     group: "Getting started",
     icon: "compass",
-    intro: "HSC Study Planner is built around one idea: decide the whole week once, then work from a calm, single screen every day. Nothing is locked — every target can be changed at any moment.",
+    intro: "Plan your Saturday–Friday week, then work through each day's targets in one place.",
     keywords: "welcome begin overview how it works introduction first time",
     blocks: [
       {
@@ -34,8 +34,8 @@ export const GUIDE_SECTIONS: GuideSection[] = [
         title: "The four moves",
         items: [
           { title: "Set your profile once", text: "Choose your group, subjects, exam date and a realistic daily goal. You can change all of it later in Settings." },
-          { title: "Plan Saturday to Friday", text: "At the start of the week, open Fast plan to schedule day by day, or add a target from any weekday column. The whole week stays visible on the planner board." },
-          { title: "Work from Today", text: "Today shows your targets, daily goal, exam countdown and streak. Use the tap-first Log study flow or start a timer on a target; finishing the timer records actual elapsed time." },
+          { title: "Plan Saturday to Friday", text: "At the start of the week, open Quick Actions with Ctrl+K and choose Plan the week, or add targets from the weekday columns." },
+          { title: "Work from Today", text: "Today shows your targets, daily goal, exam countdown and streak. Log a study session or start a timer on a target; finishing the timer records actual elapsed time." },
           { title: "Review and adjust", text: "Insights shows the honest numbers; History lets you correct any session. Unfinished targets can be carried into next week from the planner's weekly review." }
         ]
       },
@@ -80,7 +80,7 @@ export const GUIDE_SECTIONS: GuideSection[] = [
         kind: "steps",
         title: "A good weekly rhythm",
         items: [
-          { title: "Saturday: decide the week", text: "Use Fast plan to choose days, subjects, chapters and goals, or add targets from the weekday columns. Scan the seven columns and adjust anything unrealistic." },
+          { title: "Saturday: decide the week", text: "Open Quick Actions with Ctrl+K and choose Plan the week, or add targets from the weekday columns. Review the seven days and adjust the schedule." },
           { title: "Sunday to Thursday: execute and adjust", text: "Work from Today. If something is harder than expected, change the minutes, move the target to another day, or add an extra target whenever you need to." },
           { title: "Friday: lighten and review", text: "Keep Friday manageable by planning only what fits. Use the weekly review to see what is unfinished." },
           { title: "At the next week: carry forward", text: "Carry unfinished targets into next week so nothing quietly disappears. Their history stays in the original week." }
@@ -103,7 +103,7 @@ export const GUIDE_SECTIONS: GuideSection[] = [
         kind: "steps",
         title: "Create a week",
         items: [
-          { title: "Open Fast plan", text: "Choose a day from the week strip, then select a subject, a chapter and a time or cumulative chapter-progress goal—all without leaving the screen." },
+          { title: "Plan the week", text: "Open Quick Actions with Ctrl+K, choose Plan the week, then select dates, subjects, chapters and goals." },
           { title: "Plan one target", text: "Tap Add target beneath a weekday column. Choose one or more dates, a subject, chapter and a time or chapter-progress goal." }
         ]
       },
@@ -112,7 +112,7 @@ export const GUIDE_SECTIONS: GuideSection[] = [
         title: "Working inside a day",
         items: [
           "Tap a target (or its edit button) to adjust its date, subject, chapter and goal in the guided flow.",
-          "Drag-and-drop can move a target to another day, but it is optional; the guided flow supports tap-first planning.",
+          "Drag-and-drop can move a target to another day; its editor also lets you change the date.",
           "Time goals track planned and logged minutes. Chapter-progress goals track an overall cumulative chapter estimate and complete only at their saved milestone.",
           "Use the trash button to remove a target; Undo brings it back.",
           "The small bar shows planned minutes against your daily goal. Amber means the day is over capacity.",
@@ -138,12 +138,12 @@ export const GUIDE_SECTIONS: GuideSection[] = [
   },
   {
     id: "quick-entry",
-    title: "Guided planning: tap through dates, subjects and goals",
+    title: "Guided planning",
     nav: "Planning & logging",
     group: "Planning",
     icon: "sparkles",
     page: "planner",
-    intro: "Plan one day or a whole Saturday–Friday week without routine typing. The guided flow lets you select dates, a subject, a built-in chapter and either a time or cumulative chapter-progress goal.",
+    intro: "Plan one day or a whole Saturday–Friday week. Select dates, a subject, a built-in chapter and either a time or cumulative chapter-progress goal.",
     keywords: "wizard guided plan week date subject chapter tap progress percentage cumulative log typing",
     blocks: [
       {
@@ -167,7 +167,7 @@ export const GUIDE_SECTIONS: GuideSection[] = [
     group: "Daily study",
     icon: "target",
     page: "today",
-    intro: "Today is the execution screen. It shows the day's targets, daily goal, week at a glance, and a tap-first way to log study without routine typing.",
+    intro: "Today shows the day's targets, daily goal, week at a glance and study logging controls.",
     keywords: "today targets streak countdown progress week strip quick log checklist execute",
     blocks: [
       {

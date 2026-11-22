@@ -8,6 +8,9 @@ import { defaultSettings, emptyData, GROUP_SUBJECTS } from "../lib/storage";
 import { GROUP_LABELS, subjectName } from "../data/subjects";
 import { Card, SectionTitle } from "../components/UI";
 
+const buildTime = new Date(__BUILD_TIMESTAMP__);
+const buildTimeLabel = `${buildTime.getFullYear()}-${String(buildTime.getMonth() + 1).padStart(2, "0")}-${String(buildTime.getDate()).padStart(2, "0")} ${String(buildTime.getHours()).padStart(2, "0")}:${String(buildTime.getMinutes()).padStart(2, "0")}`;
+
 export default function SettingsPage({ data, actions }: { data: AppData; actions: AppActions }) {
   const [status, setStatus] = useState("");
   const [confirmClear, setConfirmClear] = useState(false);
@@ -113,7 +116,7 @@ export default function SettingsPage({ data, actions }: { data: AppData; actions
           <button className={`btn ghost danger ${confirmClear ? "confirm" : ""}`} onClick={clearAll} onBlur={() => setConfirmClear(false)}><Trash2 size={16} /> {confirmClear ? "Click again to erase everything" : "Clear workspace"}</button>
         </div>
         {status && <p className="status-note">{status}</p>}
-        <p className="privacy-note"><ShieldCheck size={16} /> No account, no tracking, no records sent anywhere. Export a backup before clearing browser data.</p>
+        <p className="privacy-note"><ShieldCheck size={16} /> No account, no tracking, no records sent anywhere. Export a backup before clearing browser data. <time dateTime={buildTime.toISOString()}>{buildTimeLabel}</time></p>
       </Card>
     </div>
   );

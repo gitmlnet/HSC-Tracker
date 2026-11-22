@@ -10,7 +10,9 @@ Verification performed on this branch. Every item below was checked against the 
 - [x] Progress semantics verified: an overall chapter estimate of 100% does not complete a time target; a progress goal completes at its cumulative milestone; timer minutes alone do not complete a progress target.
 - [x] Today target edit controls open the exact target in the guided planner; History displays and edits chapter snapshots separately from target completion.
 - [x] Fast plan DOM flow verifies the seven-day rail, day selection, subject/chapter/goal panes, immediate schedule update, multi-target planning, week navigation, Today navigation, and Escape close.
-- [x] Weekly Planner keeps weekday headers and week navigation while removing Fast plan, Plan a target, Copy last week, Auto-plan and Clear week from above the columns; each day retains its own Add target control. Target names and metadata stay within their day cards, with planner-only small-text contrast and sizing adjustments.
+- [x] Weekly Planner keeps weekday headers and week navigation without the Fast plan, Plan a target, Copy last week, Auto-plan or Clear week action buttons; each day retains its own Add target control. Target names and metadata stay within their day cards, with planner-only small-text contrast and sizing adjustments.
+- [x] Settings privacy footer includes a build date and time without an explanatory label.
+- [x] Fast Plan and guided add are available from Quick Actions rather than persistent buttons above the page content.
 - [x] Fast Plan's seven-day overview makes every existing task an edit control; saving updates that target (including its date) without duplicating it, and adding a new plan remains available.
 - [x] Carry-forward, drag between days and weekly review are wired to the same target store.
 - [x] v1 migration preserves plans, sessions, progress and theme; v2 records without tracking-mode fields default to time, completed legacy links gain an absolute 100% chapter snapshot, and session→target links are repaired where possible.
@@ -35,7 +37,7 @@ Verification performed on this branch. Every item below was checked against the 
 
 - [x] Desktop sidebar collapses to a persistent, keyboard-accessible icon rail and expands from the top-bar control; mobile retains its independent slide-in drawer, backdrop, close control and Escape handling.
 
-- [x] Typography uses the platform system font stack on Apple devices, including headings; supporting copy, form labels, planning metadata and primary Fast plan controls use a larger, consistent readable type scale, with touch form controls at 16px on mobile.
+- [x] Typography uses the platform system font stack on Apple devices, including headings; supporting copy, form labels, planning metadata and primary planning controls use a larger, consistent readable type scale, with touch form controls at 16px on mobile.
 - [x] Every tinted foreground/background pair used for small text meets at least 4.5:1 contrast (light muted 4.73:1, accent 5.37:1, success 4.81:1, warning 5.01:1, danger 5.14:1).
 - [x] Touch controls enlarged on phones; target actions are always visible on touch devices instead of hover-only.
 - [x] Subject colour rails make targets scannable without adding text.

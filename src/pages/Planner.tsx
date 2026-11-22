@@ -149,7 +149,7 @@ export default function Planner({ data, actions, anchor, setAnchor }: {
         <div className="review-actions">
           <button className="btn secondary" onClick={carryForward}><ClipboardCopy size={16} /> Carry unfinished to next week</button>
           <button className="btn ghost" onClick={addRevisionDay}><Sparkles size={16} /> Add a revision day</button>
-          <span className="review-hint"><CheckCircle2 size={15} /> Change any target by clicking it — nothing is locked in.</span>
+          <span className="review-hint"><CheckCircle2 size={15} /> Click any target to edit it.</span>
         </div>
       </Card>
     </div>

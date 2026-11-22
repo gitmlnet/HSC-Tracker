@@ -71,7 +71,7 @@ export default function Today({ data, actions }: { data: AppData; actions: AppAc
                 {targets.map(t => <TargetRow key={t.id} target={t} data={data} actions={actions} onEdit={() => actions.openStudyWizard("plan", t.date, t.id)} />)}
               </div>
             ) : (
-              <EmptyState icon={Target} title="Nothing planned for today" text="Choose a subject, chapter and goal—no typing required." />
+              <EmptyState icon={Target} title="Nothing planned for today" text="Add a target to schedule today's study." />
             )}
             <div className="inline-add">
               <button className="today-plan-cta" onClick={() => actions.openStudyWizard("plan", today)}>
@@ -113,7 +113,7 @@ export default function Today({ data, actions }: { data: AppData; actions: AppAc
           </Card>
           <Card className="side-note">
             <div><Timer size={19} /></div>
-            <div><b>Timer tip</b><p>Press <kbd>Ctrl</kbd> + <kbd>K</kbd> anywhere to plan, log or jump to a page without leaving your keyboard.</p></div>
+            <div><b>Timer tip</b><p>Press <kbd>Ctrl</kbd> + <kbd>K</kbd> to plan, log or jump to a page.</p></div>
           </Card>
           <Card className="side-note guide-promo">
             <div><BookOpen size={19} /></div>

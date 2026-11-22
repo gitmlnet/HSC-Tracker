@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { ArrowRight, BookOpen, CalendarPlus, Clock3, Command, CornerDownLeft, Search, Sparkles } from "lucide-react";
+import { ArrowRight, BookOpen, CalendarDays, CalendarPlus, Clock3, Command, CornerDownLeft, Search, Sparkles } from "lucide-react";
 import type { AppActions, Page } from "../lib/appTypes";
 import { useDialogFocus } from "../lib/dialogFocus";
 
@@ -24,6 +24,7 @@ export default function CommandPalette({ actions, onClose }: { actions: AppActio
     : guideSection === "today" ? "today" : "start";
 
   const openPlan = () => { actions.openStudyWizard("plan"); onClose(); };
+  const openFastPlan = () => { actions.openFastPlan(); onClose(); };
   const openLog = () => { actions.openStudyWizard("log"); onClose(); };
   const run = () => {
     if (guideMatch) { actions.openGuide(guideTarget); onClose(); return; }
@@ -48,9 +49,10 @@ export default function CommandPalette({ actions, onClose }: { actions: AppActio
           ) : (
             <div className="palette-actions">
               <span className="palette-label"><Command size={14} /> QUICK ACTIONS</span>
-              <button className="palette-result" onClick={openPlan}><CalendarPlus size={17} /><span><b>Plan a study target</b><small>Tap through date, subject, chapter and goal</small></span><ArrowRight size={15} /></button>
-              <button className="palette-result" onClick={openLog}><Clock3 size={17} /><span><b>Log study</b><small>Choose a subject and record time or progress</small></span><ArrowRight size={15} /></button>
-              <div className="palette-hint"><Sparkles size={15} /><p>Type <code>go planner</code> to switch screens, or <code>help timer</code> for guidance. Planning and logging are tap-first.</p></div>
+              <button className="palette-result" onClick={openFastPlan}><CalendarDays size={17} /><span><b>Plan the week</b><small>Schedule targets across seven days</small></span><ArrowRight size={15} /></button>
+              <button className="palette-result" onClick={openPlan}><CalendarPlus size={17} /><span><b>Add a target</b><small>Set a date, subject, chapter and goal</small></span><ArrowRight size={15} /></button>
+              <button className="palette-result" onClick={openLog}><Clock3 size={17} /><span><b>Log study</b><small>Record time or chapter progress</small></span><ArrowRight size={15} /></button>
+              <div className="palette-hint"><Sparkles size={15} /><p>Type <code>go planner</code> to switch screens, or <code>help timer</code> for guidance.</p></div>
             </div>
           )}
         </div>

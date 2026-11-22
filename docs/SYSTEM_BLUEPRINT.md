@@ -34,7 +34,7 @@ Everything below is built on top of the existing stack; nothing needs a backend 
 ## 2. Product principles
 
 1. **One screen for the truth.** *Today* is the default and contains countdown, targets, timer, quick capture, week strip, and due revisions.
-2. **Plan in bulk, adjust individually.** Fast plan and auto-plan build the week; the guided editor adjusts each target.
+2. **Plan in one place, adjust individually.** Fast plan and the guided editor build and update weekly targets.
 3. **Log from the target, not from a form.** Every planned target has Start / Done / +Time right on it.
 4. **Text first, pickers second.** "Physics ch 3 45m tomorrow" beats five dropdowns.
 5. **Local-first, offline, private.** No account required; JSON backup for portability; optional cloud sync is a later phase only.
@@ -97,8 +97,7 @@ Sat        Sun        Mon        Tue        Wed        Thu        Fri
 - **Fast plan**: select a day, subject, syllabus chapter and time or progress goal in one screen; scheduled targets appear in the day rail immediately.
 - **Guided add**: use Plan a target for one date or repeat the target across selected dates.
 - **Fast plan**: a full-screen Saturday–Friday scheduling surface with a day rail and subject, chapter, and goal panes.
-- **Auto-plan**: choose hours/day + subjects + "focus weak chapters" → generates the week using coverage, weak topics, and revision gaps. Every generated target is editable/movable.
-- **Copy last week**, "repeat this target weekly", drag to another day, bulk select/delete, and "carry forward unfinished targets" at week end.
+- Drag targets to another day or carry unfinished targets forward at week end. Repeated-date planning is available in the guided target editor.
 - **Weekly review prompt** at the end of the week: planned vs completed, best day, missed targets, one-click "roll over" to next week.
 
 **Files:** new `src/pages/Planner.tsx`, `src/lib/autoPlan.ts`, `src/data/templates.ts`.
@@ -106,7 +105,7 @@ Sat        Sun        Mon        Tue        Wed        Thu        Fri
 ### G4 — Progress intelligence (from logging to knowing)
 
 - **Chapter mastery map**: subject → paper → chapter grid with status (Not started / Learning / Practised / Strong), driven by completed targets, logged time, and revisions — one consistent selector.
-- **Coverage and weak topics** sorted by low mastery and proximity to the exam date; "weak first" feeds auto-plan and revision.
+- **Coverage and weak topics** sorted by low mastery and proximity to the exam date; weak topics inform revision planning.
 - **Revision engine**: when a target hits 100%, schedule reviews at +1, +3, +7, +14 days (configurable). Due revisions appear on Today with **Revised ✓** / **Still weak** (pulls the review closer). Last 30 days before exam auto-prioritises revision.
 - **Insights**: weekly review card, study heatmap and streaks, subject/time distribution, best study hours, planned-vs-actual trend over 8 weeks.
 - **Readiness score** explained in plain language (coverage + consistency + revision health), with "what to do next" rather than a mysterious number.
@@ -128,7 +127,7 @@ Sat        Sun        Mon        Tue        Wed        Thu        Fri
 ```
 HSC Study Tracker
 ├── Today          (default — countdown, targets, timer, quick capture, week strip, revisions)
-├── Planner        (weekly board, fast plan, auto-plan, review)
+├── Planner        (weekly board, fast plan, review)
 ├── Subjects       (syllabus map, chapter mastery, weak topics, custom topics)
 ├── Review          (due revisions, weak-first queue, weekly review)
 ├── Insights       (trends, heatmap, distribution, readiness)
@@ -204,7 +203,7 @@ Migration runs once on load: v1 `plans` → `targets`, sessions matched to a tar
 | --- | --- | --- |
 | **G1 — Foundation** | Setup, v2 data model + migration, selectors, design system | Everything else depends on it; no more fragile key matching |
 | **G2 — Speed** | Today screen, one-tap timer, smart quick capture, command palette, shortcuts | This is the "doesn't take long to log" requirement |
-| **G3 — Planner** | Weekly board, tap-first Fast plan, auto-plan, copy/carry forward | This is the "plan a week easily in one place" requirement |
+| **G3 — Planner** | Weekly board, Fast plan, carry-forward and target editing | This is the "plan a week easily in one place" requirement |
 | **G4 — Intelligence** | Mastery map, revision engine, insights, readiness, weak topics | This is what makes it an *effective* study system, not a diary |
 | **G5 — Polish & ship** | Premium UI pass, reminders, backup v2, PWA, deploy | Makes it feel professional and safe to trust |
 
@@ -227,7 +226,7 @@ Migration runs once on load: v1 `plans` → `targets`, sessions matched to a tar
 
 - **G1 — Foundation:** done. v2 schema with first-class targets, automatic v1 migration (including session back-linking and a saved v1 snapshot), selectors, shared UI kit, setup wizard.
 - **G2 — Speed:** done. Today command center, one-tap wall-clock timer with pause/partial/finish, natural-language quick capture, `Ctrl/Cmd + K` palette, `N` shortcut, undo toasts.
-- **G3 — Planner:** done. Saturday–Friday board, full-screen Fast plan, guided target editor, auto-plan, copy last week, optional drag between days, carry-forward, weekly review.
+- **G3 — Planner:** done. Saturday–Friday board, full-screen Fast plan, guided target editor, optional drag between days, carry-forward, weekly review.
 - **G4 — Intelligence:** partially done. Coverage, subject distribution, 8-week trend and consistency heatmap are in Insights; the spaced revision queue, mastery map and weak-topic engine are still to build.
 - **G5 — Polish & ship:** done to a high standard. Responsive premium UI with platform-native typography, subject colour coding, touch-sized controls, accessible dialogs, motion with reduced-motion support, contrast-checked tokens, PWA install prompt + fallback guide, notification digest, v2 backup with undo. Vercel alias is live; GitHub Pages workflow is ready but Pages must be enabled in repository settings. See `docs/QA_CHECKLIST.md`.
 

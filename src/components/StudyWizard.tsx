@@ -196,9 +196,9 @@ export default function StudyWizard({
         <button className="icon-btn study-wizard-close" onClick={onClose} aria-label="Close"><X size={18} /></button>
         <header className="study-wizard-head">
           <div className="study-wizard-mark"><BookOpen size={20} /></div>
-          <span className="eyebrow">{mode === "plan" ? "PLAN · TAP THROUGH" : "LOG · NO TYPING NEEDED"}</span>
+          <span className="eyebrow">{mode === "plan" ? "PLAN" : "LOG STUDY"}</span>
           <h2 id="study-wizard-title">{saved ? "Added to your week" : title}</h2>
-          <p>{saved ? "Your plan is saved. Add another target or finish planning." : "Choose one step at a time. You can adjust any target later."}</p>
+          <p>{saved ? "Your plan is saved. Add another target or finish planning." : mode === "plan" ? "Set a date, study target and goal." : "Record study time or chapter progress."}</p>
         </header>
 
         {!saved && <div className="study-wizard-progress" aria-label={`Step ${stepIndex + 1} of ${steps.length}`}>
