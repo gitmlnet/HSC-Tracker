@@ -34,7 +34,7 @@ export const GUIDE_SECTIONS: GuideSection[] = [
         title: "The four moves",
         items: [
           { title: "Set your profile once", text: "Choose your group, subjects, exam date and a realistic daily goal. You can change all of it later in Settings." },
-          { title: "Plan Saturday to Friday", text: "At the start of the week, open Fast plan to schedule day by day, use Auto-plan, or copy last week. The whole week stays visible on the planner board." },
+          { title: "Plan Saturday to Friday", text: "At the start of the week, open Fast plan to schedule day by day, or add a target from any weekday column. The whole week stays visible on the planner board." },
           { title: "Work from Today", text: "Today shows your targets, daily goal, exam countdown and streak. Use the tap-first Log study flow or start a timer on a target; finishing the timer records actual elapsed time." },
           { title: "Review and adjust", text: "Insights shows the honest numbers; History lets you correct any session. Unfinished targets can be carried into next week from the planner's weekly review." }
         ]
@@ -80,9 +80,9 @@ export const GUIDE_SECTIONS: GuideSection[] = [
         kind: "steps",
         title: "A good weekly rhythm",
         items: [
-          { title: "Saturday: decide the week", text: "Use Fast plan to choose days, subjects, chapters and goals, or apply Auto-plan. Scan the seven columns and adjust anything unrealistic." },
+          { title: "Saturday: decide the week", text: "Use Fast plan to choose days, subjects, chapters and goals, or add targets from the weekday columns. Scan the seven columns and adjust anything unrealistic." },
           { title: "Sunday to Thursday: execute and adjust", text: "Work from Today. If something is harder than expected, change the minutes, move the target to another day, or add an extra target whenever you need to." },
-          { title: "Friday: lighten and review", text: "Auto-plan may give Friday one fewer target. Use the weekly review to see what is unfinished." },
+          { title: "Friday: lighten and review", text: "Keep Friday manageable by planning only what fits. Use the weekly review to see what is unfinished." },
           { title: "At the next week: carry forward", text: "Carry unfinished targets into next week so nothing quietly disappears. Their history stays in the original week." }
         ]
       },
@@ -97,16 +97,14 @@ export const GUIDE_SECTIONS: GuideSection[] = [
     icon: "calendar",
     page: "planner",
     intro: "This is the heart of the app: seven day columns, each with a capacity bar against your daily goal and a list of targets. Every target is editable.",
-    keywords: "planner template auto plan copy clear drag edit priority review revision board",
+    keywords: "planner fast plan add target drag edit priority review revision board",
     blocks: [
       {
         kind: "steps",
         title: "Create a week",
         items: [
           { title: "Open Fast plan", text: "Choose a day from the week strip, then select a subject, a chapter and a time or cumulative chapter-progress goal—all without leaving the screen." },
-          { title: "Copy if you prefer continuity", text: "Copy last week duplicates the previous week's targets into the same weekdays with new IDs." },
-          { title: "Plan one target", text: "Tap Plan a target on the board. Choose one or more dates, a subject, chapter and a time or chapter-progress goal." },
-          { title: "Clear and restart", text: "Clear week needs two clicks to protect against accidents. Undo is available in the toast for five seconds." }
+          { title: "Plan one target", text: "Tap Add target beneath a weekday column. Choose one or more dates, a subject, chapter and a time or chapter-progress goal." }
         ]
       },
       {
@@ -118,7 +116,7 @@ export const GUIDE_SECTIONS: GuideSection[] = [
           "Time goals track planned and logged minutes. Chapter-progress goals track an overall cumulative chapter estimate and complete only at their saved milestone.",
           "Use the trash button to remove a target; Undo brings it back.",
           "The small bar shows planned minutes against your daily goal. Amber means the day is over capacity.",
-          "Auto-plan creates a balanced schedule from your selected subjects; adjust any target afterward using Fast plan or its edit button."
+          "Fast plan builds a day-by-day schedule from your selected subjects; adjust any target afterward using its edit control."
         ]
       },
       {

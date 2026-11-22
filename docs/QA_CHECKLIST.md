@@ -10,8 +10,9 @@ Verification performed on this branch. Every item below was checked against the 
 - [x] Progress semantics verified: an overall chapter estimate of 100% does not complete a time target; a progress goal completes at its cumulative milestone; timer minutes alone do not complete a progress target.
 - [x] Today target edit controls open the exact target in the guided planner; History displays and edits chapter snapshots separately from target completion.
 - [x] Fast plan DOM flow verifies the seven-day rail, day selection, subject/chapter/goal panes, immediate schedule update, multi-target planning, week navigation, Today navigation, and Escape close.
-- [x] Weekly Planner hides the redundant heading, intro, date-range summary and open-week copy; week navigation and planning actions remain available. Today plan/log actions use styled card controls with concise labels.
-- [x] Copy last week, carry-forward, drag between days and weekly review are wired to the same target store.
+- [x] Weekly Planner keeps weekday headers and week navigation while removing Fast plan, Plan a target, Copy last week, Auto-plan and Clear week from above the columns; each day retains its own Add target control. Target names and metadata stay within their day cards, with planner-only small-text contrast and sizing adjustments.
+- [x] Fast Plan's seven-day overview makes every existing task an edit control; saving updates that target (including its date) without duplicating it, and adding a new plan remains available.
+- [x] Carry-forward, drag between days and weekly review are wired to the same target store.
 - [x] v1 migration preserves plans, sessions, progress and theme; v2 records without tracking-mode fields default to time, completed legacy links gain an absolute 100% chapter snapshot, and session→target links are repaired where possible.
 - [x] Multi-date planning creates distinct targets on the selected Saturday–Friday dates; single-date planning remains available.
 - [x] Undo is surgical: reversing a completion no longer overwrites unrelated edits made while the toast is visible.

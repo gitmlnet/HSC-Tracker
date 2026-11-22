@@ -1,11 +1,10 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import type { DragEvent } from "react";
-import { ArrowLeft, ArrowRight, CalendarDays, CheckCircle2, ClipboardCopy, Copy, Plus, Sparkles, Trash2, WandSparkles, Zap } from "lucide-react";
+import { ArrowLeft, ArrowRight, CalendarDays, CheckCircle2, ClipboardCopy, Plus, Sparkles } from "lucide-react";
 import type { AppData, Target } from "../types";
 import type { AppActions } from "../lib/appTypes";
-import type { PlanStyle } from "../lib/autoPlan";
 import { DAY_NAMES, addDays, formatDuration, localDate, prettyDate, uid, weekDates, weekStart } from "../lib/storage";
-import { buildWeek, copyWeek, STYLE_INFO } from "../lib/autoPlan";
+import { buildWeek } from "../lib/autoPlan";
 import { daySummary, isDone, weekSummary } from "../lib/selectors";
 import { Card, Meter, SectionTitle, TargetRow } from "../components/UI";
 
@@ -19,7 +18,6 @@ export default function Planner({ data, actions, anchor, setAnchor }: {
   const dates = useMemo(() => weekDates(start), [start]);
   const today = localDate();
   const week = weekSummary(dates, data);
-  const [confirmClear, setConfirmClear] = useState(false);
 
   // A target with a live timer holds unsaved minutes; never remove it silently.
   const protectsTimer = (targets: Target[]) => {
@@ -31,44 +29,11 @@ export default function Planner({ data, actions, anchor, setAnchor }: {
     return false;
   };
 
-  const replaceWeek = (targets: Target[], message: string, undoTargets?: Target[]) => {
-    const previous = undoTargets || data.targets.filter(t => dates.includes(t.date));
-    if (protectsTimer(previous)) return;
-    actions.setData(prev => ({
-      ...prev,
-      targets: [...prev.targets.filter(t => !dates.includes(t.date)), ...targets]
-    }));
-    actions.notify(message, () => actions.setData(prev => ({
-      ...prev,
-      targets: [...prev.targets.filter(t => !dates.includes(t.date)), ...previous]
-    })));
-  };
-
-  const applyStyle = (style: PlanStyle) => {
-    const result = buildWeek(style, dates, data);
-    replaceWeek(result.targets, `${STYLE_INFO[style].name} applied to this week`);
-  };
-
   const addRevisionDay = () => {
     const quietest = dates.reduce((best, date) => daySummary(date, data).plannedMinutes < daySummary(best, data).plannedMinutes ? date : best, dates[6]);
     const additions = buildWeek("revision", [quietest], data, false).targets;
     actions.setData(prev => ({ ...prev, targets: [...prev.targets, ...additions] }));
     actions.notify(`Revision targets added to ${prettyDate(quietest)}`);
-  };
-
-  const copyPrevious = () => {
-    const previous = copyWeek(addDays(start, -7), dates, data);
-    if (!previous.length) { actions.notify("No targets found in the previous week"); return; }
-    replaceWeek(previous, "Last week's plan copied");
-  };
-
-  const clearWeek = () => {
-    if (!confirmClear) { setConfirmClear(true); return; }
-    const previous = data.targets.filter(t => dates.includes(t.date));
-    if (protectsTimer(previous)) { setConfirmClear(false); return; }
-    actions.setData(prev => ({ ...prev, targets: prev.targets.filter(t => !dates.includes(t.date)) }));
-    setConfirmClear(false);
-    actions.notify("Week cleared", () => actions.setData(prev => ({ ...prev, targets: [...prev.targets, ...previous] })));
   };
 
   const carryForward = () => {
@@ -118,15 +83,6 @@ export default function Planner({ data, actions, anchor, setAnchor }: {
           <button className="icon-btn" onClick={() => setAnchor(addDays(start, -7))} aria-label="Previous week" title="Previous week"><ArrowLeft size={18} /></button>
           <button className={`icon-btn planner-current-week ${start === weekStart(today) ? "selected" : ""}`} onClick={() => setAnchor(today)} aria-label="Go to current week" title="Go to current week"><CalendarDays size={17} /></button>
           <button className="icon-btn" onClick={() => setAnchor(addDays(start, 7))} aria-label="Next week" title="Next week"><ArrowRight size={18} /></button>
-        </div>
-        <div className="week-toolbar">
-          <button className="btn primary fast-plan-launch" onClick={() => actions.openFastPlan(dates[0])}><Zap size={16} /> Fast plan</button>
-          <button className="btn secondary" onClick={() => actions.openStudyWizard("plan", dates[0])}><Plus size={16} /> Plan a target</button>
-          <button className="btn secondary" onClick={copyPrevious}><Copy size={15} /> Copy last week</button>
-          <button className="btn secondary" onClick={() => applyStyle("balanced")}><WandSparkles size={15} /> Auto-plan</button>
-          <button className={`btn ghost danger ${confirmClear ? "confirm" : ""}`} onClick={clearWeek} onBlur={() => setConfirmClear(false)}>
-            <Trash2 size={15} /> {confirmClear ? "Click again to clear" : "Clear week"}
-          </button>
         </div>
       </div>
 

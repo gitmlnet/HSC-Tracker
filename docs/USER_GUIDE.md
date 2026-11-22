@@ -25,9 +25,9 @@ HSC Study Planner is built around a single workflow: **decide the whole week onc
 
 A planning week always runs **Saturday → Friday**. That matches a typical HSC study week and keeps the seven days visible together on one board.
 
-1. **Saturday — decide the week.** Use Fast plan to fill the week by hand, or apply Auto-plan and then adjust anything unrealistic.
+1. **Saturday — decide the week.** Open Fast plan to fill the week by hand, or add targets directly from the weekday columns.
 2. **Sunday to Thursday — execute and adjust.** Work from **Today**. If a subject takes longer than expected, change its minutes, move it to another day or add an extra target. Nothing is locked.
-3. **Friday — lighter review.** Auto-plan may give Friday one fewer target. Use the weekly review to see what is unfinished.
+3. **Friday — review.** Use the weekly review to see what is unfinished and carry targets forward when useful.
 4. **Next week — carry forward.** Copy unfinished targets into next week. The originals remain in the current week so history stays truthful.
 
 The point is concentration: you should never have to hunt across screens to know **what is next**.
@@ -56,19 +56,17 @@ The planner is the heart of the app. On desktop, use the panel control beside th
 - completed / total targets;
 - a capacity bar comparing planned minutes with your daily goal (amber means over capacity);
 - target rows, with high-priority targets first;
-- a tap-first **Plan a target** button for adding to that day.
+- a tap-first **Add target** button for adding to that day.
 
 ### Creating a week
 
 | Control | What it does |
 | --- | --- |
-| **Fast plan** | Opens a full-screen weekly view: choose a day, subject, chapter and goal, then add targets without leaving the screen |
-| **Plan a target** | Opens the guided flow for a single target or a repeated set of dates |
-| **Auto-plan** | Applies a balanced set of targets to the week |
-| **Copy last week** | Duplicates the previous week's targets on the same weekdays with new IDs |
-| **Clear week** | Requires a second click; Undo is offered in the toast |
+| **Fast plan** | Opens from Today: choose a day, subject, chapter and goal, then add targets without leaving the screen. Existing tasks in its week strip can be selected to edit. |
+| **Add target** | Each weekday column opens the guided flow for a single target; Today also supports repeated dates. |
+| **Week navigation** | Move between weeks or return to the current week without changing any targets. |
 
-Auto-plan uses your subjects and daily goal to pick chapters and minutes. Fast plan is the direct, tap-first option for building a schedule yourself.
+Fast plan is the direct, tap-first option for building a schedule yourself. Each day's Add target control remains available on the Weekly Planner.
 
 ### Working with a target
 
@@ -89,13 +87,13 @@ At the bottom of the planner:
 - **Add a revision day** — puts short revision targets on the lightest day;
 - a reminder that nothing is locked in.
 
-> **Timer protection:** while a timer is running on a target, you cannot delete that target, clear or replace its week, or clear the whole workspace. Finish the timer first so its minutes are never lost.
+> **Timer protection:** while a timer is running on a target, you cannot delete that target. Finish the timer first so its minutes are never lost.
 
 ---
 
 ## 4. Tap-first planning and logging
 
-Use **Plan week**, **Plan a target**, or **Log study** to open the guided flow. The normal planning and logging path is designed for tapping—typing is only needed if you choose to add an optional custom topic.
+Use **Fast plan** for day-by-day scheduling, **Plan a target** for the guided flow, or **Log study** to record a session. The normal planning and logging path is designed for tapping—typing is only needed if you choose to add an optional custom topic.
 
 ### Plan one day or several days
 
