@@ -1,11 +1,10 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import type { DragEvent } from "react";
-import { ArrowLeft, ArrowRight, CalendarDays, CheckCircle2, ClipboardCopy, Copy, Plus, Sparkles, Trash2, WandSparkles, Zap } from "lucide-react";
+import { ArrowLeft, ArrowRight, CalendarDays, CheckCircle2, ClipboardCopy, Plus, Sparkles, Zap } from "lucide-react";
 import type { AppData, Target } from "../types";
 import type { AppActions } from "../lib/appTypes";
-import type { PlanStyle } from "../lib/autoPlan";
 import { DAY_NAMES, addDays, formatDuration, localDate, prettyDate, uid, weekDates, weekStart } from "../lib/storage";
-import { buildWeek, copyWeek, STYLE_INFO } from "../lib/autoPlan";
+import { buildWeek } from "../lib/autoPlan";
 import { daySummary, isDone, weekSummary } from "../lib/selectors";
 import { Card, Meter, SectionTitle, TargetRow } from "../components/UI";
 
@@ -19,49 +18,13 @@ export default function Planner({ data, actions, anchor, setAnchor }: {
   const dates = useMemo(() => weekDates(start), [start]);
   const today = localDate();
   const week = weekSummary(dates, data);
-  const [confirmClear, setConfirmClear] = useState(false);
-
-  // A target with a live timer holds unsaved minutes; never remove it silently.
   const protectsTimer = (targets: Target[]) => {
     const activeId = actions.timer?.targetId;
-    if (activeId && targets.some(t => t.id === activeId)) {
+    if (activeId && targets.some(target => target.id === activeId)) {
       actions.notify("Finish the active timer before changing that target");
       return true;
     }
     return false;
-  };
-
-  const replaceWeek = (targets: Target[], message: string, undoTargets?: Target[]) => {
-    const previous = undoTargets || data.targets.filter(target => dates.includes(target.date));
-    if (protectsTimer(previous)) return;
-    actions.setData(previousData => ({
-      ...previousData,
-      targets: [...previousData.targets.filter(target => !dates.includes(target.date)), ...targets]
-    }));
-    actions.notify(message, () => actions.setData(previousData => ({
-      ...previousData,
-      targets: [...previousData.targets.filter(target => !dates.includes(target.date)), ...previous]
-    })));
-  };
-
-  const applyStyle = (style: PlanStyle) => {
-    const result = buildWeek(style, dates, data);
-    replaceWeek(result.targets, `${STYLE_INFO[style].name} applied to this week`);
-  };
-
-  const copyPrevious = () => {
-    const copies = copyWeek(addDays(start, -7), dates, data);
-    if (!copies.length) { actions.notify("No targets found in the previous week"); return; }
-    replaceWeek(copies, "Last week's plan copied");
-  };
-
-  const clearWeek = () => {
-    if (!confirmClear) { setConfirmClear(true); return; }
-    const previous = data.targets.filter(target => dates.includes(target.date));
-    if (protectsTimer(previous)) { setConfirmClear(false); return; }
-    actions.setData(previousData => ({ ...previousData, targets: previousData.targets.filter(target => !dates.includes(target.date)) }));
-    setConfirmClear(false);
-    actions.notify("Week cleared", () => actions.setData(previousData => ({ ...previousData, targets: [...previousData.targets, ...previous] })));
   };
 
   const addRevisionDay = () => {
@@ -122,9 +85,6 @@ export default function Planner({ data, actions, anchor, setAnchor }: {
         <div className="planner-header-actions" aria-label="Weekly planning actions">
           <button className="btn primary" onClick={() => actions.openFastPlan(dates[0])}><Zap size={16} /> Fast plan</button>
           <button className="btn secondary" onClick={() => actions.openStudyWizard("plan", dates[0])}><Plus size={16} /> Plan a target</button>
-          <button className="btn secondary" onClick={copyPrevious}><Copy size={15} /> Copy last week</button>
-          <button className="btn secondary" onClick={() => applyStyle("balanced")}><WandSparkles size={15} /> Auto-plan</button>
-          <button className={`btn ghost danger ${confirmClear ? "confirm" : ""}`} onClick={clearWeek} onBlur={() => setConfirmClear(false)}><Trash2 size={15} /> {confirmClear ? "Click again to clear" : "Clear week"}</button>
         </div>
       </div>
 

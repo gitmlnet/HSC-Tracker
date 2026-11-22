@@ -36,9 +36,12 @@ export default function StudyWizard({
   const [repeatOpen, setRepeatOpen] = useState(false);
   const [trackingMode, setTrackingMode] = useState<TrackingMode>(target?.trackingMode || "time");
   const [priority, setPriority] = useState<Target["priority"]>(target?.priority || "normal");
-  const [minutes, setMinutes] = useState(() => mode === "log"
-    ? Math.min(60, Math.max(15, target?.plannedMinutes || 30))
-    : target?.plannedMinutes || 60);
+  const [minutes, setMinutes] = useState(() => {
+    if (mode !== "log") return target?.plannedMinutes || 60;
+    const alreadyLogged = target ? sessionsFor(target, data.sessions).reduce((sum, session) => sum + session.duration, 0) : 0;
+    const remaining = target ? Math.max(15, (target.plannedMinutes || 30) - alreadyLogged) : 30;
+    return Math.min(60, remaining);
+  });
   const [progressGoal, setProgressGoal] = useState(() => target && mode === "log"
     ? chapterProgressOf(target, data.sessions)
     : mode === "log" ? 0 : target?.progressGoal || 25);
@@ -286,35 +289,44 @@ export default function StudyWizard({
                     <button type="button" aria-pressed={quickKind === "time"} className={quickKind === "time" ? "selected" : ""} onClick={() => setQuickKind("time")}><Clock3 size={17} /><b>Study time</b><small>Primary log</small></button>
                     <button type="button" aria-pressed={quickKind === "progress"} className={quickKind === "progress" ? "selected" : ""} onClick={() => setQuickKind("progress")}><Percent size={17} /><b>Chapter progress</b><small>Primary log</small></button>
                   </div>}
-                  {mode === "log" && <label className="wizard-secondary-toggle">
-                    <input type="checkbox" checked={secondaryEnabled} onChange={event => setSecondaryEnabled(event.target.checked)} />
-                    <span><b>Also log {secondaryMode === "time" ? "study time" : "chapter progress"}</b><small>Optional secondary measure</small></span>
-                  </label>}
-
-                  {activeMode === "time" ? <div className="wizard-time-goal">
-                    <div className="wizard-value-display"><b>{formatDuration(minutes)}</b><span>{mode === "plan" ? "planned study time" : "actual study time"}</span></div>
+                  {mode === "log" ? <div className="wizard-measures-grid">
+                    <div className="wizard-measure-panel wizard-primary-measure">
+                      <div className="wizard-secondary-heading">Primary · {activeMode === "time" ? "study time" : "chapter progress"}</div>
+                      {activeMode === "time" ? <>
+                        <div className="wizard-value-display"><b>{formatDuration(minutes)}</b><span>actual study time</span></div>
+                        <div className="wizard-preset-row">{[15, 30, 45, 60, 90, 120].map(value => <button key={value} className={minutes === value ? "selected" : ""} onClick={() => setMinutes(value)} aria-pressed={minutes === value}>{formatDuration(value)}</button>)}</div>
+                        <label className="wizard-slider-label">Adjust time<input type="range" min="15" max="300" step="15" value={minutes} onChange={event => setMinutes(Number(event.target.value))} aria-label="Actual study minutes" /></label>
+                        {target && target.trackingMode === "time" && <p className="wizard-measure-note">Logged {formatDuration(loggedTargetMinutes)} of {formatDuration(target.plannedMinutes)}. Default is remaining planned time.</p>}
+                      </> : <>
+                        <div className="wizard-value-display"><b>{progressGoal}%</b><span>chapter progress now</span></div>
+                        <p className="wizard-measure-note">Current chapter estimate: <strong>{currentChapterProgress}%</strong></p>
+                        <div className="wizard-percent-picks">{[0, 20, 40, 60, 80, 100].map(value => <button key={value} className={progressGoal === value ? "selected" : ""} onClick={() => setProgressGoal(value)} aria-pressed={progressGoal === value}>{value}%</button>)}</div>
+                        <label className="wizard-slider-label">Chapter completion<input type="range" min="0" max="100" step="5" value={progressGoal} onChange={event => setProgressGoal(Number(event.target.value))} aria-label="Current chapter completion" /></label>
+                      </>}
+                    </div>
+                    <div className="wizard-measure-panel wizard-secondary-measure">
+                      <div className="wizard-secondary-heading">Secondary · {secondaryMode === "time" ? "study time" : "chapter progress"} <span>optional · adjust to include</span></div>
+                      {secondaryMode === "time" ? <>
+                        <div className="wizard-value-display"><b>{formatDuration(minutes)}</b><span>actual study time</span></div>
+                        <div className="wizard-preset-row">{[15, 30, 45, 60, 90, 120].map(value => <button key={value} className={minutes === value ? "selected" : ""} onClick={() => { setMinutes(value); setSecondaryEnabled(true); }} aria-pressed={minutes === value}>{formatDuration(value)}</button>)}</div>
+                        <label className="wizard-slider-label">Adjust time<input type="range" min="15" max="300" step="15" value={minutes} onChange={event => { setMinutes(Number(event.target.value)); setSecondaryEnabled(true); }} aria-label="Secondary actual study minutes" /></label>
+                      </> : <>
+                        <div className="wizard-value-display"><b>{progressGoal}%</b><span>overall chapter completion</span></div>
+                        <p className="wizard-measure-note">Current estimate: <strong>{currentChapterProgress}%</strong></p>
+                        <div className="wizard-percent-picks">{[0, 20, 40, 60, 80, 100].map(value => <button key={value} className={progressGoal === value ? "selected" : ""} onClick={() => { setProgressGoal(value); setSecondaryEnabled(true); }} aria-pressed={progressGoal === value}>{value}%</button>)}</div>
+                        <label className="wizard-slider-label">Chapter completion<input type="range" min="0" max="100" step="5" value={progressGoal} onChange={event => { setProgressGoal(Number(event.target.value)); setSecondaryEnabled(true); }} aria-label="Secondary chapter completion" /></label>
+                      </>}
+                    </div>
+                  </div> : activeMode === "time" ? <div className="wizard-time-goal">
+                    <div className="wizard-value-display"><b>{formatDuration(minutes)}</b><span>planned study time</span></div>
                     <div className="wizard-preset-row">{[30, 45, 60, 90, 120, 150].map(value => <button key={value} className={minutes === value ? "selected" : ""} onClick={() => setMinutes(value)} aria-pressed={minutes === value}>{formatDuration(value)}</button>)}</div>
-                    <label className="wizard-slider-label">Adjust in 15-minute steps<input type="range" min="15" max="300" step="15" value={minutes} onChange={event => setMinutes(Number(event.target.value))} aria-label={mode === "plan" ? "Planned minutes" : "Actual study minutes"} /></label>
-                    {mode === "log" && target && trackingMode === "time" && <p className="wizard-note">Already logged: {formatDuration(loggedTargetMinutes)} of {formatDuration(target.plannedMinutes)} planned.</p>}
+                    <label className="wizard-slider-label">Adjust in 15-minute steps<input type="range" min="15" max="300" step="15" value={minutes} onChange={event => setMinutes(Number(event.target.value))} aria-label="Planned minutes" /></label>
                   </div> : <div className="wizard-progress-goal">
-                    <div className="wizard-value-display"><b>{progressGoal}%</b><span>{mode === "plan" ? "chapter progress goal" : "chapter progress now"}</span></div>
-                    <p>Current chapter estimate: <strong>{currentChapterProgress}%</strong>{mode === "plan" ? " · set where you want to reach" : " · choose the new overall chapter percentage"}</p>
+                    <div className="wizard-value-display"><b>{progressGoal}%</b><span>chapter progress goal</span></div>
+                    <p>Current chapter estimate: <strong>{currentChapterProgress}%</strong> · set where you want to reach</p>
                     <div className="wizard-percent-picks">{[20, 40, 60, 80, 100].map(value => <button key={value} className={progressGoal === value ? "selected" : ""} onClick={() => setProgressGoal(value)} aria-pressed={progressGoal === value}>{value}%</button>)}</div>
-                    <label className="wizard-slider-label">{mode === "plan" ? "Target chapter completion" : "Chapter completion now"}<input type="range" min="0" max="100" step="5" value={progressGoal} onChange={event => setProgressGoal(Number(event.target.value))} aria-label={mode === "plan" ? "Chapter progress goal" : "Current chapter completion"} /></label>
-                    {mode === "plan" && <p className="wizard-note">This is the chapter's overall completion—not a percentage to add every time. Your target completes once the logged chapter estimate reaches {progressGoal}%.</p>}
-                  </div>}
-                  {mode === "log" && secondaryEnabled && secondaryMode === "time" && <div className="wizard-time-goal wizard-secondary-field">
-                    <div className="wizard-secondary-heading">Secondary · actual study time</div>
-                    <div className="wizard-value-display"><b>{formatDuration(minutes)}</b><span>time studied</span></div>
-                    <div className="wizard-preset-row">{[15, 30, 45, 60, 90, 120].map(value => <button key={value} className={minutes === value ? "selected" : ""} onClick={() => setMinutes(value)} aria-pressed={minutes === value}>{formatDuration(value)}</button>)}</div>
-                    <label className="wizard-slider-label">Adjust in 15-minute steps<input type="range" min="15" max="300" step="15" value={minutes} onChange={event => setMinutes(Number(event.target.value))} aria-label="Secondary actual study minutes" /></label>
-                  </div>}
-                  {mode === "log" && secondaryEnabled && secondaryMode === "progress" && <div className="wizard-progress-goal wizard-secondary-field">
-                    <div className="wizard-secondary-heading">Secondary · chapter progress</div>
-                    <div className="wizard-value-display"><b>{progressGoal}%</b><span>overall chapter completion</span></div>
-                    <p>Current chapter estimate: <strong>{currentChapterProgress}%</strong></p>
-                    <div className="wizard-percent-picks">{[0, 20, 40, 60, 80, 100].map(value => <button key={value} className={progressGoal === value ? "selected" : ""} onClick={() => setProgressGoal(value)} aria-pressed={progressGoal === value}>{value}%</button>)}</div>
-                    <label className="wizard-slider-label">Chapter completion now<input type="range" min="0" max="100" step="5" value={progressGoal} onChange={event => setProgressGoal(Number(event.target.value))} aria-label="Secondary chapter completion" /></label>
+                    <label className="wizard-slider-label">Target chapter completion<input type="range" min="0" max="100" step="5" value={progressGoal} onChange={event => setProgressGoal(Number(event.target.value))} aria-label="Chapter progress goal" /></label>
+                    <p className="wizard-note">This is the chapter's overall completion—not a percentage to add every time. Your target completes once the logged chapter estimate reaches {progressGoal}%.</p>
                   </div>}
                   {mode === "plan" && <button type="button" className={`wizard-priority-toggle ${priority === "high" ? "selected" : ""}`} aria-pressed={priority === "high"} onClick={() => setPriority(value => value === "high" ? "normal" : "high")}><Star size={15} /> High priority <small>{priority === "high" ? "Shown first in your plan" : "Optional · shown first in your plan"}</small></button>}
                   {error && <p className="wizard-error" role="alert">{error}</p>}

@@ -124,9 +124,15 @@ export default function App() {
   const stopTimer = useCallback((mode: "full" | "partial") => {
     if (!timer) return;
     const target = data.targets.find(t => t.id === timer.targetId);
-    const duration = Math.max(1, Math.round((timer.accumulatedMs + (timer.running ? Math.max(0, Date.now() - timer.startedAt) : 0)) / 60000));
+    const elapsedMs = timer.accumulatedMs + (timer.running ? Math.max(0, Date.now() - timer.startedAt) : 0);
+    const duration = Math.floor(elapsedMs / 60000);
     if (!target) {
       notify("That target is no longer in the plan — no session was logged");
+      setTimer(null);
+      return;
+    }
+    if (duration < 1) {
+      notify("Timer was under one minute — no study time was logged");
       setTimer(null);
       return;
     }

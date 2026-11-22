@@ -1,5 +1,5 @@
 import type { DragEvent, ElementType, KeyboardEvent, ReactNode } from "react";
-import { ArrowUpRight, Check, Circle, CornerDownLeft, Pause, Play, Square, Trash2, WandSparkles } from "lucide-react";
+import { ArrowUpRight, Check, Circle, CornerDownLeft, Pause, Play, RotateCcw, Square, Trash2, WandSparkles } from "lucide-react";
 import type { AppData, Target } from "../types";
 import type { AppActions } from "../lib/appTypes";
 import { targetLabel } from "../data/subjects";
@@ -124,20 +124,17 @@ export function TargetRow({ target, data, actions, onEdit, onDelete, onDragStart
   const label = targetLabel(target, data.settings);
 
   const chapterProgress = chapterProgressOf(target, data.sessions);
-  const toggle = () => {
-    if (done && target.trackingMode !== "progress") {
-      const progressBefore = sessionsFor(target, data.sessions).map(s => ({ id: s.id, progress: s.progress }));
-      actions.setData(prev => uncompleteTarget(prev, target));
-      actions.notify("Target reopened", () => actions.setData(prev => ({
-        ...prev,
-        sessions: prev.sessions.map(s => {
-          const old = progressBefore.find(item => item.id === s.id);
-          return old && old.progress !== s.progress ? { ...s, progress: old.progress } : s;
-        })
-      })));
-      return;
-    }
-    actions.openStudyWizard("log", target.date, target.id);
+  const logStudy = () => actions.openStudyWizard("log", target.date, target.id);
+  const reopenTarget = () => {
+    const progressBefore = sessionsFor(target, data.sessions).map(s => ({ id: s.id, progress: s.progress }));
+    actions.setData(prev => uncompleteTarget(prev, target));
+    actions.notify("Target reopened", () => actions.setData(prev => ({
+      ...prev,
+      sessions: prev.sessions.map(s => {
+        const old = progressBefore.find(item => item.id === s.id);
+        return old && old.progress !== s.progress ? { ...s, progress: old.progress } : s;
+      })
+    })));
   };
 
   return (
@@ -148,7 +145,7 @@ export function TargetRow({ target, data, actions, onEdit, onDelete, onDragStart
       onDragStart={onDragStart}
       aria-label={label}
     >
-      <button className={`check ${done ? "checked" : ""}`} onClick={toggle} aria-label={done && target.trackingMode !== "progress" ? `Reopen ${label}` : `Log study for ${label}`} title={done && target.trackingMode !== "progress" ? "Reopen target" : "Log study"}>
+      <button className={`check ${done ? "checked" : ""}`} onClick={logStudy} disabled={done && target.trackingMode !== "progress"} aria-label={done && target.trackingMode !== "progress" ? `${label} is complete` : `Log study for ${label}`} title={done && target.trackingMode !== "progress" ? "Completed" : "Log study"}>
         {done ? <Check size={14} /> : <Circle size={15} />}
       </button>
       <div className="target-main" onClick={onEdit} role={onEdit ? "button" : undefined} tabIndex={onEdit ? 0 : undefined} onKeyDown={e => { if (onEdit && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); onEdit(); } }}>
@@ -165,6 +162,7 @@ export function TargetRow({ target, data, actions, onEdit, onDelete, onDragStart
         </div>
       </div>
       <div className="target-actions">
+        {done && target.trackingMode !== "progress" && <button className="icon-btn" onClick={reopenTarget} title="Reopen target" aria-label={`Reopen ${label}`}><RotateCcw size={15} /></button>}
         {timerHere ? (
           <>
             <button className="icon-btn" onClick={actions.pauseTimer} title="Pause timer" aria-label="Pause timer"><Pause size={15} /></button>

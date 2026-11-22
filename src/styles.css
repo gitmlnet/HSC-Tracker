@@ -1034,10 +1034,23 @@ label, .field-label { font-size: var(--type-small); line-height: 1.45; }
   .fast-plan-task small { font-size: 10.5px; }
 }
 
-.wizard-secondary-toggle { display: flex; align-items: center; gap: 10px; min-height: 50px; margin: 0 0 13px; padding: 9px 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--card-2); cursor: pointer; }
-.wizard-secondary-toggle input { width: 18px; height: 18px; margin: 0; accent-color: var(--accent); flex: none; }
-.wizard-secondary-toggle span { display: grid; gap: 2px; }
-.wizard-secondary-toggle b { color: var(--text); font-size: 12px; }
-.wizard-secondary-toggle small { color: var(--muted); font-size: 10.5px; }
 .wizard-secondary-field { margin-top: 12px; border-style: dashed; }
 .wizard-secondary-heading { margin-bottom: 9px; color: var(--accent); font-size: 11px; font-weight: 800; }
+.wizard-secondary-heading span { display: block; margin-top: 2px; color: var(--muted); font-size: 9px; font-weight: 600; }
+.wizard-measures-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: stretch; gap: 10px; }
+.wizard-measure-panel { min-width: 0; padding: 12px; border: 1px solid var(--line); border-radius: 14px; background: var(--card); }
+.wizard-measure-panel .wizard-value-display { flex-direction: column; align-items: center; gap: 0; padding: 1px 0 10px; }
+.wizard-measure-panel .wizard-value-display b { font-size: 25px; }
+.wizard-measure-panel .wizard-value-display span { font-size: 10px; text-align: center; }
+.wizard-measure-panel .wizard-preset-row, .wizard-measure-panel .wizard-percent-picks { gap: 5px; }
+.wizard-measure-panel .wizard-preset-row button, .wizard-measure-panel .wizard-percent-picks button { min-height: 32px; padding: 0 7px; font-size: 10px; }
+.wizard-measure-panel .wizard-slider-label { gap: 5px; margin-top: 11px; font-size: 10px; }
+.wizard-measure-panel .wizard-measure-note { margin: 8px 0 0; color: var(--muted); font-size: 10px; line-height: 1.4; text-align: center; }
+.wizard-measure-panel .wizard-measure-note strong { color: var(--text); }
+@media (max-width: 700px) {
+  .wizard-measures-grid { gap: 7px; }
+  .wizard-measure-panel { padding: 9px; }
+  .wizard-measure-panel .wizard-secondary-heading { font-size: 10px; }
+  .wizard-measure-panel .wizard-preset-row, .wizard-measure-panel .wizard-percent-picks { gap: 4px; }
+  .wizard-measure-panel .wizard-preset-row button, .wizard-measure-panel .wizard-percent-picks button { min-height: 30px; padding: 0 5px; font-size: 9px; }
+}

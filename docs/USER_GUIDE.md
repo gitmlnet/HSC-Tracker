@@ -141,7 +141,7 @@ A timer belongs to one target and follows you across pages. It survives a refres
 3. **Finish** logs the real elapsed time. On a time-based target, a full timer finish also marks the target complete; on a progress-based target, minutes alone never complete it.
 4. **Log partial** saves the minutes but leaves the target open for later.
 
-Sessions are rounded to whole minutes with a minimum of one minute. Finishing creates a real, editable session in History. Use the target's circle to open the guided logger and record actual time or cumulative chapter progress.
+Only complete elapsed minutes are logged; stopping before one minute records no session. Finishing creates a real, editable session in History. Use the target's circle to open the guided logger and record actual time or cumulative chapter progress. A completed time target stays checked if you tap its green check; use the separate Reopen control when you intentionally want to reopen it.
 
 ---
 
