@@ -891,3 +891,101 @@ h1, h2, h3, h4 { font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display
   .fast-plan-backdrop, .fast-plan-dialog { animation: none !important; }
   .today-plan-cta, .quick-log-cta, .day-add-button { transition: none; }
 }
+
+/* Readable type scale: keep supporting copy, labels and compact metadata legible at normal viewing distance. */
+:root {
+  --type-caption: 12px;
+  --type-small: 13px;
+  --type-body: 15px;
+  --type-control: 14px;
+}
+body { font-size: var(--type-body); line-height: 1.5; }
+button, input, select, textarea { font-family: inherit; }
+input, select, textarea { font-size: var(--type-control); }
+label, .field-label { font-size: var(--type-small); line-height: 1.45; }
+.btn, .icon-btn { font-size: 14px; }
+
+/* App chrome and secondary labels */
+.brand strong { font-size: 15px; }
+.brand small, .sidebar-foot p, .command-link { font-size: 12px; }
+.sidebar nav button { font-size: 14px; }
+.eyebrow { font-size: 11px; }
+.topbar-title .eyebrow { font-size: 10.5px; }
+.topbar-title h1 { font-size: 19px; }
+.pill { font-size: 12px; }
+.ring-copy small, .smart-hint, .target-meta { font-size: 12px; }
+.target-name strong, .target-row.compact .target-name strong { font-size: 14px; }
+.target-row.compact .target-meta { font-size: 12px; }
+.hero-stats span, .setup-banner small, .side-note p { font-size: 12.5px; }
+.week-strip-day small, .week-strip-day span { font-size: 11px; }
+.week-strip-day b { font-size: 16px; }
+.week-range p, .review-hint, .review-stats span, .review-day span, .metric span, .bar-row b, .trend-week span { font-size: 12px; }
+.day-head small { font-size: 11px; }
+.day-head b { font-size: 14px; }
+.today-tag { font-size: 10.5px; }
+.day-count { font-size: 12px; }
+.day-capacity, .day-empty, .day-jump, .target-editor label { font-size: 12px; }
+.day-add .smart-input-row input, .target-editor input, .target-editor select { font-size: 12.5px; }
+.history-title b, .history-title span, .history-meta, .pref-row p, .privacy-note { font-size: 12.5px; }
+.setup-group small, .timer-copy span, .palette-result small, .palette-foot { font-size: 12px; }
+.toast { font-size: 14px; }
+.toast button { font-size: 13px; }
+
+/* Planning, guide and install dialogs */
+.install-steps small, .install-foot small, .install-diagnostics-title span, .install-check, .install-check b, .install-browser-note { font-size: 12px; }
+.guide-nav-label, .guide-count { font-size: 11px; }
+.guide-no-results, .guide-block h4, .guide-steps li::before, .guide-examples code, .guide-promo-btn, .guide-brand p { font-size: 12px; }
+.guide-steps b, .guide-steps span, .guide-bullets li, .guide-note p { font-size: 13px; }
+.guide-nav button, .guide-footer .btn, .guide-btn { font-size: 13px; }
+.study-wizard-head .eyebrow { font-size: 11px; }
+.study-wizard-head p, .wizard-step-title small, .wizard-day small, .wizard-day span, .wizard-repeat-toggle span, .wizard-date-pill { font-size: 12px; }
+.study-wizard-progress > div { font-size: 11px; }
+.study-wizard-progress i, .wizard-choice-icon, .wizard-choice b { font-size: 13px; }
+.wizard-choice small, .wizard-paper-tabs button, .wizard-chapter > span, .wizard-chapter b, .wizard-text-link, .wizard-custom-topic label { font-size: 12px; }
+.wizard-mode-toggle button b, .wizard-mode-toggle button small, .wizard-value-display span, .wizard-preset-row button, .wizard-percent-picks button { font-size: 12px; }
+.wizard-slider-label, .wizard-progress-goal > p, .wizard-note, .wizard-error, .study-wizard-footer > span, .wizard-success p { font-size: 12px; }
+.study-wizard-footer .btn, .wizard-success-actions .btn, .wizard-success > .btn, .wizard-priority-toggle { font-size: 13px; }
+.wizard-priority-toggle small { font-size: 11px; }
+.today-action-copy b { font-size: 14px; }
+.today-action-copy small { font-size: 12px; }
+.quick-log-pill { font-size: 10px; }
+
+/* Keep the Fast plan overview compact, but never rely on tiny text for the schedule or controls. */
+.fast-plan-heading .eyebrow { font-size: 10.5px; }
+.fast-plan-heading h2 { font-size: clamp(18px, 2vw, 23px); }
+.fast-plan-heading p { font-size: 12px; }
+.fast-plan-today, .fast-plan-day-button > span, .fast-plan-day-button > small,
+.fast-plan-task small, .fast-plan-empty, .fast-plan-more, .fast-plan-pane-title > span,
+.fast-plan-pane-title small, .fast-plan-subject small, .fast-plan-paper-tabs button,
+.fast-plan-chapter > span, .fast-plan-custom-toggle, .fast-plan-custom label,
+.fast-plan-custom input, .fast-plan-mode-toggle button, .fast-plan-goal-value span,
+.fast-plan-current, .fast-plan-quick-values button, .fast-plan-range,
+.fast-plan-priority, .fast-plan-submit small, .fast-plan-error,
+.fast-plan-feedback, .fast-plan-empty-state { font-size: 12px; }
+.fast-plan-day-button > b { font-size: 20px; }
+.fast-plan-task-name, .fast-plan-chapter b, .fast-plan-submit span { font-size: 12.5px; }
+.fast-plan-pane-title h3 { font-size: 14px; }
+.fast-plan-subject b { font-size: 13px; }
+.fast-plan-subject-icon { font-size: 13px; }
+.fast-plan-submit { min-height: 50px; }
+.fast-plan-priority { min-height: 36px; }
+.fast-plan-quick-values button, .fast-plan-paper-tabs button { min-height: 34px; }
+.fast-plan-day-button { min-height: 55px; }
+
+@media (max-width: 720px) {
+  :root { --type-body: 15px; --type-control: 16px; }
+  .topbar-title h1 { font-size: 17px; }
+  .planner-page .day-head small { font-size: 11px; }
+  .planner-page .day-head b { font-size: 15px; }
+  .planner-page .day-capacity, .planner-page .target-row.compact .target-meta { font-size: 12px; }
+  .study-wizard-head p { font-size: 12px; }
+  .study-wizard-progress > div, .study-wizard-progress i { font-size: 11px; }
+  .wizard-day span, .wizard-day small { font-size: 11px; }
+  .fast-plan-heading h2 { font-size: 16px; }
+  .fast-plan-heading p { font-size: 11px; }
+  .fast-plan-today { font-size: 11px; }
+  .fast-plan-day-button > span, .fast-plan-day-button > small,
+  .fast-plan-task-name, .fast-plan-task small { font-size: 10.5px; }
+  .fast-plan-day-button > b { font-size: 18px; }
+  .fast-plan-subject b, .fast-plan-chapter b { font-size: 12px; }
+}

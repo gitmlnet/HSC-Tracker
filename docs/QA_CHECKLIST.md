@@ -34,7 +34,7 @@ Verification performed on this branch. Every item below was checked against the 
 
 - [x] Desktop sidebar collapses to a persistent, keyboard-accessible icon rail and expands from the top-bar control; mobile retains its independent slide-in drawer, backdrop, close control and Escape handling.
 
-- [x] Typography uses the platform system font stack on Apple devices, including headings.
+- [x] Typography uses the platform system font stack on Apple devices, including headings; supporting copy, form labels, planning metadata and primary Fast plan controls use a larger, consistent readable type scale, with touch form controls at 16px on mobile.
 - [x] Every tinted foreground/background pair used for small text meets at least 4.5:1 contrast (light muted 4.73:1, accent 5.37:1, success 4.81:1, warning 5.01:1, danger 5.14:1).
 - [x] Touch controls enlarged on phones; target actions are always visible on touch devices instead of hover-only.
 - [x] Subject colour rails make targets scannable without adding text.
