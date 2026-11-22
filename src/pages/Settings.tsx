@@ -1,2 +1,123 @@
-import{useState}from"react";import type{ChangeEvent}from"react";import{Bell,Download,Upload,Trash2}from"lucide-react";import type{Dispatch,SetStateAction}from"react";import type{AppData}from"../types";import{emptyData}from"../lib/storage";import{exportJson,parseBackup}from"../lib/backup";
-export default function Settings({data,setData}:{data:AppData;setData:Dispatch<SetStateAction<AppData>>}){const[status,setStatus]=useState("");const importBackup=(e:ChangeEvent<HTMLInputElement>)=>{const file=e.target.files?.[0];if(!file)return;const reader=new FileReader();reader.onload=()=>{try{const next=parseBackup(String(reader.result));const merge=window.confirm("Replace current study records with this backup?\n\nPress Cancel to add the backup records to the current ones.");if(merge)setData(next);else setData(old=>({...old,sessions:[...old.sessions,...next.sessions.filter(s=>!old.sessions.some(x=>x.id===s.id))],plans:[...old.plans,...next.plans.filter(p=>!old.plans.some(x=>x.id===p.id))]}));setStatus("Backup restored successfully.");}catch{setStatus("Import failed: the selected file is not a valid backup.")}};reader.readAsText(file);e.target.value=""};const clear=()=>{if(window.confirm("Delete all study sessions and plans? This cannot be undone unless you have a backup.")){setData(old=>({...emptyData,settings:old.settings}));setStatus("All study data cleared.")}};const askNotification=async()=>{if(!("Notification" in window)){setStatus("Notifications are not supported in this browser.");return}const p=await Notification.requestPermission();setStatus(p==="granted"?"Notifications enabled for reminders.":p==="denied"?"Notifications are blocked by the browser.":"Notification permission was not granted.")};return <div className="stack"><section className="card"><div className="section-head"><div><span className="eyebrow">BACKUP</span><h2>Backup & restore</h2><p className="muted">Save a backup of your study records or restore one when needed.</p></div></div><div className="settings-actions"><button className="secondary" onClick={()=>exportJson(data)}><Download size={17}/> Export backup</button><label className="secondary file-btn"><Upload size={17}/> Import backup<input type="file" accept=".json,application/json" onChange={importBackup}/></label><button className="secondary danger-btn" onClick={clear}><Trash2 size={17}/> Clear data</button></div>{status&&<p className={status.includes("failed")||status.includes("blocked")?"error-note":"save-note"}>{status}</p>}</section><section className="card"><div className="section-head"><div><span className="eyebrow">APPEARANCE</span><h2>Theme</h2></div></div><div className="segmented"><button className={data.settings.theme==="light"?"selected":""} onClick={()=>setData(x=>({...x,settings:{theme:"light"}}))}>Light</button><button className={data.settings.theme==="dark"?"selected":""} onClick={()=>setData(x=>({...x,settings:{theme:"dark"}}))}>Dark</button></div></section><section className="card"><div className="section-head"><div><span className="eyebrow">REMINDERS</span><h2>Notifications</h2><p className="muted">Allow notifications for your planned study reminders.</p></div><Bell size={22}/></div><button className="primary" onClick={askNotification}>Enable notifications</button></section></div>}
+import { useState } from "react";
+import type { ChangeEvent } from "react";
+import { Bell, Download, Moon, ShieldCheck, Sun, Trash2, Upload } from "lucide-react";
+import type { AppData, Group } from "../types";
+import type { AppActions } from "../lib/appTypes";
+import { exportCsv, exportJson, parseBackup } from "../lib/backup";
+import { defaultSettings, emptyData, GROUP_SUBJECTS } from "../lib/storage";
+import { GROUP_LABELS, subjectName } from "../data/subjects";
+import { Card, SectionTitle } from "../components/UI";
+
+const buildTime = new Date(__BUILD_TIMESTAMP__);
+const buildTimeLabel = `${buildTime.getFullYear()}-${String(buildTime.getMonth() + 1).padStart(2, "0")}-${String(buildTime.getDate()).padStart(2, "0")} ${String(buildTime.getHours()).padStart(2, "0")}:${String(buildTime.getMinutes()).padStart(2, "0")}`;
+
+export default function SettingsPage({ data, actions }: { data: AppData; actions: AppActions }) {
+  const [status, setStatus] = useState("");
+  const [confirmClear, setConfirmClear] = useState(false);
+  const s = data.settings;
+  const patch = (values: Partial<AppData["settings"]>) => actions.setData(prev => ({ ...prev, settings: { ...prev.settings, ...values } }));
+
+  const setGroup = (group: Group) => patch({ group, subjects: [...GROUP_SUBJECTS[group]] });
+  const toggleSubject = (id: string) => patch({
+    subjects: s.subjects.includes(id) ? s.subjects.filter(x => x !== id) : [...s.subjects, id]
+  });
+
+  const importBackup = async (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    try {
+      const next = parseBackup(await file.text());
+      const before = data;
+      actions.setData(next);
+      actions.notify("Backup restored", () => actions.setData(before));
+      setStatus("Backup restored successfully. You can undo with the toast.");
+    } catch {
+      setStatus("That file is not a valid HSC Planner backup.");
+    }
+    event.target.value = "";
+  };
+
+  const clearAll = () => {
+    if (!confirmClear) { setConfirmClear(true); return; }
+    if (actions.timer?.targetId && data.targets.some(t => t.id === actions.timer?.targetId)) {
+      setConfirmClear(false);
+      actions.notify("Finish the active timer before clearing the workspace");
+      return;
+    }
+    const before = data;
+    actions.setData({ ...emptyData, settings: { ...defaultSettings(), theme: s.theme, onboarded: true, group: s.group, subjects: s.subjects } });
+    setConfirmClear(false);
+    actions.notify("All plans and sessions cleared", () => actions.setData(before));
+    setStatus("Workspace cleared. Undo is available in the toast.");
+  };
+
+  return (
+    <div className="page settings-page">
+      <div className="page-head">
+        <span className="eyebrow">SETTINGS</span>
+        <h1>Make the planner yours</h1>
+        <p>Your group, subjects, exam date and goals shape every recommendation.</p>
+      </div>
+
+      <Card>
+        <SectionTitle eyebrow="STUDENT PROFILE" title="Your setup" detail="Change this whenever your plan needs to change." />
+        <div className="settings-grid">
+          <label>Student group
+            <select value={s.group} onChange={e => setGroup(e.target.value as Group)}>
+              {(Object.keys(GROUP_LABELS) as Group[]).map(g => <option key={g} value={g}>{GROUP_LABELS[g]}</option>)}
+            </select>
+          </label>
+          <label>HSC exam date<input type="date" value={s.examDate} onChange={e => patch({ examDate: e.target.value })} /></label>
+          <label>Daily study goal (minutes)<input type="number" min="15" max="720" step="15" value={s.dailyGoalMinutes} onChange={e => patch({ dailyGoalMinutes: Math.max(15, Number(e.target.value) || 150) })} /></label>
+        </div>
+        <div className="subject-picker">
+          <span className="field-label">Subjects in your plan</span>
+          <div className="chips">
+            {[...new Set([...s.subjects, ...GROUP_SUBJECTS[s.group]])].map(id => (
+              <button key={id} className={`chip ${s.subjects.includes(id) ? "selected" : ""}`} onClick={() => toggleSubject(id)}>
+                {subjectName(id, s)} {s.subjects.includes(id) ? "✓" : "+"}
+              </button>
+            ))}
+          </div>
+        </div>
+      </Card>
+
+      <Card>
+        <SectionTitle eyebrow="PREFERENCES" title="Appearance & reminders" />
+        <div className="pref-row">
+          <div><b>Theme</b><p>A calm dark mode for late-night sessions.</p></div>
+          <div className="segmented">
+            <button className={s.theme === "light" ? "selected" : ""} onClick={() => patch({ theme: "light" })}><Sun size={15} /> Light</button>
+            <button className={s.theme === "dark" ? "selected" : ""} onClick={() => patch({ theme: "dark" })}><Moon size={15} /> Dark</button>
+          </div>
+        </div>
+        <div className="pref-row">
+          <div><b>Gentle reminders</b><p>Notification while the app is open; browsers cannot guarantee delivery after they are closed.</p></div>
+          <label className="switch"><input type="checkbox" checked={s.reminders.enabled} onChange={e => patch({ reminders: { ...s.reminders, enabled: e.target.checked } })} /><span /></label>
+        </div>
+        {s.reminders.enabled && (
+          <div className="settings-grid">
+            <label>Daily digest time<input type="time" value={s.reminders.dailyDigest} onChange={e => patch({ reminders: { ...s.reminders, dailyDigest: e.target.value } })} /></label>
+            <button className="btn secondary" onClick={async () => {
+              if (!("Notification" in window)) { setStatus("This browser does not support notifications."); return; }
+              const result = await Notification.requestPermission();
+              setStatus(result === "granted" ? "Notifications enabled." : "Notification permission was not granted.");
+            }}><Bell size={15} /> Enable browser permission</button>
+          </div>
+        )}
+      </Card>
+
+      <Card>
+        <SectionTitle eyebrow="YOUR DATA" title="Backup & safety" detail="Everything stays on this device unless you export it." />
+        <div className="backup-actions">
+          <button className="btn secondary" onClick={() => exportJson(data)}><Download size={16} /> Export backup</button>
+          <button className="btn secondary" onClick={() => exportCsv(data)}><Download size={16} /> Export study CSV</button>
+          <label className="btn secondary file-btn"><Upload size={16} /> Import backup<input type="file" accept=".json,application/json" onChange={importBackup} /></label>
+          <button className={`btn ghost danger ${confirmClear ? "confirm" : ""}`} onClick={clearAll} onBlur={() => setConfirmClear(false)}><Trash2 size={16} /> {confirmClear ? "Click again to erase everything" : "Clear workspace"}</button>
+        </div>
+        {status && <p className="status-note">{status}</p>}
+        <p className="privacy-note"><ShieldCheck size={16} /> No account, no tracking, no records sent anywhere. Export a backup before clearing browser data. <time dateTime={buildTime.toISOString()}>{buildTimeLabel}</time></p>
+      </Card>
+    </div>
+  );
+}
