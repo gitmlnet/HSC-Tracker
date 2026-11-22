@@ -118,6 +118,8 @@ The command palette still supports page navigation (`go planner`) and guide topi
 
 Today is the execution screen — the only one you need while studying.
 
+The full-width weekly dashboard sits near the top of Today. Use the arrows to review another Saturday–Friday week, select a day to inspect its targets, and use its Plan target, Log study or Planner actions. It shows target completion, study time, active days and each day's progress. Focus points are earned at 10 per 15 logged minutes plus 15 for each completed target, with a progress bar toward the next 100-point milestone. These points are a motivational summary of saved study activity, not a grade.
+
 | Area | What it shows |
 | --- | --- |
 | Header | Date, greeting, exam countdown, consecutive-day streak |

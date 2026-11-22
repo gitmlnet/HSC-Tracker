@@ -228,7 +228,7 @@ export default function StudyWizard({
 
   return (
     <div className="study-wizard-backdrop" onMouseDown={onClose}>
-      <div ref={dialogRef} className="study-wizard" role="dialog" aria-modal="true" aria-labelledby="study-wizard-title" onMouseDown={event => event.stopPropagation()} tabIndex={-1}>
+      <div ref={dialogRef} className={`study-wizard ${mode === "log" ? "study-wizard-log" : ""}`} role="dialog" aria-modal="true" aria-labelledby="study-wizard-title" onMouseDown={event => event.stopPropagation()} tabIndex={-1}>
         <button className="icon-btn study-wizard-close" onClick={onClose} aria-label="Close"><X size={18} /></button>
         <header className="study-wizard-head">
           <div className="study-wizard-mark"><BookOpen size={20} /></div>

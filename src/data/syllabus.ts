@@ -18,7 +18,7 @@ export const syllabus:SyllabusEntry[]=[
 "Cell and Its Structure","Cell Division","Cell Chemistry","Microorganisms","Algae and Fungi","Bryophyta and Pteridophyta","Gymnosperms and Angiosperms","Tissue and Tissue System","Plant Physiology","Plant Reproduction","Biotechnology","Environment, Distribution and Conservation of Organisms"])},
 {id:"biology-2",name:"2nd Paper",chapters:chapters("bio2",[
 "Animal Diversity and Classification","Introduction to Animals","Digestion and Absorption","Blood and Circulation","Breathing and Respiration","Wastes and Excretion","Locomotion and Movement","Coordination and Nervous System","Human Reproduction","Immunity","Genetics and Evolution"])}]},
-{id:"higher-math",name:"Higher Mathematics",papers:[
+{id:"higher-math",name:"HM",papers:[
 {id:"math-1",name:"1st Paper",chapters:chapters("math1",[
 "Matrices and Determinants","Vector","Straight Lines","Circle","Permutation and Combination","Trigonometric Ratios","Trigonometric Ratios of Associated Angles","Functions and Graph of Functions","Differentiation","Integration"])},
 {id:"math-2",name:"2nd Paper",chapters:chapters("math2",[

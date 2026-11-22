@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowLeft, ArrowRight, BookOpen, CalendarPlus, Clock3, Flame, Plus, Target, Timer, TrendingUp } from "lucide-react";
+import { ArrowLeft, ArrowRight, BookOpen, CalendarPlus, Clock3, Flame, Plus, Sparkles, Target, Timer, TrendingUp } from "lucide-react";
 import type { AppData } from "../types";
 import type { AppActions } from "../lib/appTypes";
 import { DAY_NAMES, addDays, daysBetween, formatDuration, localDate, prettyDate, weekDates, weekStart } from "../lib/storage";
@@ -15,6 +15,18 @@ export default function Today({ data, actions }: { data: AppData; actions: AppAc
   const summary = daySummary(today, data);
   const week = weekSummary(dates, data);
   const currentWeekSummary = weekSummary(weekDates(weekStart(today)), data);
+  const activeWeekDays = new Set(week.sessions.filter(session => session.duration > 0 || session.chapterProgress !== undefined).map(session => session.date)).size;
+  const focusPoints = Math.floor(week.loggedMinutes / 15) * 10 + week.done * 15;
+  const pointsIntoMilestone = focusPoints % 100;
+  const pointsToNextMilestone = 100 - pointsIntoMilestone;
+  const nextMilestone = (Math.floor(focusPoints / 100) + 1) * 100;
+  const weeklyEncouragement = focusPoints === 0
+    ? "Your first focus block starts the momentum."
+    : week.rate >= 75
+      ? "Look at you turning plans into progress. Keep that rhythm going."
+      : activeWeekDays >= 3
+        ? "You’re showing up consistently. One more focused session builds on that."
+        : "Great start. Every focused block moves you forward.";
   const selectedSummary = daySummary(selectedWeekDay, data);
   const selectedTargets = data.targets.filter(target => target.date === selectedWeekDay).sort((a, b) => Number(b.priority === "high") - Number(a.priority === "high"));
   const changeDashboardWeek = (offset: number) => {
@@ -73,6 +85,66 @@ export default function Today({ data, actions }: { data: AppData; actions: AppAc
         </button>
       )}
 
+      <Card className="weekly-dashboard-card">
+        <SectionTitle eyebrow={`YOUR WEEK · ${DAY_NAMES[0]} TO ${DAY_NAMES[6]}`} title={weekStart(dashboardWeek) === weekStart(today) ? "Your week at a glance" : "Weekly overview"} detail={`${prettyDate(dates[0], { day: "numeric", month: "short" })} – ${prettyDate(dates[6], { day: "numeric", month: "short" })}`} action={<div className="dashboard-week-nav" aria-label="Choose dashboard week"><button className="icon-btn" onClick={() => changeDashboardWeek(-1)} aria-label="Previous week"><ArrowLeft size={17} /></button><button className="icon-btn" onClick={showCurrentDashboardWeek} aria-label="Current week" title="Current week"><CalendarPlus size={16} /></button><button className="icon-btn" onClick={() => changeDashboardWeek(1)} aria-label="Next week"><ArrowRight size={17} /></button></div>} />
+        <div className="dashboard-week-stats">
+          <div><b>{week.rate}%</b><span>week complete</span></div>
+          <div><b>{week.done}/{week.count}</b><span>targets done</span></div>
+          <div><b>{formatDuration(week.loggedMinutes)}</b><span>time studied</span></div>
+          <div><b>{activeWeekDays}/7</b><span>active study days</span></div>
+        </div>
+        <div className="dashboard-motivation">
+          <div className="dashboard-points-card">
+            <span className="dashboard-points-icon"><Sparkles size={23} /></span>
+            <small>FOCUS POINTS</small>
+            <strong>{focusPoints}</strong>
+            <span>earned this week</span>
+          </div>
+          <div className="dashboard-motivation-main">
+            <h3>{weeklyEncouragement}</h3>
+            <p>Earn 10 points for every 15 minutes logged, plus 15 points for each completed target.</p>
+            <div className="dashboard-reward-label"><span>{focusPoints >= 100 ? `Next milestone · ${nextMilestone} points` : "First milestone · 100 points"}</span><b>{pointsToNextMilestone} to go</b></div>
+            <div className="dashboard-reward-meter" role="progressbar" aria-label="Progress to next weekly points milestone" aria-valuemin={0} aria-valuemax={100} aria-valuenow={pointsIntoMilestone}><i style={{ width: `${pointsIntoMilestone}%` }} /></div>
+            <small>{activeWeekDays ? `${activeWeekDays} active study day${activeWeekDays === 1 ? "" : "s"} so far` : "A 15-minute session earns your first focus points"}</small>
+          </div>
+        </div>
+          <div className="week-strip week-strip-dashboard">
+            {dates.map(date => {
+              const s = daySummary(date, data);
+              const isToday = date === today;
+              const selected = date === selectedWeekDay;
+              return (
+                <button key={date} className={`week-strip-day ${isToday ? "today" : ""} ${selected ? "selected" : ""}`} onClick={() => setSelectedWeekDay(date)} aria-pressed={selected} aria-label={`${DAY_NAMES[dates.indexOf(date)]}, ${prettyDate(date)}: ${s.done} of ${s.count} complete, ${s.progressPercent}% progress`} title="Select day details">
+                  <small>{DAY_NAMES[dates.indexOf(date)]}</small>
+                  <b>{new Date(`${date}T12:00:00`).getDate()}</b>
+                  <i style={{ height: `${Math.max(4, s.progressPercent)}%` }} />
+                  <span>{s.done}/{s.count}</span>
+                  <em>{s.count ? `${s.progressPercent}%` : "—"}</em>
+                </button>
+              );
+            })}
+          </div>
+          <div className="dashboard-day-detail">
+            <div className="dashboard-day-summary">
+              <div><small>{selectedWeekDay === today ? "TODAY" : DAY_NAMES[dates.indexOf(selectedWeekDay)]}</small><b>{prettyDate(selectedWeekDay, { day: "numeric", month: "short" })}</b></div>
+              <div><strong>{selectedSummary.done}/{selectedSummary.count}</strong><small>{formatDuration(selectedSummary.loggedMinutes)} studied · {selectedSummary.progressPercent}% average</small></div>
+            </div>
+            {selectedTargets.length ? <div className="dashboard-target-list">
+              {selectedTargets.slice(0, 4).map(target => <button key={target.id} className="dashboard-target" onClick={() => actions.openStudyWizard("log", selectedWeekDay, target.id)}>
+                <span className={`dashboard-target-dot ${isDone(target, data.sessions) ? "done" : ""}`} />
+                <span><b>{targetLabel(target, data.settings)}</b><small>{isDone(target, data.sessions) ? "Complete" : `${progressOf(target, data.sessions)}% complete`} · {formatDuration(loggedMinutes(target, data.sessions))} logged</small></span>
+                <ArrowRight size={14} />
+              </button>)}
+              {selectedTargets.length > 4 && <small className="dashboard-more-targets">+{selectedTargets.length - 4} more targets · open planner to see all</small>}
+            </div> : <p className="dashboard-empty">No targets planned for this day yet. Add one or log a study session.</p>}
+            <div className="dashboard-day-actions">
+              <button className="btn primary" onClick={() => actions.openStudyWizard("plan", selectedWeekDay)}><Plus size={14} /> Plan target</button>
+              <button className="btn secondary" onClick={() => actions.openStudyWizard("log", selectedWeekDay)}><Clock3 size={14} /> Log study</button>
+              <button className="btn ghost" onClick={() => actions.go("planner", selectedWeekDay)}>Planner <ArrowRight size={14} /></button>
+            </div>
+          </div>
+        </Card>
+
       <div className="today-grid">
         <div className="today-main">
           <Card>
@@ -110,49 +182,7 @@ export default function Today({ data, actions }: { data: AppData; actions: AppAc
         </div>
 
         <aside className="today-side">
-          <Card className="weekly-dashboard-card">
-            <SectionTitle eyebrow="WEEKLY DASHBOARD" title={weekStart(dashboardWeek) === weekStart(today) ? "Your week at a glance" : "Weekly overview"} detail={`${prettyDate(dates[0], { day: "numeric", month: "short" })} – ${prettyDate(dates[6], { day: "numeric", month: "short" })}`} action={<div className="dashboard-week-nav" aria-label="Choose dashboard week"><button className="icon-btn" onClick={() => changeDashboardWeek(-1)} aria-label="Previous week"><ArrowLeft size={15} /></button><button className="icon-btn" onClick={showCurrentDashboardWeek} aria-label="Current week" title="Current week"><CalendarPlus size={14} /></button><button className="icon-btn" onClick={() => changeDashboardWeek(1)} aria-label="Next week"><ArrowRight size={15} /></button></div>} />
-            <div className="dashboard-week-stats">
-              <div><b>{week.rate}%</b><span>complete</span></div>
-              <div><b>{week.done}/{week.count}</b><span>targets done</span></div>
-              <div><b>{formatDuration(week.loggedMinutes)}</b><span>study time</span></div>
-            </div>
-            <div className="week-strip week-strip-dashboard">
-              {dates.map(date => {
-                const s = daySummary(date, data);
-                const isToday = date === today;
-                const selected = date === selectedWeekDay;
-                return (
-                  <button key={date} className={`week-strip-day ${isToday ? "today" : ""} ${selected ? "selected" : ""}`} onClick={() => setSelectedWeekDay(date)} aria-pressed={selected} aria-label={`${DAY_NAMES[dates.indexOf(date)]}, ${prettyDate(date)}: ${s.done} of ${s.count} complete, ${s.progressPercent}% progress`} title="Select day details">
-                    <small>{DAY_NAMES[dates.indexOf(date)]}</small>
-                    <b>{new Date(`${date}T12:00:00`).getDate()}</b>
-                    <i style={{ height: `${Math.max(4, s.progressPercent)}%` }} />
-                    <span>{s.done}/{s.count}</span>
-                    <em>{s.count ? `${s.progressPercent}%` : "—"}</em>
-                  </button>
-                );
-              })}
-            </div>
-            <div className="dashboard-day-detail">
-              <div className="dashboard-day-summary">
-                <div><small>{selectedWeekDay === today ? "TODAY" : DAY_NAMES[dates.indexOf(selectedWeekDay)]}</small><b>{prettyDate(selectedWeekDay, { day: "numeric", month: "short" })}</b></div>
-                <div><strong>{selectedSummary.done}/{selectedSummary.count}</strong><small>{formatDuration(selectedSummary.loggedMinutes)} studied · {selectedSummary.progressPercent}% average</small></div>
-              </div>
-              {selectedTargets.length ? <div className="dashboard-target-list">
-                {selectedTargets.slice(0, 4).map(target => <button key={target.id} className="dashboard-target" onClick={() => actions.openStudyWizard("log", selectedWeekDay, target.id)}>
-                  <span className={`dashboard-target-dot ${isDone(target, data.sessions) ? "done" : ""}`} />
-                  <span><b>{targetLabel(target, data.settings)}</b><small>{isDone(target, data.sessions) ? "Complete" : `${progressOf(target, data.sessions)}% complete`} · {formatDuration(loggedMinutes(target, data.sessions))} logged</small></span>
-                  <ArrowRight size={14} />
-                </button>)}
-                {selectedTargets.length > 4 && <small className="dashboard-more-targets">+{selectedTargets.length - 4} more targets · open planner to see all</small>}
-              </div> : <p className="dashboard-empty">No targets planned for this day yet. Add one or log a study session.</p>}
-              <div className="dashboard-day-actions">
-                <button className="btn primary" onClick={() => actions.openStudyWizard("plan", selectedWeekDay)}><Plus size={14} /> Plan target</button>
-                <button className="btn secondary" onClick={() => actions.openStudyWizard("log", selectedWeekDay)}><Clock3 size={14} /> Log study</button>
-                <button className="btn ghost" onClick={() => actions.go("planner", selectedWeekDay)}>Planner <ArrowRight size={14} /></button>
-              </div>
-            </div>
-          </Card>
+
           <Card className="side-note">
             <div><Timer size={19} /></div>
             <div><b>Timer tip</b><p>Press <kbd>Ctrl</kbd> + <kbd>K</kbd> to plan, log or jump to a page.</p></div>

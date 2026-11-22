@@ -1119,3 +1119,130 @@ label, .field-label { font-size: var(--type-small); line-height: 1.45; }
   .wizard-delete-button { padding-inline: 7px !important; }
   .study-wizard-footer { flex-wrap: wrap; }
 }
+
+/* Make logging as easy to read as planning, without changing the planner editor. */
+.study-wizard-log { width: min(980px, calc(100vw - 36px)); max-height: min(920px, calc(100dvh - 36px)); }
+.study-wizard-log .study-wizard-head { padding: 30px 34px 20px; }
+.study-wizard-log .study-wizard-head h2 { font-size: clamp(27px, 3vw, 34px); }
+.study-wizard-log .study-wizard-head p { max-width: 620px; font-size: 15px; }
+.study-wizard-log .study-wizard-progress > div { font-size: 13px; }
+.study-wizard-log .study-wizard-progress i { width: 30px; height: 30px; font-size: 12px; }
+.study-wizard-log .wizard-step-content { width: min(930px, 100%); padding: 24px 30px 30px; }
+.study-wizard-log .wizard-step-title { gap: 13px; margin-bottom: 20px; }
+.study-wizard-log .wizard-step-title b { font-size: 18px; }
+.study-wizard-log .wizard-step-title small { font-size: 14px; }
+.study-wizard-log .wizard-measures-grid { gap: 18px; }
+.study-wizard-log .wizard-measure-panel { padding: 22px; border-radius: 18px; }
+.study-wizard-log .wizard-secondary-heading { margin-bottom: 15px; font-size: 15px; }
+.study-wizard-log .wizard-secondary-heading span { font-size: 12px; }
+.study-wizard-log .wizard-measure-panel .wizard-value-display { padding-bottom: 17px; }
+.study-wizard-log .wizard-measure-panel .wizard-value-display b { font-size: 38px; }
+.study-wizard-log .wizard-measure-panel .wizard-value-display span { font-size: 14px; }
+.study-wizard-log .wizard-measure-panel .wizard-preset-row,
+.study-wizard-log .wizard-measure-panel .wizard-percent-picks { gap: 8px; }
+.study-wizard-log .wizard-measure-panel .wizard-preset-row button,
+.study-wizard-log .wizard-measure-panel .wizard-percent-picks button { min-height: 44px; padding: 0 13px; border-radius: 11px; font-size: 13px; }
+.study-wizard-log .wizard-measure-panel .wizard-slider-label { gap: 9px; margin-top: 17px; font-size: 13px; }
+.study-wizard-log .wizard-measure-panel .wizard-measure-note { margin-top: 13px; font-size: 12px; line-height: 1.5; }
+.study-wizard-log .wizard-mode-toggle { gap: 12px; margin-bottom: 20px; }
+.study-wizard-log .wizard-mode-toggle button { min-height: 82px; padding: 14px; }
+.study-wizard-log .wizard-mode-toggle button b { font-size: 15px; }
+.study-wizard-log .wizard-mode-toggle button small { font-size: 12px; }
+.study-wizard-log .wizard-choice b { font-size: 15px; }
+.study-wizard-log .wizard-choice small { font-size: 12px; }
+.study-wizard-log .wizard-chapter b { font-size: 13px; }
+.study-wizard-log .wizard-paper-tabs button { min-height: 40px; font-size: 13px; }
+.study-wizard-log .wizard-error { font-size: 14px; }
+.study-wizard-log .study-wizard-footer { gap: 12px; padding: 16px 24px; }
+.study-wizard-log .study-wizard-footer .btn { min-height: 46px; font-size: 14px; }
+
+/* The weekly overview is the main event on Today: full width, high contrast, and reward-focused. */
+.weekly-dashboard-card { padding: clamp(22px, 3.2vw, 38px); overflow: hidden; background: radial-gradient(ellipse at 92% 0%, color-mix(in srgb, var(--accent) 13%, transparent), transparent 44%), linear-gradient(135deg, var(--card), color-mix(in srgb, var(--accent-soft) 34%, var(--card))); }
+.weekly-dashboard-card > .section-title { align-items: center; margin-bottom: 23px; }
+.weekly-dashboard-card > .section-title h2 { font-size: clamp(22px, 2.5vw, 30px); }
+.weekly-dashboard-card > .section-title p { font-size: 14px; }
+.dashboard-week-nav { gap: 7px; }
+.dashboard-week-nav .icon-btn { width: 40px; height: 40px; }
+.dashboard-week-nav .icon-btn svg { width: 19px; height: 19px; }
+.dashboard-week-stats { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin: 0 0 17px; }
+.dashboard-week-stats > div { padding: 14px 16px; border-radius: 14px; background: color-mix(in srgb, var(--card) 80%, transparent); }
+.dashboard-week-stats b { font-size: 23px; }
+.dashboard-week-stats span { font-size: 12px; }
+.dashboard-motivation { display: grid; grid-template-columns: minmax(190px, 235px) minmax(0, 1fr); gap: 20px; align-items: stretch; margin: 0 0 17px; padding: 18px; border: 1px solid color-mix(in srgb, var(--accent) 22%, var(--line)); border-radius: 18px; background: color-mix(in srgb, var(--card) 77%, transparent); }
+.dashboard-points-card { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 178px; padding: 17px; border-radius: 15px; color: var(--accent-ink); background: linear-gradient(145deg, var(--accent), color-mix(in srgb, var(--accent) 58%, #253276)); text-align: center; box-shadow: 0 10px 24px color-mix(in srgb, var(--accent) 22%, transparent); }
+.dashboard-points-icon { display: grid; place-items: center; width: 42px; height: 42px; margin-bottom: 8px; border-radius: 14px; background: color-mix(in srgb, var(--accent-ink) 17%, transparent); }
+.dashboard-points-card small { font-size: 10px; font-weight: 900; letter-spacing: .12em; }
+.dashboard-points-card strong { margin: 2px 0; font-family: "Plus Jakarta Sans", sans-serif; font-size: 42px; line-height: 1.1; }
+.dashboard-points-card > span:last-child { font-size: 12px; opacity: .88; }
+.dashboard-motivation-main { display: flex; flex-direction: column; justify-content: center; min-width: 0; padding: 6px 10px; }
+.dashboard-motivation-main h3 { font-size: clamp(19px, 2.2vw, 25px); line-height: 1.25; }
+.dashboard-motivation-main > p { margin: 8px 0 17px; color: var(--muted); font-size: 13px; line-height: 1.55; }
+.dashboard-reward-label { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 7px; color: var(--muted); font-size: 12px; }
+.dashboard-reward-label b { color: var(--accent); white-space: nowrap; }
+.dashboard-reward-meter { height: 11px; overflow: hidden; border-radius: 99px; background: color-mix(in srgb, var(--accent) 13%, var(--card-2)); }
+.dashboard-reward-meter i { display: block; height: 100%; min-width: 3px; border-radius: inherit; background: linear-gradient(90deg, var(--accent), var(--accent-2)); transition: width .35s ease; }
+.dashboard-motivation-main > small { margin-top: 8px; color: var(--muted); font-size: 11px; }
+.week-strip-dashboard { gap: 10px; }
+.week-strip-dashboard .week-strip-day { min-height: 142px; padding: 13px 6px 11px; gap: 5px; border-radius: 14px; }
+.week-strip-dashboard .week-strip-day small { font-size: 12px; }
+.week-strip-dashboard .week-strip-day b { font-size: 22px; }
+.week-strip-dashboard .week-strip-day span { font-size: 12px; }
+.week-strip-dashboard .week-strip-day em { font-size: 11px; }
+.week-strip-dashboard .week-strip-day.selected { transform: translateY(-2px); background: var(--accent-soft); }
+.dashboard-day-detail { gap: 14px; margin-top: 18px; padding-top: 17px; }
+.dashboard-day-summary small { font-size: 12px; }
+.dashboard-day-summary b { font-size: 18px; }
+.dashboard-day-summary strong { font-size: 17px; }
+.dashboard-target-list { grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 8px; }
+.dashboard-target { min-height: 57px; gap: 11px; padding: 10px 12px; border-radius: 12px; }
+.dashboard-target b { font-size: 13px; }
+.dashboard-target small { font-size: 11px; }
+.dashboard-target-dot { width: 11px; height: 11px; }
+.dashboard-day-actions { gap: 9px; }
+.dashboard-day-actions .btn { min-height: 42px; padding: 0 13px; font-size: 12px; }
+.dashboard-day-actions .btn svg { width: 16px; }
+
+@media (max-width: 700px) {
+  .study-wizard-log { width: 100%; height: 100dvh; max-height: none; }
+  .study-wizard-log .study-wizard-head { padding: max(20px, env(safe-area-inset-top)) 48px 15px; }
+  .study-wizard-log .study-wizard-head h2 { font-size: 25px; }
+  .study-wizard-log .study-wizard-head p { font-size: 13px; }
+  .study-wizard-log .wizard-step-content { padding: 16px 12px 19px; }
+  .study-wizard-log .wizard-measures-grid { gap: 9px; }
+  .study-wizard-log .wizard-measure-panel { padding: 12px; }
+  .study-wizard-log .wizard-measure-panel .wizard-value-display b { font-size: 31px; }
+  .study-wizard-log .wizard-measure-panel .wizard-preset-row button,
+  .study-wizard-log .wizard-measure-panel .wizard-percent-picks button { min-height: 39px; padding: 0 8px; font-size: 12px; }
+  .study-wizard-log .wizard-measure-panel .wizard-measure-note { font-size: 11px; }
+  .weekly-dashboard-card { padding: 20px 16px; }
+  .weekly-dashboard-card > .section-title { align-items: flex-start; gap: 8px; }
+  .weekly-dashboard-card > .section-title h2 { font-size: 21px; }
+  .weekly-dashboard-card > .section-title p { font-size: 12px; }
+  .dashboard-week-nav { gap: 2px; }
+  .dashboard-week-nav .icon-btn { width: 34px; height: 34px; }
+  .dashboard-week-stats { gap: 7px; }
+  .dashboard-week-stats > div { padding: 9px 7px; }
+  .dashboard-week-stats b { font-size: 17px; }
+  .dashboard-week-stats span { font-size: 10px; }
+  .dashboard-motivation { grid-template-columns: 105px minmax(0, 1fr); gap: 10px; padding: 10px; }
+  .dashboard-points-card { min-height: 148px; padding: 10px 5px; }
+  .dashboard-points-icon { width: 32px; height: 32px; margin-bottom: 5px; }
+  .dashboard-points-icon svg { width: 18px; }
+  .dashboard-points-card small { font-size: 8px; }
+  .dashboard-points-card strong { font-size: 32px; }
+  .dashboard-points-card > span:last-child { font-size: 10px; }
+  .dashboard-motivation-main { padding: 3px 1px; }
+  .dashboard-motivation-main h3 { font-size: 16px; }
+  .dashboard-motivation-main > p { margin: 5px 0 10px; font-size: 10.5px; }
+  .dashboard-reward-label { gap: 5px; font-size: 9px; }
+  .dashboard-reward-label b { font-size: 9px; }
+  .dashboard-reward-meter { height: 8px; }
+  .dashboard-motivation-main > small { font-size: 9px; }
+  .week-strip-dashboard { gap: 4px; }
+  .week-strip-dashboard .week-strip-day { min-height: 114px; padding: 9px 1px 7px; gap: 4px; }
+  .week-strip-dashboard .week-strip-day small { font-size: 9px; }
+  .week-strip-dashboard .week-strip-day b { font-size: 17px; }
+  .week-strip-dashboard .week-strip-day span { font-size: 9px; }
+  .week-strip-dashboard .week-strip-day em { font-size: 8px; }
+  .dashboard-target-list { grid-template-columns: 1fr; }
+}
