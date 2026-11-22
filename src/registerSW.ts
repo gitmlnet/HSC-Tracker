@@ -1,3 +1,7 @@
+// Keep this in sync with public/sw.js so visits on older worker URLs can
+// trigger an immediate, cache-busted update to the current offline shell.
+const SW_VERSION = "v8";
+
 export function registerSW() {
   if (!("serviceWorker" in navigator) || !window.isSecureContext) return;
 
@@ -6,6 +10,7 @@ export function registerSW() {
   const register = () => {
     const url = new URL("sw.js", document.baseURI);
     if (!import.meta.env.PROD) url.searchParams.set("dev", "1");
+    else url.searchParams.set("v", SW_VERSION);
     navigator.serviceWorker.register(url.href, {
       scope: new URL("./", document.baseURI).pathname,
       updateViaCache: "none"

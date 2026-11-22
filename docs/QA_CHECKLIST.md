@@ -23,7 +23,7 @@ Verification performed on this branch. Every item below was checked against the 
 - [x] Manifest served at `/manifest.webmanifest` with `standalone` display, 192/512 PNG icons, shortcuts and relative scope.
 - [x] The `beforeinstallprompt` event is captured at module load (before React effects), retained until the user clicks Install, and its accepted/dismissed result is handled without losing the native prompt.
 - [x] The Install dialog checks HTTPS, same-origin manifest scope, standalone display, both actual PNG icon dimensions/content types, and an activated service worker; it gives platform-correct install steps and explains that a webpage cannot force an unsupported browser to install.
-- [x] Service worker registers in production and contains a `fetch` handler; offline shell and assets are cached under a versioned cache and old caches are removed on activate.
+- [x] Service worker registers in production with a versioned, cache-busted script URL and contains a `fetch` handler; offline shell and assets are cached under the matching versioned cache and old caches are removed on activate.
 - [x] Stable Vercel alias serves the current manifest and service worker; per-deployment URLs are SSO-protected by the Vercel team.
 - [x] Relative Vite base verified by serving `dist/` at `/HSC-Tracker/`: HTML, manifest, icons, JS/CSS and SW all resolve.
 
