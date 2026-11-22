@@ -13,7 +13,10 @@ Verification performed on this branch. Every item below was checked against the 
 - [x] Weekly Planner keeps weekday headers, week navigation, Fast plan and Plan a target; Copy last week, Auto-plan and Clear week are removed, and each day retains its own Add target control. Target names and metadata stay within their day cards, with planner-only small-text contrast and sizing adjustments.
 - [x] Today summarizes target progress proportionally: three targets at 80% show 80%, and targets at 50%, 60% and 70% average to 60%.
 - [x] Logging a planned target keeps its selected metric primary and displays the optional secondary measure beside it in the same panel; both measures save in one session.
-- [x] Completed time targets cannot be accidentally reopened by tapping the green check; reopening has a separate explicit action and added logs default to the unfilled planned duration.
+- [x] The target-row check always opens its logger (including completed time targets); logged time is edited as a cumulative target total and only the increase is appended, while saving an unchanged total is blocked.
+- [x] Target rows expose only timer controls; clicking the task opens its adjust flow, where Delete requires a second confirmation and preserves existing history.
+- [x] Weekly dashboard offers week navigation, seven selectable days, target/time/progress summaries, and selected-day plan/log/planner actions.
+- [x] Planner day task lists are height-capped with aligned day columns, so a busy day does not stretch the weekly board indefinitely.
 - [x] Stopping a timer before a full minute records no fabricated one-minute session.
 - [x] Settings privacy footer includes a build date and time without an explanatory label.
 - [x] Fast Plan's seven-day overview makes every existing task an edit control; saving updates that target (including its date) without duplicating it, and adding a new plan remains available.

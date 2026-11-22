@@ -1,15 +1,31 @@
-import { ArrowRight, BookOpen, CalendarPlus, Clock3, Flame, Plus, Target, Timer, TrendingUp } from "lucide-react";
+import { useState } from "react";
+import { ArrowLeft, ArrowRight, BookOpen, CalendarPlus, Clock3, Flame, Plus, Target, Timer, TrendingUp } from "lucide-react";
 import type { AppData } from "../types";
 import type { AppActions } from "../lib/appTypes";
-import { DAY_NAMES, daysBetween, formatDuration, localDate, prettyDate, weekDates, weekStart } from "../lib/storage";
-import { coverage, daySummary, streakDays, weekSummary } from "../lib/selectors";
+import { DAY_NAMES, addDays, daysBetween, formatDuration, localDate, prettyDate, weekDates, weekStart } from "../lib/storage";
+import { coverage, daySummary, isDone, loggedMinutes, progressOf, streakDays, weekSummary } from "../lib/selectors";
+import { targetLabel } from "../data/subjects";
 import { Card, EmptyState, Meter, ProgressRing, SectionTitle, TargetRow } from "../components/UI";
 
 export default function Today({ data, actions }: { data: AppData; actions: AppActions }) {
   const today = localDate();
-  const dates = weekDates(weekStart(today));
+  const [dashboardWeek, setDashboardWeek] = useState(today);
+  const [selectedWeekDay, setSelectedWeekDay] = useState(today);
+  const dates = weekDates(weekStart(dashboardWeek));
   const summary = daySummary(today, data);
   const week = weekSummary(dates, data);
+  const currentWeekSummary = weekSummary(weekDates(weekStart(today)), data);
+  const selectedSummary = daySummary(selectedWeekDay, data);
+  const selectedTargets = data.targets.filter(target => target.date === selectedWeekDay).sort((a, b) => Number(b.priority === "high") - Number(a.priority === "high"));
+  const changeDashboardWeek = (offset: number) => {
+    const nextStart = addDays(weekStart(dashboardWeek), offset * 7);
+    setDashboardWeek(nextStart);
+    setSelectedWeekDay(nextStart);
+  };
+  const showCurrentDashboardWeek = () => {
+    setDashboardWeek(today);
+    setSelectedWeekDay(today);
+  };
   const targets = data.targets.filter(t => t.date === today).sort((a, b) => Number(b.priority === "high") - Number(a.priority === "high"));
   const streak = streakDays(data.sessions, today);
   const cov = coverage(data.settings, data);
@@ -49,7 +65,7 @@ export default function Today({ data, actions }: { data: AppData; actions: AppAc
         <ProgressRing value={summary.progressPercent} size={132} sub="average progress" />
       </Card>
 
-      {week.count === 0 && (
+      {currentWeekSummary.count === 0 && (
         <button className="setup-banner" onClick={() => actions.openStudyWizard("plan")}>
           <span className="banner-icon"><CalendarPlus size={22} /></span>
           <span><b>Your week is still open</b><small>Plan Saturday to Friday in one sitting — you can change anything, anytime.</small></span>
@@ -63,7 +79,7 @@ export default function Today({ data, actions }: { data: AppData; actions: AppAc
             <SectionTitle
               eyebrow="EXECUTE"
               title="Today's targets"
-              detail="Tap a target to log actual time or update chapter progress."
+              detail="Tap the check to log; tap target details to adjust the plan."
               action={<button className="btn ghost" onClick={() => actions.go("planner")}>Open planner <ArrowRight size={15} /></button>}
             />
             {targets.length ? (
@@ -94,21 +110,47 @@ export default function Today({ data, actions }: { data: AppData; actions: AppAc
         </div>
 
         <aside className="today-side">
-          <Card>
-            <SectionTitle eyebrow="THIS WEEK" title={`${week.done}/${week.count} targets`} detail={`${formatDuration(week.loggedMinutes)} studied so far`} />
-            <div className="week-strip">
+          <Card className="weekly-dashboard-card">
+            <SectionTitle eyebrow="WEEKLY DASHBOARD" title={weekStart(dashboardWeek) === weekStart(today) ? "Your week at a glance" : "Weekly overview"} detail={`${prettyDate(dates[0], { day: "numeric", month: "short" })} – ${prettyDate(dates[6], { day: "numeric", month: "short" })}`} action={<div className="dashboard-week-nav" aria-label="Choose dashboard week"><button className="icon-btn" onClick={() => changeDashboardWeek(-1)} aria-label="Previous week"><ArrowLeft size={15} /></button><button className="icon-btn" onClick={showCurrentDashboardWeek} aria-label="Current week" title="Current week"><CalendarPlus size={14} /></button><button className="icon-btn" onClick={() => changeDashboardWeek(1)} aria-label="Next week"><ArrowRight size={15} /></button></div>} />
+            <div className="dashboard-week-stats">
+              <div><b>{week.rate}%</b><span>complete</span></div>
+              <div><b>{week.done}/{week.count}</b><span>targets done</span></div>
+              <div><b>{formatDuration(week.loggedMinutes)}</b><span>study time</span></div>
+            </div>
+            <div className="week-strip week-strip-dashboard">
               {dates.map(date => {
                 const s = daySummary(date, data);
                 const isToday = date === today;
+                const selected = date === selectedWeekDay;
                 return (
-                  <button key={date} className={`week-strip-day ${isToday ? "today" : ""}`} onClick={() => actions.go("planner", date)} title={prettyDate(date)}>
+                  <button key={date} className={`week-strip-day ${isToday ? "today" : ""} ${selected ? "selected" : ""}`} onClick={() => setSelectedWeekDay(date)} aria-pressed={selected} aria-label={`${DAY_NAMES[dates.indexOf(date)]}, ${prettyDate(date)}: ${s.done} of ${s.count} complete, ${s.progressPercent}% progress`} title="Select day details">
                     <small>{DAY_NAMES[dates.indexOf(date)]}</small>
                     <b>{new Date(`${date}T12:00:00`).getDate()}</b>
-                    <i style={{ height: Math.min(100, s.plannedMinutes ? s.loggedMinutes / s.plannedMinutes * 100 : 0) + "%" }} />
+                    <i style={{ height: `${Math.max(4, s.progressPercent)}%` }} />
                     <span>{s.done}/{s.count}</span>
+                    <em>{s.count ? `${s.progressPercent}%` : "—"}</em>
                   </button>
                 );
               })}
+            </div>
+            <div className="dashboard-day-detail">
+              <div className="dashboard-day-summary">
+                <div><small>{selectedWeekDay === today ? "TODAY" : DAY_NAMES[dates.indexOf(selectedWeekDay)]}</small><b>{prettyDate(selectedWeekDay, { day: "numeric", month: "short" })}</b></div>
+                <div><strong>{selectedSummary.done}/{selectedSummary.count}</strong><small>{formatDuration(selectedSummary.loggedMinutes)} studied · {selectedSummary.progressPercent}% average</small></div>
+              </div>
+              {selectedTargets.length ? <div className="dashboard-target-list">
+                {selectedTargets.slice(0, 4).map(target => <button key={target.id} className="dashboard-target" onClick={() => actions.openStudyWizard("log", selectedWeekDay, target.id)}>
+                  <span className={`dashboard-target-dot ${isDone(target, data.sessions) ? "done" : ""}`} />
+                  <span><b>{targetLabel(target, data.settings)}</b><small>{isDone(target, data.sessions) ? "Complete" : `${progressOf(target, data.sessions)}% complete`} · {formatDuration(loggedMinutes(target, data.sessions))} logged</small></span>
+                  <ArrowRight size={14} />
+                </button>)}
+                {selectedTargets.length > 4 && <small className="dashboard-more-targets">+{selectedTargets.length - 4} more targets · open planner to see all</small>}
+              </div> : <p className="dashboard-empty">No targets planned for this day yet. Add one or log a study session.</p>}
+              <div className="dashboard-day-actions">
+                <button className="btn primary" onClick={() => actions.openStudyWizard("plan", selectedWeekDay)}><Plus size={14} /> Plan target</button>
+                <button className="btn secondary" onClick={() => actions.openStudyWizard("log", selectedWeekDay)}><Clock3 size={14} /> Log study</button>
+                <button className="btn ghost" onClick={() => actions.go("planner", selectedWeekDay)}>Planner <ArrowRight size={14} /></button>
+              </div>
             </div>
           </Card>
           <Card className="side-note">

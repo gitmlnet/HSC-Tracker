@@ -70,11 +70,10 @@ Fast plan supports day-by-day scheduling. Each day's Add target control remains 
 
 ### Working with a target
 
-- **Tap the row or its edit button** to adjust its date, subject, chapter and goal in the guided flow.
+- **Tap the target details** to adjust its date, subject, chapter and goal in the guided flow. Delete is inside this adjust flow and asks you to confirm before removing the target; existing history is kept and can be restored with Undo.
 - **Drag the row** onto another day if you prefer; drag-and-drop is optional.
-- **Trash** removes the target; **Undo** restores it for five seconds.
-- **Circle** opens the target's logging flow for actual time or chapter progress.
-- **Play** starts the focus timer on that target.
+- **Check mark** opens logging, even when a time target is complete. For a planned target, time is shown as a cumulative total; increase it from 15 to 30 minutes, for example, and only the extra 15 minutes is added. An unchanged total is not logged again.
+- **Play** starts the focus timer on that target. Stopping it before one minute logs no time.
 - The coloured rail on the left of each row identifies the subject at a glance.
 
 ### Weekly review

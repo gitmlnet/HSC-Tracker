@@ -1,11 +1,10 @@
 import type { DragEvent, ElementType, KeyboardEvent, ReactNode } from "react";
-import { ArrowUpRight, Check, Circle, CornerDownLeft, Pause, Play, RotateCcw, Square, Trash2, WandSparkles } from "lucide-react";
+import { Check, Circle, CornerDownLeft, Pause, Play, Square, WandSparkles } from "lucide-react";
 import type { AppData, Target } from "../types";
 import type { AppActions } from "../lib/appTypes";
 import { targetLabel } from "../data/subjects";
 import { formatDuration, localDate } from "../lib/storage";
-import { chapterProgressOf, isDone, loggedMinutes, progressOf, sessionsFor } from "../lib/selectors";
-import { uncompleteTarget } from "../lib/targetActions";
+import { chapterProgressOf, isDone, loggedMinutes, progressOf } from "../lib/selectors";
 import { parseSmartInput, type Draft } from "../lib/parser";
 
 export function Card({ children, className = "" }: { children: ReactNode; className?: string }) {
@@ -108,12 +107,11 @@ export function SmartInput({ settings, value, onChange, onSubmit, placeholder, d
   );
 }
 
-export function TargetRow({ target, data, actions, onEdit, onDelete, onDragStart, compact = false }: {
+export function TargetRow({ target, data, actions, onEdit, onDragStart, compact = false }: {
   target: Target;
   data: AppData;
   actions: AppActions;
   onEdit?: () => void;
-  onDelete?: () => void;
   onDragStart?: (event: DragEvent<HTMLDivElement>) => void;
   compact?: boolean;
 }) {
@@ -125,17 +123,6 @@ export function TargetRow({ target, data, actions, onEdit, onDelete, onDragStart
 
   const chapterProgress = chapterProgressOf(target, data.sessions);
   const logStudy = () => actions.openStudyWizard("log", target.date, target.id);
-  const reopenTarget = () => {
-    const progressBefore = sessionsFor(target, data.sessions).map(s => ({ id: s.id, progress: s.progress }));
-    actions.setData(prev => uncompleteTarget(prev, target));
-    actions.notify("Target reopened", () => actions.setData(prev => ({
-      ...prev,
-      sessions: prev.sessions.map(s => {
-        const old = progressBefore.find(item => item.id === s.id);
-        return old && old.progress !== s.progress ? { ...s, progress: old.progress } : s;
-      })
-    })));
-  };
 
   return (
     <div
@@ -145,7 +132,7 @@ export function TargetRow({ target, data, actions, onEdit, onDelete, onDragStart
       onDragStart={onDragStart}
       aria-label={label}
     >
-      <button className={`check ${done ? "checked" : ""}`} onClick={logStudy} disabled={done && target.trackingMode !== "progress"} aria-label={done && target.trackingMode !== "progress" ? `${label} is complete` : `Log study for ${label}`} title={done && target.trackingMode !== "progress" ? "Completed" : "Log study"}>
+      <button className={`check ${done ? "checked" : ""}`} onClick={logStudy} aria-label={`Log study for ${label}`} title={done ? "Update logged total" : "Log study"}>
         {done ? <Check size={14} /> : <Circle size={15} />}
       </button>
       <div className="target-main" onClick={onEdit} role={onEdit ? "button" : undefined} tabIndex={onEdit ? 0 : undefined} onKeyDown={e => { if (onEdit && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); onEdit(); } }}>
@@ -162,7 +149,6 @@ export function TargetRow({ target, data, actions, onEdit, onDelete, onDragStart
         </div>
       </div>
       <div className="target-actions">
-        {done && target.trackingMode !== "progress" && <button className="icon-btn" onClick={reopenTarget} title="Reopen target" aria-label={`Reopen ${label}`}><RotateCcw size={15} /></button>}
         {timerHere ? (
           <>
             <button className="icon-btn" onClick={actions.pauseTimer} title="Pause timer" aria-label="Pause timer"><Pause size={15} /></button>
@@ -171,8 +157,6 @@ export function TargetRow({ target, data, actions, onEdit, onDelete, onDragStart
         ) : (
           <button className="icon-btn" onClick={() => actions.startTimer(target.id)} title="Start timer" aria-label="Start timer"><Play size={15} /></button>
         )}
-        {onEdit && <button className="icon-btn" onClick={onEdit} title="Edit target" aria-label="Edit target"><ArrowUpRight size={15} /></button>}
-        {onDelete && <button className="icon-btn danger" onClick={onDelete} title="Delete target" aria-label="Delete target"><Trash2 size={15} /></button>}
       </div>
     </div>
   );

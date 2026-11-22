@@ -18,15 +18,6 @@ export default function Planner({ data, actions, anchor, setAnchor }: {
   const dates = useMemo(() => weekDates(start), [start]);
   const today = localDate();
   const week = weekSummary(dates, data);
-  const protectsTimer = (targets: Target[]) => {
-    const activeId = actions.timer?.targetId;
-    if (activeId && targets.some(target => target.id === activeId)) {
-      actions.notify("Finish the active timer before changing that target");
-      return true;
-    }
-    return false;
-  };
-
   const addRevisionDay = () => {
     const quietest = dates.reduce((best, date) => daySummary(date, data).plannedMinutes < daySummary(best, data).plannedMinutes ? date : best, dates[6]);
     const additions = buildWeek("revision", [quietest], data, false).targets;
@@ -57,13 +48,6 @@ export default function Planner({ data, actions, anchor, setAnchor }: {
       ...prev,
       targets: prev.targets.map(t => t.id === id ? { ...t, ...patch, updatedAt: new Date().toISOString() } : t)
     }));
-  };
-
-  const removeTarget = (id: string) => {
-    const target = data.targets.find(t => t.id === id);
-    if (!target || protectsTimer([target])) return;
-    actions.setData(prev => ({ ...prev, targets: prev.targets.filter(t => t.id !== id) }));
-    actions.notify("Target removed", () => actions.setData(prev => ({ ...prev, targets: [...prev.targets, target] })));
   };
 
   const onDrop = (event: DragEvent<HTMLDivElement>, date: string) => {
@@ -116,7 +100,6 @@ export default function Planner({ data, actions, anchor, setAnchor }: {
                       actions={actions}
                       compact
                       onEdit={() => actions.openStudyWizard("plan", target.date, target.id)}
-                      onDelete={() => removeTarget(target.id)}
                       onDragStart={e => e.dataTransfer.setData("text/plain", target.id)}
                     />
 

@@ -1054,3 +1054,68 @@ label, .field-label { font-size: var(--type-small); line-height: 1.45; }
   .wizard-measure-panel .wizard-preset-row, .wizard-measure-panel .wizard-percent-picks { gap: 4px; }
   .wizard-measure-panel .wizard-preset-row button, .wizard-measure-panel .wizard-percent-picks button { min-height: 30px; padding: 0 5px; font-size: 9px; }
 }
+
+/* Weekly dashboard interactions */
+.dashboard-week-nav { display: flex; align-items: center; gap: 4px; }
+.dashboard-week-nav .icon-btn { width: 30px; height: 30px; }
+.dashboard-week-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin: -2px 0 12px; }
+.dashboard-week-stats > div { display: grid; gap: 2px; min-width: 0; padding: 9px 10px; border: 1px solid var(--line); border-radius: 11px; background: var(--card-2); }
+.dashboard-week-stats b { overflow: hidden; color: var(--accent); font-family: "Plus Jakarta Sans", sans-serif; font-size: 17px; text-overflow: ellipsis; white-space: nowrap; }
+.dashboard-week-stats span { color: var(--muted); font-size: 10px; }
+.week-strip-dashboard { gap: 5px; }
+.week-strip-dashboard .week-strip-day { min-height: 92px; padding: 8px 2px 7px; }
+.week-strip-dashboard .week-strip-day > :not(i) { position: relative; z-index: 1; }
+.week-strip-dashboard .week-strip-day small { font-size: 9px; }
+.week-strip-dashboard .week-strip-day b { font-size: 14px; }
+.week-strip-dashboard .week-strip-day span { font-size: 9px; font-weight: 700; }
+.week-strip-dashboard .week-strip-day em { color: var(--muted); font-size: 8px; font-style: normal; }
+.week-strip-dashboard .week-strip-day.selected { border-color: var(--accent); box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 12%, transparent); }
+.week-strip-dashboard .week-strip-day i { z-index: 0; background: color-mix(in srgb, var(--accent) 17%, transparent); }
+.dashboard-day-detail { display: grid; gap: 10px; margin-top: 13px; padding-top: 12px; border-top: 1px solid var(--line); }
+.dashboard-day-summary { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.dashboard-day-summary > div { display: grid; gap: 2px; }
+.dashboard-day-summary > div:last-child { text-align: right; }
+.dashboard-day-summary small { color: var(--muted); font-size: 9px; }
+.dashboard-day-summary > div:first-child small { color: var(--accent); font-weight: 800; letter-spacing: .06em; }
+.dashboard-day-summary b { font-size: 14px; }
+.dashboard-day-summary strong { font-size: 13px; }
+.dashboard-target-list { display: grid; gap: 5px; }
+.dashboard-target { display: flex; align-items: center; gap: 8px; min-width: 0; padding: 7px 8px; border: 1px solid var(--line); border-radius: 9px; background: var(--card-2); color: var(--text); text-align: left; }
+.dashboard-target > span:nth-child(2) { display: grid; flex: 1; min-width: 0; gap: 1px; }
+.dashboard-target b { overflow: hidden; font-size: 10.5px; text-overflow: ellipsis; white-space: nowrap; }
+.dashboard-target small { color: var(--muted); font-size: 9px; }
+.dashboard-target > svg { flex: none; color: var(--accent); }
+.dashboard-target-dot { width: 8px; height: 8px; flex: none; border: 1.5px solid var(--muted); border-radius: 50%; }
+.dashboard-target-dot.done { border-color: var(--green); background: var(--green); }
+.dashboard-more-targets, .dashboard-empty { color: var(--muted); font-size: 10px; line-height: 1.45; }
+.dashboard-day-actions { display: flex; gap: 5px; flex-wrap: wrap; }
+.dashboard-day-actions .btn { min-height: 32px; padding: 0 8px; font-size: 10px; }
+.dashboard-day-actions .btn svg { width: 13px; }
+
+/* Keep the seven day cards aligned and stop a busy day from stretching the whole planner. */
+.planner-board { align-items: stretch; }
+.planner-page .day-column { display: flex; flex-direction: column; }
+.planner-page .day-targets { flex: 1 1 auto; min-height: 38px; max-height: 320px; overflow-y: auto; align-content: start; scrollbar-gutter: stable; padding-right: 2px; }
+
+/* The target editor owns deletion, with a deliberate second confirmation. */
+.wizard-delete-button { white-space: nowrap; }
+.wizard-delete-overlay { position: absolute; inset: 0; z-index: 5; display: grid; place-items: center; padding: 18px; background: rgba(10, 14, 26, .56); }
+.wizard-delete-confirm { width: min(390px, 100%); padding: 22px; border: 1px solid var(--line); border-radius: 18px; background: var(--card); box-shadow: var(--shadow-lg); text-align: center; }
+.wizard-delete-icon { display: grid; place-items: center; width: 42px; height: 42px; margin: 0 auto 10px; border-radius: 13px; color: var(--red); background: var(--red-soft); }
+.wizard-delete-confirm h3 { font-size: 17px; }
+.wizard-delete-confirm p { margin: 8px 0 17px; color: var(--muted); font-size: 12px; line-height: 1.5; }
+.wizard-delete-buttons { display: flex; justify-content: center; gap: 8px; }
+.wizard-delete-buttons .btn { min-height: 38px; font-size: 11px; }
+@media (max-width: 520px) {
+  .dashboard-week-stats > div { padding: 7px 6px; }
+  .dashboard-week-stats b { font-size: 15px; }
+  .week-strip-dashboard { gap: 3px; }
+  .week-strip-dashboard .week-strip-day { min-height: 86px; padding-inline: 1px; }
+  .week-strip-dashboard .week-strip-day small { font-size: 8px; letter-spacing: 0; }
+  .week-strip-dashboard .week-strip-day b { font-size: 13px; }
+  .week-strip-dashboard .week-strip-day span { font-size: 8px; }
+  .week-strip-dashboard .week-strip-day em { font-size: 7px; }
+  .dashboard-day-actions .btn { flex: 1; justify-content: center; padding-inline: 5px; }
+  .wizard-delete-button { padding-inline: 7px !important; }
+  .study-wizard-footer { flex-wrap: wrap; }
+}

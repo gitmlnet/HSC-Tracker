@@ -1,5 +1,5 @@
 import { useMemo, useRef, useState } from "react";
-import { BookOpen, CalendarDays, Check, ChevronLeft, ChevronRight, Clock3, Percent, Plus, Sparkles, Star, X } from "lucide-react";
+import { BookOpen, CalendarDays, Check, ChevronLeft, ChevronRight, Clock3, Percent, Plus, Sparkles, Star, Trash2, X } from "lucide-react";
 import type { AppData, Target, TrackingMode } from "../types";
 import type { AppActions } from "../lib/appTypes";
 import { subjectOptions, targetLabel } from "../data/subjects";
@@ -25,6 +25,9 @@ export default function StudyWizard({
   const initialSubject = target?.subjectId || subjectList[0]?.id || "";
   const initialSubjectOption = subjectList.find(subject => subject.id === initialSubject);
   const initialPaper = target?.paperId || initialSubjectOption?.papers[0]?.id || "";
+  const existingLoggedMinutes = mode === "log" && target
+    ? sessionsFor(target, data.sessions).reduce((sum, session) => sum + session.duration, 0)
+    : 0;
   const [step, setStep] = useState<Step>(target && mode === "log" ? 3 : 0);
   const [date, setDate] = useState(target?.date || initialDate);
   const [subjectId, setSubjectId] = useState(initialSubject);
@@ -38,9 +41,8 @@ export default function StudyWizard({
   const [priority, setPriority] = useState<Target["priority"]>(target?.priority || "normal");
   const [minutes, setMinutes] = useState(() => {
     if (mode !== "log") return target?.plannedMinutes || 60;
-    const alreadyLogged = target ? sessionsFor(target, data.sessions).reduce((sum, session) => sum + session.duration, 0) : 0;
-    const remaining = target ? Math.max(15, (target.plannedMinutes || 30) - alreadyLogged) : 30;
-    return Math.min(60, remaining);
+    if (existingLoggedMinutes > 0) return existingLoggedMinutes;
+    return Math.min(60, Math.max(15, target?.plannedMinutes || 30));
   });
   const [progressGoal, setProgressGoal] = useState(() => target && mode === "log"
     ? chapterProgressOf(target, data.sessions)
@@ -48,6 +50,7 @@ export default function StudyWizard({
   const [quickKind, setQuickKind] = useState<TrackingMode>(target?.trackingMode || "time");
   const [secondaryEnabled, setSecondaryEnabled] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [deleteConfirm, setDeleteConfirm] = useState(false);
   const [customInput, setCustomInput] = useState(target?.topic || "");
   const [error, setError] = useState("");
   const dialogRef = useRef<HTMLDivElement>(null);
@@ -167,10 +170,20 @@ export default function StudyWizard({
     }
 
     const logDate = target ? localDate() : date;
-    const logMinutes = recordsTime ? minutes : 0;
+    if (target && recordsTime && minutes < existingLoggedMinutes) {
+      setError(`This target already has ${formatDuration(existingLoggedMinutes)} logged. Adjust the total here or edit individual sessions in History.`);
+      return;
+    }
+    const logMinutes = recordsTime
+      ? target ? Math.max(0, minutes - existingLoggedMinutes) : minutes
+      : 0;
+    if (target && recordsTime && logMinutes === 0 && !recordsProgress) {
+      setError(`No new time to add — ${formatDuration(existingLoggedMinutes)} is already logged. Increase the total or add a progress update.`);
+      return;
+    }
     const start = logMinutes > 0 ? timeBefore(logMinutes) : clockNow();
     const taskProgress = target && target.trackingMode !== "progress" && logMinutes > 0
-      && loggedTargetMinutes + logMinutes >= target.plannedMinutes ? 100 : undefined;
+      && existingLoggedMinutes + logMinutes >= target.plannedMinutes ? 100 : undefined;
     const chapterSnapshot = recordsProgress ? progressGoal : undefined;
     const session = makeSession({
       ...(target ? { targetId: target.id } : {}),
@@ -186,16 +199,31 @@ export default function StudyWizard({
       ...(chapterSnapshot !== undefined ? { chapterProgress: chapterSnapshot } : {})
     });
     actions.setData(previous => ({ ...previous, sessions: [...previous.sessions, session] }));
+    const totalLogged = target ? existingLoggedMinutes + logMinutes : logMinutes;
     actions.notify(recordsTime && recordsProgress
-      ? `${formatDuration(logMinutes)} and ${progressGoal}% chapter progress logged`
+      ? logMinutes > 0
+        ? `${formatDuration(logMinutes)} added · ${formatDuration(totalLogged)} total, chapter progress ${progressGoal}%`
+        : `Chapter progress saved at ${progressGoal}%`
       : recordsTime
-        ? `${formatDuration(logMinutes)} logged`
+        ? target ? `${formatDuration(logMinutes)} added · ${formatDuration(totalLogged)} total logged` : `${formatDuration(logMinutes)} logged`
         : `Chapter progress saved at ${progressGoal}%`);
     onClose();
   };
 
-  const linkedSessions = target ? sessionsFor(target, data.sessions) : [];
-  const loggedTargetMinutes = linkedSessions.reduce((sum, session) => sum + session.duration, 0);
+  const deleteTarget = () => {
+    if (!target) return;
+    if (actions.timer?.targetId === target.id) {
+      actions.notify("Finish or pause the active timer before deleting this target");
+      setDeleteConfirm(false);
+      return;
+    }
+    actions.setData(previous => ({ ...previous, targets: previous.targets.filter(item => item.id !== target.id) }));
+    actions.notify("Target deleted", () => actions.setData(previous => ({ ...previous, targets: [...previous.targets, target] })));
+    setDeleteConfirm(false);
+    onClose();
+  };
+
+  const loggedTargetMinutes = existingLoggedMinutes;
   const labels = mode === "plan" ? ["Day", "Subject", "Chapter", "Goal"] : ["Day", "Subject", "Chapter", "Log"];
 
   return (
@@ -291,12 +319,12 @@ export default function StudyWizard({
                   </div>}
                   {mode === "log" ? <div className="wizard-measures-grid">
                     <div className="wizard-measure-panel wizard-primary-measure">
-                      <div className="wizard-secondary-heading">Primary · {activeMode === "time" ? "study time" : "chapter progress"}</div>
+                      <div className="wizard-secondary-heading">Primary · {activeMode === "time" ? target ? "total study time" : "study time" : "chapter progress"}</div>
                       {activeMode === "time" ? <>
-                        <div className="wizard-value-display"><b>{formatDuration(minutes)}</b><span>actual study time</span></div>
-                        <div className="wizard-preset-row">{[15, 30, 45, 60, 90, 120].map(value => <button key={value} className={minutes === value ? "selected" : ""} onClick={() => setMinutes(value)} aria-pressed={minutes === value}>{formatDuration(value)}</button>)}</div>
-                        <label className="wizard-slider-label">Adjust time<input type="range" min="15" max="300" step="15" value={minutes} onChange={event => setMinutes(Number(event.target.value))} aria-label="Actual study minutes" /></label>
-                        {target && target.trackingMode === "time" && <p className="wizard-measure-note">Logged {formatDuration(loggedTargetMinutes)} of {formatDuration(target.plannedMinutes)}. Default is remaining planned time.</p>}
+                        <div className="wizard-value-display"><b>{formatDuration(minutes)}</b><span>{target ? "total time after this log" : "actual study time"}</span></div>
+                        <div className="wizard-preset-row">{[15, 30, 45, 60, 90, 120].map(value => <button key={value} disabled={Boolean(target && value < existingLoggedMinutes)} className={minutes === value ? "selected" : ""} onClick={() => setMinutes(value)} aria-pressed={minutes === value}>{formatDuration(value)}</button>)}</div>
+                        <label className="wizard-slider-label">{target ? "Set total time logged" : "Adjust time"}<input type="range" min={target ? existingLoggedMinutes : 15} max={Math.max(300, existingLoggedMinutes + 300)} step="15" value={minutes} onChange={event => setMinutes(Number(event.target.value))} aria-label={target ? "Total study minutes" : "Actual study minutes"} /></label>
+                        {target && <p className="wizard-measure-note">Already logged {formatDuration(existingLoggedMinutes)}. Set the total; only the difference is added.</p>}
                       </> : <>
                         <div className="wizard-value-display"><b>{progressGoal}%</b><span>chapter progress now</span></div>
                         <p className="wizard-measure-note">Current chapter estimate: <strong>{currentChapterProgress}%</strong></p>
@@ -305,11 +333,12 @@ export default function StudyWizard({
                       </>}
                     </div>
                     <div className="wizard-measure-panel wizard-secondary-measure">
-                      <div className="wizard-secondary-heading">Secondary · {secondaryMode === "time" ? "study time" : "chapter progress"} <span>optional · adjust to include</span></div>
+                      <div className="wizard-secondary-heading">Secondary · {secondaryMode === "time" ? target ? "total study time" : "study time" : "chapter progress"} <span>optional · adjust to include</span></div>
                       {secondaryMode === "time" ? <>
-                        <div className="wizard-value-display"><b>{formatDuration(minutes)}</b><span>actual study time</span></div>
-                        <div className="wizard-preset-row">{[15, 30, 45, 60, 90, 120].map(value => <button key={value} className={minutes === value ? "selected" : ""} onClick={() => { setMinutes(value); setSecondaryEnabled(true); }} aria-pressed={minutes === value}>{formatDuration(value)}</button>)}</div>
-                        <label className="wizard-slider-label">Adjust time<input type="range" min="15" max="300" step="15" value={minutes} onChange={event => { setMinutes(Number(event.target.value)); setSecondaryEnabled(true); }} aria-label="Secondary actual study minutes" /></label>
+                        <div className="wizard-value-display"><b>{formatDuration(minutes)}</b><span>{target ? "total time after this log" : "actual study time"}</span></div>
+                        <div className="wizard-preset-row">{[15, 30, 45, 60, 90, 120].map(value => <button key={value} disabled={Boolean(target && value < existingLoggedMinutes)} className={minutes === value ? "selected" : ""} onClick={() => { setMinutes(value); setSecondaryEnabled(true); }} aria-pressed={minutes === value}>{formatDuration(value)}</button>)}</div>
+                        <label className="wizard-slider-label">{target ? "Set total time logged" : "Adjust time"}<input type="range" min={target ? existingLoggedMinutes : 15} max={Math.max(300, existingLoggedMinutes + 300)} step="15" value={minutes} onChange={event => { setMinutes(Number(event.target.value)); setSecondaryEnabled(true); }} aria-label={target ? "Secondary total study minutes" : "Secondary actual study minutes"} /></label>
+                        {target && <p className="wizard-measure-note">Already logged {formatDuration(existingLoggedMinutes)}. Only the difference is added.</p>}
                       </> : <>
                         <div className="wizard-value-display"><b>{progressGoal}%</b><span>overall chapter completion</span></div>
                         <p className="wizard-measure-note">Current estimate: <strong>{currentChapterProgress}%</strong></p>
@@ -336,8 +365,18 @@ export default function StudyWizard({
           )}
         </div>
 
+        {deleteConfirm && <div className="wizard-delete-overlay">
+          <section className="wizard-delete-confirm" role="alertdialog" aria-modal="true" aria-labelledby="wizard-delete-title" aria-describedby="wizard-delete-description">
+            <div className="wizard-delete-icon"><Trash2 size={20} /></div>
+            <h3 id="wizard-delete-title">Delete this target?</h3>
+            <p id="wizard-delete-description">“{target ? targetLabel(target, data.settings) : "This target"}” will be removed from your plan. Existing study logs will remain in History.</p>
+            <div className="wizard-delete-buttons"><button className="btn ghost" onClick={() => setDeleteConfirm(false)}>Keep target</button><button className="btn danger" onClick={deleteTarget}>Delete target</button></div>
+          </section>
+        </div>}
+
         {!saved && <footer className="study-wizard-footer">
           <button className="btn ghost" onClick={stepIndex > 0 ? goBack : onClose}>{stepIndex > 0 ? <><ChevronLeft size={15} /> Back</> : "Cancel"}</button>
+          {mode === "plan" && target && <button className="btn ghost danger wizard-delete-button" onClick={() => setDeleteConfirm(true)}><Trash2 size={14} /> Delete</button>}
           <span>{mode === "plan" ? `${prettyDate(date)}${repeatDates.length ? ` + ${repeatDates.length} day${repeatDates.length > 1 ? "s" : ""}` : ""}` : prettyDate(date)}</span>
           {step === 3 ? <button className="btn primary" onClick={save} disabled={mode === "plan" && trackingMode === "progress" && progressGoal <= currentChapterProgress}>{mode === "plan" ? isEdit ? "Save target" : "Add target" : "Save log"}<Check size={15} /></button>
             : step === 0 ? <button className="btn primary" onClick={() => { setError(""); setStep(hasLoggedTarget ? 3 : 1); }}>Next <ChevronRight size={15} /></button>
