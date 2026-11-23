@@ -8,6 +8,7 @@ import { weekSummary } from "./lib/selectors";
 import TimerDock from "./components/TimerDock";
 import CommandPalette from "./components/CommandPalette";
 import InstallDialog from "./components/InstallDialog";
+import InstallPromptBanner from "./components/InstallPromptBanner";
 import GuideDialog from "./components/GuideDialog";
 import { PAGE_GUIDE } from "./data/guide";
 import { promptInstall, usePwaInstall } from "./lib/pwaInstall";
@@ -45,6 +46,7 @@ export default function App() {
   });
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [installInfoOpen, setInstallInfoOpen] = useState(false);
+  const [installBannerVisible, setInstallBannerVisible] = useState(false);
   const [guideOpen, setGuideOpen] = useState(false);
   const [guideSection, setGuideSection] = useState("start");
   const [studyWizard, setStudyWizard] = useState<{ mode: "plan" | "log"; date: string; targetId?: string } | null>(null);
@@ -59,6 +61,39 @@ export default function App() {
   useEffect(() => {
     loadData().then(d => { setData(d); document.documentElement.dataset.theme = d.settings.theme; }).finally(() => setReady(true));
   }, []);
+
+  // Show a lightweight install invitation after the planner is ready. This is
+  // an in-page invitation; only the browser can provide its native install UI.
+  useEffect(() => {
+    if (!ready || !data.settings.onboarded || installState.installed) return;
+    try {
+      const dismissedUntil = Number(localStorage.getItem("hsc-pwa-install-dismissed-until") || 0);
+      if (dismissedUntil > Date.now()) return;
+    } catch { /* Keep the invitation available when storage is restricted. */ }
+    const id = window.setTimeout(() => setInstallBannerVisible(true), 2500);
+    return () => window.clearTimeout(id);
+  }, [ready, data.settings.onboarded, installState.installed]);
+
+  const dismissInstallBanner = useCallback((days = 30) => {
+    setInstallBannerVisible(false);
+    try {
+      localStorage.setItem("hsc-pwa-install-dismissed-until", String(Date.now() + days * 24 * 60 * 60 * 1000));
+    } catch { /* Dismissal remains effective for this render. */ }
+  }, []);
+
+  const handleInstallBanner = useCallback(async () => {
+    const result = await promptInstall();
+    if (result === "accepted") {
+      setInstallBannerVisible(false);
+      return;
+    }
+    if (result === "dismissed") {
+      dismissInstallBanner(7);
+      return;
+    }
+    setInstallBannerVisible(false);
+    setInstallInfoOpen(true);
+  }, [dismissInstallBanner]);
 
   useEffect(() => { if (ready) saveData(data).catch(() => undefined); }, [data, ready]);
   useEffect(() => { document.documentElement.dataset.theme = data.settings.theme; }, [data.settings.theme]);
@@ -222,6 +257,7 @@ export default function App() {
       </aside>
 
       <div className="main-area">
+        {installBannerVisible && !installState.installed && <InstallPromptBanner canInstall={Boolean(installState.prompt)} onInstall={() => void handleInstallBanner()} onDismiss={() => dismissInstallBanner()} />}
         <header className="topbar">
           <button className="icon-btn menu-btn" onClick={() => setMenuOpen(v => !v)} aria-label={menuOpen ? "Close navigation" : "Open navigation"} aria-expanded={menuOpen}><Menu size={20} /></button>
           <button className="icon-btn sidebar-toggle" onClick={() => setSidebarCollapsed(value => !value)} aria-label={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"} title={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"} aria-controls="primary-sidebar" aria-expanded={!sidebarCollapsed}>
